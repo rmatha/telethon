@@ -4,7 +4,7 @@
 			<Header row="0" col="0" colSpan="3"/>
 			<StackLayout row="1" col="0" colSpan="3">
 				<Image src="~/assets/telethon_root.png" />
-				<Button text="RéinitialiserR les tables de la base" @tap="reinit" />
+				<Button text="Réinitialiser les tables de la base" @tap="reinit" />
 				<Button text="Recharger l'équipe e cours" @tap="reinitEquipe" />
 				<Button text="Recharger les scores" @tap="reinitScore" />
 				<Label :text="currentEquipe" />
