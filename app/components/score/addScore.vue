@@ -6,7 +6,7 @@
 					<Label :text="defiNom" />
 					<Label text="Sélection du participant :" />
 					<ListPicker v-if="isNouveauScore" ref="profilEnCours" :items="$store.state.profilsEquipe" textField="lastname" />
-					<Label :text="participant"/>
+					<Label v-else :text="participant"/>
 					<Label text="Score obtenu :"/>
 					<ListPicker ref="scoreEnCours" :items="scoresRef" :selectedIndex="selectedIndexScore" />
 					
