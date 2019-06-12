@@ -1,5 +1,5 @@
 <template>
-	<page>
+	<page class="page" actionBarHidden="true">
 		<GridLayout rows="auto, *, auto" columns="*">
 			<Header row="0" col="0" />
 			<ScrollView row="1" col="0" >
@@ -14,10 +14,16 @@
 					</StackLayout>
 					<Label text="Commune des défis Téléthon" />
 					<Label :text="$store.state.currentEquipe.commune" />
+
+					<Label text="Votre équipe est Organisateur" v-if="isOrganisateur"  />
+					<Label text="Votre équipe est Coordinateur " v-if="isCoordinateur" />
+
 					
 					<StackLayout orientation="horizontal" >
+						
 						<Label width="85%" class="m-b-20" text="Liste des participants de l'équipe" textWrap="true" />
 						<Image width="15%" src="~/assets/icons/add-256.gif" @tap="addParticipant"/>
+						
 					</StackLayout>
 					<ScrollView >
 						<StackLayout >
@@ -49,6 +55,7 @@
 	
     export default {
         mounted() {
+			console.log(this.EtatAdmin);
         },
 		computed: {			
 			titreEquipe() {
@@ -56,11 +63,31 @@
 					return this.$store.state.currentEquipe.nom;
 				}
 				return "Pas d'équipe en cours";
+			},
+			isOrganisateur(){
+						if (this.$store.state.currentEquipe.admin == 1){
+							console.log("vous etes organisateur") 
+							return true;
+						};
+					
+				return false;
+			},
+			isCoordinateur(){
+				if (this.$store.state.currentEquipe.admin == 2 ){
+					console.log("vous etes Coordinateur") 
+					return true;
+				};
+					
+				return false;
 			}
         },
+
+	
+
 		data() {
             return {
 				imageSrc : null,
+				LibelleAdmin : 0,
             };
         },
 		

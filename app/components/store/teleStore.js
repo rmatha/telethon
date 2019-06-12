@@ -37,14 +37,14 @@ const store = new Vuex.Store({
 			nom : "",
 			commune : "",
 			code : "",
-			admin : false,
+			admin : 0,
 		},
 		equipes : [{
 			id : -1,
 			nom: "",
 			commune : "",
 			code : "",
-			admin : false,
+			admin : 0,
 		}],
 		scoresEquipe : []
     },
@@ -201,7 +201,7 @@ const store = new Vuex.Store({
 				}, error => {
 					console.log("CREATE TABLE ERROR categorie", error);
 				});
-				db.execSQL("CREATE TABLE IF NOT EXISTS equipe (id INTEGER PRIMARY KEY AUTOINCREMENT, nom varchar(256), commune varchar(256), current tinyint(1), code varchar(256), admin tinyint(1))").then(id => {
+				db.execSQL("CREATE TABLE IF NOT EXISTS equipe (id INTEGER PRIMARY KEY AUTOINCREMENT, nom varchar(256), commune varchar(256), current tinyint(1), code varchar(256), admin INTEGER)").then(id => {
 					context.commit("init", { database: db });
 					console.log("Table equipe cree");
 				}, error => {

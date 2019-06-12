@@ -1,5 +1,5 @@
 <template>
-    <page>
+    <page class="page" actionBarHidden="true">
 		<GridLayout rows="auto, *, auto" columns="*, *, *">
 			<Header row="0" col="0" colSpan="3"/>
 			<StackLayout row="1" col="0" colSpan="3" width="100%" height="100%">

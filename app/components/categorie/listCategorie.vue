@@ -17,8 +17,8 @@
 								<Label :text="item.nom"  />
 								<Label :text="item.nom" class="catTitle" />
 								<Label :text="nbDefis(item)" class="catNBDefis" />
-								<Button text="modifier" @tap="addCat(item)" />
-								<Button text="Supprimer" @tap="deleteCat(item)" />
+								<Button text="modifier" v-if="isAdmin" @tap="addCat(item)" />
+								<Button text="Supprimer" v-if="isAdmin" @tap="deleteCat(item)" />
 							</StackLayout>
 						</GridLayout>
 					</GridLayout>
@@ -47,6 +47,12 @@
             },
 			nbDefis() {
 				return item => ("Nombre de défis : ");
+			},
+			isAdmin(){
+				if (this.$store.state.currentEquipe.admin > 1){
+					return true;
+				}
+				return false;
 			},
 			
         },

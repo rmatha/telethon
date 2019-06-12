@@ -24,12 +24,14 @@
 							</StackLayout>
 						</ScrollView>
 						<FloatLabel placeholder="Code de confidentialité" label="code de confidentialité" :valeur="input.code" @updateValeur="updateCodeEquipe" />
-						<GridLayout rows="auto" columns="50,*" marginBottom="5">
-							<Image row="0" col="0" v-if="input.admin" src="~/assets/icons/true.png" @tap="updateOrganisateur"/>
+						<GridLayout rows="auto,auto" columns="50,*" marginBottom="5">
+							<Image row="0" col="0" v-if="isOrganisateur" src="~/assets/icons/true.png" @tap="updateOrganisateur"/>
 							<Image row="0" col="0" v-else src="~/assets/icons/false.png" @tap="updateOrganisateur"/>
 							<Label row="0" col="1" text="Equipe organisatrice" fontSize="14" class="input" />
+							<Image row="1" col="0" v-if="isCoordinateur" src="~/assets/icons/true.png" @tap="updateCoordinateur"/>
+							<Image row="1" col="0" v-else src="~/assets/icons/false.png" @tap="updateCoordinateur"/>
+							<Label row="1" col="1" text="Equipe de coordination Téléthon" fontSize="14" class="input" />
 						</GridLayout>
-						<CheckBox ref="isOrganisateur" text="Organisateur de commune" v-model="input.admin" checked="false" @tap="updateOrganisateur"/>
 						<Button text="Créer l'équipe" @tap="creerEquipe" />
 					</StackLayout>
 					<StackLayout v-if="isExistanteEquipe" >
@@ -82,7 +84,24 @@
 			
 			
         },
-		computed: {			
+		computed: {	
+
+			isOrganisateur(){
+				if (this.input.admin == 1){
+					console.log("Le flag orga est vert");
+					return(true);
+					
+				}
+			},
+
+			isCoordinateur(){
+				if (this.input.admin == 2){
+
+					console.log("Le flag coord est vert");
+					return(true) ;
+				}
+
+			},
 			
 			
         },
@@ -95,7 +114,7 @@
                     nom: "",
                     commune: "",
 					code : "",
-					admin : false,
+					admin : 0,
 				},
 				villesRef: [],
                 villes: [],
@@ -108,7 +127,7 @@
 		
         methods: { 
 			updateOrganisateur() {
-				this.input.admin = false;
+				this.input.admin = 0;
 				prompt({
 				  title: "Code de l'équipe",
 				  message: "Veuillez saisir le code des organisateurs qui vous a été donné par l'équipe de coordination téléthon:",
@@ -119,17 +138,41 @@
 					console.log(`Dialog result: ${result.result}, text: ${result.text}`);
 					if (result.result & (result.text == "16340")) {
 						console.log("c'est un orga");
-						this.input.admin = true;
+						this.input.admin = 1;
+						console.log(this.input.admin)
 					}
 					else {
 						console.log("ce n'est pas un orga");
 					}
 					
 				});
-				let orgaField = this.$refs.isOrganisateur.nativeView;
-				orgaField.checked = this.input.admin;
+				
 				
 			},
+
+			updateCoordinateur() {
+				this.input.admin = 0;
+				prompt({
+				  title: "Code de l'équipe",
+				  message: "Veuillez saisir le code des organisateurs qui vous a été donné par l'équipe de coordination téléthon:",
+				  okButtonText: "OK",
+				  cancelButtonText: "Cancel",
+				  defaultText: "",
+				}).then(result => {
+					console.log(`Dialog result: ${result.result}, text: ${result.text}`);
+					if (result.result & (result.text == "16340")) {
+						console.log("c'est une coordination");
+						this.input.admin = 2;
+					}
+					else {
+						console.log("ce n'est pas une corrdination");
+					}
+					
+				});
+				
+				
+			},
+
 			selectEquipeExistante() { 
 				// récupération de la commune sélectionnée
 				let indexEquipe = this.$refs.equipeEnCours.nativeView;
