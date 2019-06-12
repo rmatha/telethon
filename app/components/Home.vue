@@ -4,12 +4,8 @@
 			<Header row="0" col="0" />
 			<StackLayout row="1" col="0" >
 				<Image src="~/assets/telethon_root.png" />
-<<<<<<< HEAD
 				<Label :text="networkStatus" />
 				<Button text="Réinitialiser les tables de la base" @tap="reinit" />
-=======
-				<Button text="RéinitialiserRR les tables de la base" @tap="reinit" />
->>>>>>> 6c197d986e9f966a8b2fc4bde4bb81a5b1df0846
 				<Button text="Recharger l'équipe e cours" @tap="reinitEquipe" />
 				<Button text="Recharger les scores" @tap="reinitScore" />
 				<Label :text="currentEquipe" />
