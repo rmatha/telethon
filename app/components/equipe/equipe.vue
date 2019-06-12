@@ -25,6 +25,7 @@
 								<Label :text="libelleProfil(participant)" class="labelVille" @tap="editParticipant(participant)"/>
 							</GridLayout>
 						</StackLayout>
+						
 					</ScrollView>
 					
 				</StackLayout>

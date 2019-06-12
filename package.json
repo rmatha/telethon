@@ -12,6 +12,7 @@
   "license": "SEE LICENSE IN <your-license-filename>",
   "repository": "<fill-your-repository-here>",
   "dependencies": {
+    "connectivity": "^1.0.2",
     "nativescript-camera": "^4.5.0",
     "nativescript-checkbox": "^3.0.3",
     "nativescript-fonticon": "^2.0.0",

@@ -1,9 +1,10 @@
 <template>
 	<Page class="page" actionBarHidden="true">
-        <GridLayout rows="auto, *, auto" columns="*, *, *">
-			<Header row="0" col="0" colSpan="3"/>
-			<StackLayout row="1" col="0" colSpan="3">
+        <GridLayout rows="auto, *, auto" columns="*">
+			<Header row="0" col="0" />
+			<StackLayout row="1" col="0" >
 				<Image src="~/assets/telethon_root.png" />
+				<Label :text="networkStatus" />
 				<Button text="Réinitialiser les tables de la base" @tap="reinit" />
 				<Button text="Recharger l'équipe e cours" @tap="reinitEquipe" />
 				<Button text="Recharger les scores" @tap="reinitScore" />
@@ -12,7 +13,7 @@
 				<Label :text="$store.state.defis.length" />
 				
 			</StackLayout>
-			<Footer row="2" col="0" colSpan="3"/>
+			<Footer row="2" col="0"/>
 		</GridLayout>
     </Page>
 </template>
@@ -24,9 +25,25 @@
 		mounted() {
 			console.log("home !!");
 			this.$store.dispatch("queryCurrentEquipe");
+		// vérification de la connectivité
+			this.networkStatus = "Monitoring network connection changes.";
+            connectivity.startMonitoring((newConnectionType) => {
+                switch (newConnectionType) {
+                case connectivity.connectionType.none:
+                    this.networkStatus = "No network connection available!";
+                    break;
+                case connectivity.connectionType.wifi:
+					this.networkStatus = "You are now on wifi!";
+                    break;
+                case connectivity.connectionType.mobile:
+					this.networkStatus = "You are now on a mobile data network!";
+                    break;
+                }
+				});
 		},
         data() {
             return {
+				networkStatus : "",
             };
         },
         computed: {
@@ -47,6 +64,7 @@
 				console.log("On recharge les scores !!");
 				this.$store.dispatch("queryScoresEquipe");
 			}
+
 		}
     };
 </script>
