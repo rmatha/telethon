@@ -1,12 +1,12 @@
 <template>
-    <page>
+    <page class="page" actionBarHidden="true">
 		<GridLayout rows="auto, *, auto" columns="*, *, *">
 			<Header row="0" col="0" colSpan="3"/>
 			<StackLayout row="1" col="0" colSpan="3">
 				<Label row="0" col="0" text="categorieNom" textAlignment="center" fontSize="24"/>
 				<GridLayout rows="auto" columns="*,50">
 					<Label row="0" col="0" text="Liste des défis" textAlignment="center" fontSize="24"/>
-					<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="addDefi(categorie)"/>
+					<Image row="0" col="1" src="~/assets/icons/add-256.gif" v-if="isAdmin2" @tap="addDefi(categorie)"/>
 					
 				</GridLayout>
 				<ListView key="$store.state.defis" for="item in defisCat" height="100%" >
@@ -36,6 +36,7 @@
 <script>
 	import affichageDefi from "./affichageDefi";
 	import addDefi from "./addDefi";
+	import store from "../store/teleStore.js";
 	
 	export default {
 		props: ['commune','categorie'],
@@ -46,6 +47,18 @@
 					return item.categorie == this.categorie.id;
 				});
 			},
+
+			isAdmin2(){
+				if (this.$store.state.currentEquipe.admin){
+					console.log("Le flag est passé dans le mounted de listDefisCat");
+					console.log("la valeur d'admin est"+this.$store.state.currentEquipe.admin);
+					return true ;
+				}
+			},
+
+
+     
+
 		},
         data() {
             return {

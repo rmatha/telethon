@@ -1,5 +1,5 @@
 <template>
-    <page>
+    <page class="page" actionBarHidden="true">
 		<GridLayout rows="auto, *, auto" columns="*, *, *">
 			<Header row="0" col="0" colSpan="3"/>
 			<StackLayout row="1" col="0" colSpan="3" width="100%" height="100%">
@@ -30,7 +30,7 @@
 				
 				
 				
-				<StackLayout v-if="$store.state.currentEquipe.admin">
+				<StackLayout v-if="isAdmin">
 					<ScrollView >
 						<StackLayout class="m-20">
 							<StackLayout orientation="horizontal" backgroundcolor="#562389">
@@ -72,6 +72,21 @@
 			sousTitreCommune() {
 				return "Liste des challenges pour la commune : "+this.$store.state.currentEquipe.commune;
 			},
+
+            isAdmin(){
+				if (this.$store.state.currentEquipe.admin > 0){
+					return true;
+				}
+				return false;
+			},
+
+			isAdmin2(){
+				if (this.$store.state.currentEquipe.admin > 1){
+					return true;
+				}
+				return false;
+			},
+
 		},
         methods: {
             affichageCat() {

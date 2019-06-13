@@ -14,7 +14,11 @@
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 	<uses-permission android:name="android.permission.INTERNET"/>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+<<<<<<< HEAD
 
+=======
+	<uses-permission android:name="android.permission.CONNECTIVITY_CHANGE"/>
+>>>>>>> 31b1ffcf178627572bc56ddcba73c49ff24c2bce
 	<application
 		android:name="com.tns.NativeScriptApplication"
 		android:allowBackup="true"

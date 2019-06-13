@@ -1,11 +1,11 @@
 <template>
-    <page>
+    <page class="page" actionBarHidden="true">
 		<GridLayout rows="auto, *, auto" columns="*, *, *">
 			<Header row="0" col="0" colSpan="3"/>
 			<StackLayout row="1" col="0" colSpan="3" width="100%" height="100%">
 				<GridLayout rows="auto" columns="*,50">
-					<Label row="0" col="0" text="Choisir la catégorie"textAlignment="center" fontSize="24"/>
-					<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="addCat()"/>
+					<Label row="0" col="0" text="Choisir la catégorie" textAlignment="center" fontSize="24"/>
+					<Image row="0" col="1" src="~/assets/icons/add-256.gif" v-if="isAdmin" @tap="addCat()"/>
 					
 				</GridLayout>
 				<ListView key="$store.state.categories" for="item in $store.state.categories" height="100%" > 
@@ -17,8 +17,8 @@
 								<Label :text="item.nom"  />
 								<Label :text="item.nom" class="catTitle" />
 								<Label :text="nbDefis(item)" class="catNBDefis" />
-								<Button text="modifier" @tap="addCat(item)" />
-								<Button text="Supprimer" @tap="deleteCat(item)" />
+								<Button text="modifier" v-if="isAdmin" @tap="addCat(item)" />
+								<Button text="Supprimer" v-if="isAdmin" @tap="deleteCat(item)" />
 							</StackLayout>
 						</GridLayout>
 					</GridLayout>
@@ -48,6 +48,15 @@
 			nbDefis() {
 				return item => ("Nombre de défis : ");
 			},
+			isAdmin(){
+				if (this.$store.state.currentEquipe.admin > 1){
+					return true;
+				}
+				return false;
+			},
+
+
+
 			
         },
         data() {

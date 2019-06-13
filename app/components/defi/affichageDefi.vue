@@ -1,5 +1,5 @@
 <template>
-    <page>
+    <page class="page" actionBarHidden="true">
 		<GridLayout rows="auto, *, auto" columns="*, *, *">
 			<Header row="0" col="0" colSpan="3"/>
 			<StackLayout row="1" col="0" colSpan="3">
@@ -11,7 +11,7 @@
 				</GridLayout>
 				<GridLayout v-else rows="auto" columns="*,25,50,50">
 					<Label row="0" col="0" :text="defi.nom" class="defiName"/>
-					<Image row="0" col="1" src="~/assets/icons/Cross-red.png" @tap="supprimerDefi(defi)"/>
+					<Image row="0" col="1" src="~/assets/icons/Cross-red.png" v-if="isAdmin2" @tap="supprimerDefi(defi)"/>
 					<Image row="0" col="2" v-if="defiPresent(defi.id)" src="~/assets/icons/Cross-red.png" @tap="enleverDefi"/>
 					<Image row="0" col="2" v-else src="~/assets/icons/add-256.gif" @tap="ajouterDefi"/>				
 				</GridLayout>
@@ -51,6 +51,7 @@
 	import modal from "../include/modal";
 	import listDefisCat from "./listDefisCat";
 	import addScore from "../score/addScore";
+	import store from "../store/teleStore";
 	
 	export default {
 		props: ['defi','categorie','commune'],
@@ -70,6 +71,17 @@
 				}
 				return true;
 			},
+
+			isAdmin2(){
+				if (this.$store.state.currentEquipe.admin == 2 ){
+					console.log("le flag est passé dans le mounted de affichageDefi");
+					console.log("la valeur d'admin est :"+this.$store.state.currentEquipe.admin);
+					return true;
+				};
+					
+				return false;
+			}
+
 		},
         data() {
             return {}
