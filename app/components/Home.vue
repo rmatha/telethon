@@ -20,10 +20,10 @@
 
 <script>
 	
-	
+	const connectivity = require("connectivity");
     export default {
 		mounted() {
-			console.log("home !!");
+			console.log("home ");
 			this.$store.dispatch("queryCurrentEquipe");
 		// vérification de la connectivité
 			this.networkStatus = "Monitoring network connection changes.";
