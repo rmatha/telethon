@@ -51,12 +51,18 @@
 	import changeEquipe from "./changeEquipe";
 	import { Image } from "tns-core-modules/ui/image";
 	import * as camera from "nativescript-camera";
+	import store from "../store/teleStore.js";
 	const imageSourceModule = require("tns-core-modules/image-source");
 	const fileSystemModule = require("tns-core-modules/file-system");
 	
     export default {
         mounted() {
 			console.log(this.EtatAdmin);
+			console.log("Le flag est passé dans le mounted de equipe");
+			
+			console.log("Admin est à :"+this.$store.state.currentEquipe.admin)
+
+
         },
 		computed: {			
 			titreEquipe() {

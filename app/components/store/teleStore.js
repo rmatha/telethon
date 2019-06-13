@@ -329,7 +329,7 @@ const store = new Vuex.Store({
 		},
 		insertScore(context, data) {
 			if (data.id < 0) {
-				console.log("insertScore : insert");
+  				console.log("insertScore : insert");
 				context.state.database.execSQL("INSERT INTO score (idDefi,idProfil,score) VALUES (?,?,?)", [data.idDefi,data.idProfil,data.score]).then(id => {
 					//context.commit("saveDefi", { data: data });
 					//queryDefis(context, data : [id : data.categorie]);

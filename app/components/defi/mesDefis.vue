@@ -7,7 +7,7 @@
 					<StackLayout class="m-20">
 						<StackLayout orientation="horizontal" backgroundcolor="#562389">
 							<Label width="85%" class="m-b-20 titreTelethon" text="Mes challenges" textWrap="true" />
-							<Image src="~/assets/icons/add-256.gif" width="15%" v-if="isAdmin2" @tap="affichageCat"/>
+							<Image src="~/assets/icons/add-256.gif" width="15%" @tap="affichageCat"/>
 						</StackLayout>
 						
 					</StackLayout>

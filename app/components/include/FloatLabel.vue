@@ -34,14 +34,10 @@
 				
                 let textField = this.$refs.textField.nativeView;
                 console.log("onTextChange saisie " + textField.text);
-                if (textField.text.length > 0) {
-					onfocus();
-				}
+               
 				console.log("onTextChange label " + textField.name);
                 //ApplicationSettings.setString(textField.name, textField.text);
-                if (textField.text.lenght > 0){
-                    onFocus();
-                } 
+           
                 //this.firstTx = textField.text;
 				this.$emit("updateValeur",textField.text);
             },
