@@ -26,11 +26,11 @@
 		
 		data() {
             return {
-				scoreTestT = 0,
-				scoreMoyT = 0,
-				scoreTest = 0,
-				scoreMoy = 0,
-				testIdDefis = 0,
+				scoreTestT : 0,
+				scoreMoyT : 0,
+				scoreTest : 0,
+				scoreMoy : 0,
+				testIdDefis : 0,
 				  
 			}
         },
