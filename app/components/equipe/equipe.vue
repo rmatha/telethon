@@ -25,6 +25,7 @@
 						<Image width="15%" src="~/assets/icons/add-256.gif" @tap="addParticipant"/>
 						
 					</StackLayout>
+					<Button text="test" @tap="gotest" />
 					<ScrollView >
 						<StackLayout >
 							<GridLayout v-for="participant in $store.state.profilsEquipe" rows="40" columns="*"  >
@@ -54,6 +55,7 @@
 	import store from "../store/teleStore.js";
 	const imageSourceModule = require("tns-core-modules/image-source");
 	const fileSystemModule = require("tns-core-modules/file-system");
+	import test from "./test";
 	
     export default {
         mounted() {
@@ -146,6 +148,13 @@
 				console.log("on change d'équipe");
 				this.$navigateTo(changeEquipe);
 			},
+
+
+			gotest() {
+				console.log("test");
+				this.$navigateTo(test);
+			},
+			
 			
             
         }

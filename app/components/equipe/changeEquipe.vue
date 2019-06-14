@@ -281,7 +281,7 @@
 					this.affichageEquipes = true;
 				}
 				else {
-					this.affichageEquipes = false;
+					this.affichageEquipes = false; 
 				};
 			},
             onTextChange: function() {

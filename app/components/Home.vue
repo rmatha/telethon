@@ -10,7 +10,7 @@
 				<Button text="Recharger l'équipe e cours" @tap="reinitEquipe" />
 				<Button text="Recharger les scores" @tap="reinitScore" />
 				<Label :text="currentEquipe" />
-				<Label text="Nombre de défis en base " />
+				<Label text="Nombre de défis en base " />  
 				<Label :text="$store.state.defis.length" />
 				
 			</StackLayout>
