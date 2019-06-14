@@ -20,13 +20,11 @@
 </template>
 
 <script>
-	
-<<<<<<< HEAD
 	const connectivity = require("connectivity");
     export default {
 		mounted() {
 			console.log("home ");
-			this.$store.dispatch("queryCurrentEquipe");
+			/*this.networkStatus = "Monitoring network connection changes.";
 		// vérification de la connectivité
 			this.networkStatus = "Monitoring network connection changes.";
             connectivity.startMonitoring((newConnectionType) => {
@@ -41,17 +39,7 @@
 					this.networkStatus = "You are now on a mobile data network!";
                     break;
                 }
-				});
-=======
-
-	const connectivity = require("connectivity");
-	
-    export default {
-		data() {
-			return {
-				networkStatus: "En attente"
-			};
->>>>>>> 31b1ffcf178627572bc56ddcba73c49ff24c2bce
+				});*/
 		},
         computed: {
 			currentEquipe() {
