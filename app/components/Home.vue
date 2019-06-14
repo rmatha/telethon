@@ -24,9 +24,9 @@
     export default {
 		mounted() {
 			console.log("home ");
-			/*this.networkStatus = "Monitoring network connection changes.";
+			this.$store.dispatch("queryCurrentEquipe");
 		// vérification de la connectivité
-			this.networkStatus = "Monitoring network connection changes.";
+			/*this.networkStatus = "Monitoring network connection changes.";
             connectivity.startMonitoring((newConnectionType) => {
                 switch (newConnectionType) {
                 case connectivity.connectionType.none:
