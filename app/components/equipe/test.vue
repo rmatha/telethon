@@ -47,7 +47,7 @@
                 
 					var scoreMoyT = 0;
 					var scoreTestT = 0;
-					var idDefi = 1;
+					var idDefi = 0;
 					
 
 					for(var i = 0; i < this.$store.state.scoresEquipe.length; i++) { //On regarde si i est un index valide
