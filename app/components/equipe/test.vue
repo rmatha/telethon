@@ -10,7 +10,7 @@
 						<Label text="Resultats!" />
 						
 						</StackLayout>
-					<Button text="Tester les scores" @tap="ScorePerso" />
+					
 					</StackLayout>
 				</ScrollView>
 				
@@ -24,108 +24,57 @@
 	
 	export default {
 		
-		data() {
+		computed: {
+			
+		},
+        data() {
             return {
-				scoreTestT = 0,
-				scoreMoyT = 0,
-				scoreTest = 0,
-				scoreMoy = 0,
-				testIdDefis = 0,
+				scoreTestT : 0,
+				scoreMoyT : 0,
+				scoreTest : 0,
+				scoreMoy : 0,
+				testIdDefis : 0,
 				  
 			}
         },
-
-
-		computed: {
-			ScorePerso(){
-				
-                //alert("score equipe : "+ object.value(this.$store.state.scoresEquipe[3][3])+" id current equipe :" +this.$store.state.currentEquipe.id);
-				//Essaie un deux etape:
-				//Au lancement de la vue on fait la moyenne des scores totaux
-				for(var i = 0; i < this.$store.state.scoresEquipe.length; i++) { //On regarde si i est un index valide
-					console.log(JSON.stringify(this.$store.state.scoresEquipe[i]["score"])); //On affiche la valeur du score n°i
-					scoreTestT = scoreTestT + JSON.stringify(this.$store.state.scoresEquipe[i]["score"]);//On met cette valeur dans une var
-					console.log("scoreTest vaut : "+scoreTestT);//On l'affiche pour le debug
-					scoreMoy = scoreTestT / i;//On fait la moyenne des scores
-					console.log("scoreMoy vaut : "+scoreMoyT);//On l'affiche pour le debug
-
-				}; 
-				alert("Le score moyen est de : "+scoreMoyT);//A la fin de la boucle on affiche la moyenne finale
-				
-			//Gerer l'affichage par joueur
-
-				for(var i = 0; i < this.$store.state.scoresEquipe.length; i++) {//Même procéder mais avec l'id des défis
-					if ((JSON.stringify(this.$store.state.scoresEquipe[i]["idDefi"])) == testIdDefis){//On regarde on a séléctionner un défi
-						//Si oui
-						console.log(JSON.stringify(this.$store.state.scoresEquipe[i]["score"])+idDefi);//On affiche son score
-						scoreTest = scoreTest + JSON.stringify(this.$store.state.scoresEquipe[i]["score"]);//On le met dans une variable
-						console.log("scoreTest vaut : "+scoreTest);
-						scoreMoy = scoreTest / i;
-						console.log("scoreMoy vaut : "+scoreMoy);
-
-					}
-					console.log("Le score moyen est de : "+scoreMoy+" du défi"+idDefi);//A la fin de la boucle on affiche la moyenne finale du défis
-					
-					if (i == this.$store.state.scoresEquipe.length){//On regarde si la boucle est terminé 
-					//Si oui on chercher les scores dans le défis au dessus
-						testId++;//Contient l'idDefi actuellement scanner
-					}
-
-					else{//Si aucun des défis n'est trouvé 
-						console.log("Aucun défis trouver");//Afficher aucun défi
-					}
-
-				};
-				
-			//Essaie en une etape:
-			scoreTestT = 0;
-			scoreMoyT = 0;
-			scoreTest = 0;
-			scoreMoy = 0;
-			testIdDefis = 0;
-			
-				for(var i = 0; i < this.$store.state.scoresEquipe.length; i++) {//Même procéder mais avec l'id des défis
-					if ((JSON.stringify(this.$store.state.scoresEquipe[i]["idDefi"])) == testIdDefis){//On regarde on a séléctionner un défi
-						//Si oui
-						console.log(JSON.stringify(this.$store.state.scoresEquipe[i]["score"])+idDefi);//On affiche son score
-						scoreTest = scoreTest + JSON.stringify(this.$store.state.scoresEquipe[i]["score"]);//On le met dans une variable
-						
-						console.log("scoreTest vaut : "+scoreTest);
-						scoreMoy = scoreTest / i;
-						console.log("scoreMoy vaut : "+scoreMoy);
-
-						if (i == this.$store.state.scoresEquipe.length){//On regarde si la boucle est terminé 
-						//Si oui on chercher les scores dans le défis au dessus
-						testId++;//Contient l'idDefi actuellement scanner
-						i = 0;//On remet i à 0
-						scoreTestT = scoreTest;//On prend la valeur de scoreTest pour l'ajouté dans une variable qui contieneras tout les scores
-						scoreMoy = scoreTest / i ;
-						console.log("Le score moyen est de : "+scoreMoy+" du défi"+idDefi);//A la fin de la boucle on affiche la moyenne finale du défis
-
-						}
-
-						else{//Si aucun des défis n'est trouvé 
-						console.log("Aucun défis trouver");//Afficher aucun défi
-						}
-
-					}
-					console.log("Le score moyen totale est de : "+scoreMoyT);//On affiche le score moyen à la fin des boucles
-					
-					
-					
-
-				};
-			
-			},
-
-		},
-
 		mounted() {
 			
-        },
-		methods: {
-			
 		},
-    }
+			
+		methods: {
+			ScorePerso(){
+				
+                
+					var scoreMoyT = 0;
+					var scoreTestT = 0;
+					var idDefi = 1;
+					
+
+					for(var i = 0; i < this.$store.state.scoresEquipe.length; i++) { //On regarde si i est un index valide
+						var idDefiT = parseInt(JSON.stringify(this.$store.state.scoresEquipe[i]["idDefi"]),10);
+						var scoreTest = parseInt(JSON.stringify(this.$store.state.scoresEquipe[i]["score"]),10);
+						var idDefiProfil = parseInt(JSON.stringify(this.$store.state.scoresEquipe[i]["idDefiProfil"]),10);
+						console.log("Id defi en Integer : "+idDefi);
+						console.log("Id defi en String : "+JSON.stringify(this.$store.state.scoresEquipe[i]["idDefi"])); 
+						console.log("Score en String : "+JSON.stringify(this.$store.state.scoresEquipe[i]["score"])); //On affiche la valeur du score n°i
+						console.log("Score en integer : "+parseInt(JSON.stringify(this.$store.state.scoresEquipe[i]["score"]),10));
+						console.log(parseInt(JSON.stringify(this.$store.state.scoresEquipe[i]["score"]),10) + parseInt(JSON.stringify(this.$store.state.scoresEquipe[i]["score"]),10));
+						this.scoreTestT = this.scoreTestT + parseInt(JSON.stringify(this.$store.state.scoresEquipe[i]["score"]),10);//On met cette valeur dans une var
+						console.log("scoreTestT vaut : "+this.scoreTestT);//On l'affiche pour le debug
+					
+							i++;
+							this.scoreMoyT = this.scoreTestT/i;
+							i--;
+							console.log("scoreMoyT vaut : "+this.scoreMoyT);
+						//if (_.isEmpty(this.byDefi[idDefiT].push({idJoueur: this.idDefiProfil, score: this.scoreTest}))){
+						//	this.byDefi[idDefiT] = [];
+						//}
+						//this.byDefi[idDefiT].push({idJoueur: this.idDefiProfil, score: this.scoreTest});
+						//console.log(byDefi[[]]);
+						
+					}
+				},
+			},
+    };
 </script>
 
