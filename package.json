@@ -12,6 +12,7 @@
   "license": "SEE LICENSE IN <your-license-filename>",
   "repository": "<fill-your-repository-here>",
   "dependencies": {
+    "ajv": "^6.10.0",
     "connectivity": "^1.0.2",
     "nativescript-camera": "^4.5.0",
     "nativescript-checkbox": "^3.0.3",
@@ -22,6 +23,9 @@
     "nativescript-vue-fonticon": "^1.0.3",
     "pretty-checkbox-vue": "^1.1.9",
     "tns-core-modules": "~5.3.0",
+    "ts-loader": "^6.0.3",
+    "typescript": "^3.5.2",
+    "vue": "^2.6.10",
     "vuex": "^3.1.0"
   },
   "devDependencies": {

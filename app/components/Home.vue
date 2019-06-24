@@ -5,7 +5,7 @@
 			<StackLayout row="1" col="0" >
 				<Image src="~/assets/telethon_root.png" />
 				<Label :text="networkStatus" />
-				<button text="init monitoring reseau" @tap="monitorNetworkStart" />
+				<button text="init monitoring reseau" @tap="checkNetwork" />
 				<Button text="Réinitialiser les tables de la base" @tap="reinit" />
 				<Button text="Recharger l'équipe e cours" @tap="reinitEquipe" />
 				<Button text="Recharger les scores" @tap="reinitScore" />
@@ -20,15 +20,31 @@
 </template>
 
 <script>
-	
-
 	const connectivity = require("connectivity");
-	
     export default {
 		data() {
-			return {
-				networkStatus: "En attente"
-			};
+            return {
+				networkStatus : "",
+            };
+        },
+		mounted() {
+			console.log("home ");
+			this.$store.dispatch("queryCurrentEquipe");
+			// vérification de la connectivité
+			/*this.networkStatus = "Monitoring network connection changes.";
+            connectivity.startMonitoring((newConnectionType) => {
+                switch (newConnectionType) {
+                case connectivity.connectionType.none:
+                    this.networkStatus = "No network connection available!";
+                    break;
+                case connectivity.connectionType.wifi:
+					this.networkStatus = "You are now on wifi!";
+                    break;
+                case connectivity.connectionType.mobile:
+					this.networkStatus = "You are now on a mobile data network!";
+                    break;
+                }
+				});*/
 		},
         computed: {
 			currentEquipe() {
