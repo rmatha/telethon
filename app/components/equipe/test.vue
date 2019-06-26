@@ -54,7 +54,7 @@
 						var idDefiT = parseInt(JSON.stringify(this.$store.state.scoresEquipe[i]["idDefi"]),10);
 						var scoreTest = parseInt(JSON.stringify(this.$store.state.scoresEquipe[i]["score"]),10);
 						var idDefiProfil = parseInt(JSON.stringify(this.$store.state.scoresEquipe[i]["idDefiProfil"]),10);
-						console.log("Id defi en Integepgpegpaegpr : "+idDefi);
+						console.log("Id defi en Integer : "+idDefi);
 						console.log("Id defi en String : "+JSON.stringify(this.$store.state.scoresEquipe[i]["idDefi"])); 
 						console.log("Score en String : "+JSON.stringify(this.$store.state.scoresEquipe[i]["score"])); //On affiche la valeur du score n°i
 						console.log("Score en integer : "+parseInt(JSON.stringify(this.$store.state.scoresEquipe[i]["score"]),10));
