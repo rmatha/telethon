@@ -27,7 +27,7 @@
 				  </v-template>
 				</ListView>
 				
-				
+				<button text="Récupérer les défis de ma ville" @tap="recupereDefis" />
 				
 				
 				<StackLayout v-if="isAdmin">
@@ -54,7 +54,7 @@
 						</GridLayout>
 					  </v-template>
 					</ListView>
-				</StackLayout>
+				</StackLayout> 
 			</StackLayout>
 			<Footer row="2" col="0" colSpan="3"/>
 		</GridLayout>
@@ -70,7 +70,7 @@
 	export default {
 		computed: {
 			sousTitreCommune() {
-				return "Liste des challenges pour la commune : "+this.$store.state.currentEquipe.commune;
+				return "Liste des challenges pour la commune  : "+this.$store.state.currentEquipe.commune;
 			},
 
             isAdmin(){
@@ -89,6 +89,32 @@
 
 		},
         methods: {
+			recupereDefis() {
+				console.log("Récupération des défis de la commune");
+				let titre = "Les défis de votre commune ont été chargés dans vos défis";
+				if (this.$store.state.currentEquipe.commune.length > 0) {
+					console.log("defis de la commune : "+this.$store.state.defisCommune);
+					if (this.$store.state.defisCommune.length > 0) {
+						console.log("R2cupération des défis OK");
+						this.$store.state.nosDefis = this.$store.state.defisCommune;
+					}
+					else {
+						console.log("pas de défis pour la commune en cours");
+						titre = "Aucun défi à récupérer";
+					}
+				}
+				else {
+					console.log("pas de commune selectionné");
+					titre = "Veuillez renseigner votre commune pour pouvoir récupérer les défis";
+				}
+				alert({
+					  title: "Récupération des défis",
+					  message: titre,
+					  okButtonText: "OK"
+					}).then(() => {
+					  console.log("Alert dialog closed");
+					});
+			},
             affichageCat() {
 				console.log("liste des challenges");
                 this.$navigateTo(listeChallengesCat);

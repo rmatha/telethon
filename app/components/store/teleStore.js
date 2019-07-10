@@ -173,7 +173,9 @@ const store = new Vuex.Store({
 					id : data.data[i][0],
 					idDefi : data.data[i][1],
 					idProfil : data.data[i][2] , 
-					score : data.data[i][3]
+					score : data.data[i][3],
+					nomDefi : data.data[i][4],
+					nomProfil : data.data[i][5]+" "+data.data[i][6],
 				}); 
 				console.log("mutation load scoresEquipe : "+JSON.stringify(state.scoresEquipe));
 			}
@@ -401,7 +403,7 @@ const store = new Vuex.Store({
 		},
 		queryScoresEquipe(context,data) {
 			console.log("queryScoresEquipe : chargement des score pour equipe "+this.state.currentEquipe.id);
-			context.state.database.all("SELECT * from score, profil where score.idProfil = profil.id and profil.equipe = ?",[this.state.currentEquipe.id]).then(result => {
+			context.state.database.all("SELECT score.id,idDefi, idProfil, score, challenge.nom, firstname, lastname from score, profil, challenge where score.idDefi = challenge.id and score.idProfil = profil.id and profil.equipe = ?",[this.state.currentEquipe.id]).then(result => {
 				console.log("Nombre de réponses : "+JSON.stringify(result));
 				context.commit("loadScoresEquipe", { data: result });
 			}, error => {
