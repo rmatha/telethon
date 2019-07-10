@@ -1,4 +1,7 @@
 import Vue from "nativescript-vue";
+import _ from 'lodash';    
+Object.defineProperty(Vue.prototype, '$_', { value: _ });
+
 
 import Home from "./components/Home";
 import FloatLabel from './components/include/FloatLabel';

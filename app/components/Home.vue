@@ -8,7 +8,7 @@
 				<button text="init monitoring reseau" @tap="checkNetwork" />
 				<Button text="Réinitialiser les tables de la base" @tap="reinit" />
 				<Button text="Recharger l'équipe e cours" @tap="reinitEquipe" />
-				<Button text="Recharger les scores" @tap="reinitScore" />
+				<Button text="Rechargerr les scores" @tap="reinitScore" />
 				<Label :text="currentEquipe" />
 				<Label text="Nombre de défis en base " />  
 				<Label :text="$store.state.defis.length" />
