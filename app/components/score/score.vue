@@ -1,73 +1,38 @@
 <template>
-    <Page class="page" actionBarHidden="true">
-        <ActionBar title="Home" class="action-bar" />
-        <ScrollView>
-            <AbsoluteLayout class="iPhone-XXS-11">
-                <!--Add your page content here-->
-				
-                <label class="Version-2019" text="Version 2019" top="4" left="13"/>
-                <Image  class="Rectangle-15" src="~/assets/ResourcePage/Rectangle 15.png" top="0" left="0" />
-                <Image  class="Header" src="~/assets/ResourcePage/Header2.png" top="-240" left="-12" @tap="Home"/>
-
-                <StackLayout class="Info-space">
-                  <label class="Info-main" text="Equipe NomEquipe"  horizontalAlignment="center"/>
-                  <!--<label class="Info-main" text="this.$store.state.currentEquipe.nom" top="350" left="60" />-->
-                  <label class="Info-main" text="'NomEquipe'"  verticalAlignment="center" horizontalAlignment="center"/>
-                  <label class="Info-main" text="Défis : "   verticalAlignment="center" horizontalAlignment="center"/>
-                  <label class="Info-main" text="this.$store.state.currentEquipe.defis??"  verticalAlignment="bottom" horizontalAlignment="center"/>
-                  <label class="Info-main" text="Commune : "  verticalAlignment="center" horizontalAlignment="center"/>
-                  <label class="Info-main" text="this.$store.state.currentEquipe.commune"  />
-                </StackLayout>
-
-                <button v-if="affiche" class="boutonDev1" text="Equipe" top="285" left="100" @tap="equipe"/>
-                <button v-if="affiche" class="boutonDev2" text="Défis" top="350" left="100" @tap="defis"/>
-                <button v-if="affiche" class="boutonDer1" text="ok" top="285" left="30"/>
-                <button v-if="affiche" class="boutonDer2" text="ok" top="350" left="30"/>
-                <button v-if="affiche" class="boutonDev3" text="Score" top="415" left="100" @tap="score"/>
-                <button v-if="affiche" class="boutonDer3" text="ok" top="415" left="30"/>
-
-				<Image v-if="affiche" class="IconTeam" src="~/assets/ResourceIcon/team - fullrez.png" top="283" left="55" />
-				<Image v-if="affiche" class="IconDefis" src="~/assets/ResourceIcon/challenges.png" top="347" left="55" />
-				<Image v-if="affiche" class="IconScore" src="~/assets/ResourceIcon/star.png" top="413" left="55" />
-
-        <Image v-if="affiche" class="Cover" />
-
-				<!--<label class="textMenu" text="Mon Score" top="415" left="135"/>-->
-				<Image class="Footer" src="~/assets/ResourcePage/Footer2.png" top="300" left= "-41" @tap="affiche = !affiche" />
-            </AbsoluteLayout>
-        </ScrollView>
-    </Page>
+    <page>
+		<AbsoluteLayout class="iPhone-XXS-11">
+		<GridLayout rows="auto, *, auto" columns="*, *, *">
+			<Header row="0" col="0" colSpan="3"/>
+			<StackLayout row="1" col="0" colSpan="3">
+					<Label text="SCORE" />
+					
+					
+					
+				<Button text="Enregistrer" @tap="saveScore" />
+			</StackLayout>
+			<Footer row="2" col="0" colSpan="3"/>
+		</GridLayout>
+		<AbsoluteLayout/>
+	</page>
+	
+	
 </template>
 
 <script>
-	import equipe from "./equipe/equipe";
-  import Home from "./Home";
-	import score from "./score/score";
-  import defis from "./defi/mesDefis";
-    export default {
-      data () {
-        return {
-          affiche: false,
-        };
-    },
-    methods: {
-      equipe(){
-				console.log("equipe");
-				this.$navigateTo(equipe);
-      },
-      defis(){
-				console.log("defis");
-				this.$navigateTo(defis);
-      },
-      score(){
-       	console.log("score");
-				this.$navigateTo(score); 
-      }
-    },  
-    }
+	
 </script>
 
-<style scoped>
+<style>
+.catTitle {
+	color : black;
+	font-weight: bold;
+	font-size: 30;
+}
+.catNBDefis {
+	color : white;
+	font-weight: bold;
+	font-size: 15;
+}
     .home-panel {
         vertical-align: center;
         font-size: 20;
@@ -182,7 +147,7 @@ margin-left: auto ;
 
 }
 .Cover{
-  margin-top:30%;
+  margin-top:50%;
   width: 100%;
   height: 60%;
   background: #fbc62d;    
