@@ -3,8 +3,7 @@
         <DockLayout stretchLastChild="true">
 			<Header dock="top" />
 			<Footer dock="bottom" />
-			<StackLayout dock="center" >
-				<Image src="~/assets/telethon_root.png" />
+			<StackLayout dock="center" class="root" >
 				<Label :text="networkStatus" />
 				<button text="init monitoring reseau" @tap="checkNetwork" />
 				<Button text="Réinitialiser les tables de la base" @tap="reinit" />
@@ -107,3 +106,8 @@
 		}
     };
 </script>
+<style>
+.root {
+	background-color : #fbc62d;
+}
+</style>

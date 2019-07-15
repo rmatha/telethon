@@ -1,6 +1,5 @@
 <template>
 	<page class="page" actionBarHidden="true">
-		<AbsoluteLayout class="iPhone-XXS-11">
 		<GridLayout rows="auto, *, auto" columns="*">
 			<Header row="0" col="0" />
 			<ScrollView row="1" col="0" >
@@ -43,7 +42,6 @@
 			<Footer row="2" col="0" />
 		</GridLayout>
 		
-		<AbsoluteLayout/>
 	</page>
 </template>
 

@@ -1,7 +1,7 @@
 
 <template>
     <page class="page" actionBarHidden="true">
-		<AbsoluteLayout class="iPhone-XXS-11">
+		
 	<GridLayout rows="auto, *, auto" columns="*, *, *">
 			<Header row="0" col="0" colSpan="3"/>
 			<StackLayout row="1" col="0" colSpan="3" width="100%" height="100%">
@@ -18,7 +18,6 @@
 			</StackLayout>
 			<Footer row="2" col="0" colSpan="3"/>
 		</GridLayout>
-		<AbsoluteLayout />
 	</page>
 </template>
 

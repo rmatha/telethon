@@ -1,7 +1,7 @@
 <template>
     <!-- Bottom navigation -->
-	<StackLayout dock="bottom" :class="getClassMenu" ref="logoContainer" backgroundColor="#325487">
-		<Label text="Mon menuu" class="labelMenu" @tap="loadMenu"/>
+	<StackLayout dock="bottom" :class="getClassMenu" ref="logoContainer" backgroundColor="#fff">
+		<Image src="~/assets/ResourcePage/footer3.png" class="rootFooter root"  stretch="aspectFill" width="100%" height="200px"  @tap="loadMenu"/>
 		<GridLayout  rows="50" columns="*, *, *" >
 			<Image src="~/assets/icons/equipe.jpg" @tap="navProfil" row="0" col="0" />
 			<Image src="~/assets/icons/challenges.png" @tap="navChallenges" row="0" col="1" />

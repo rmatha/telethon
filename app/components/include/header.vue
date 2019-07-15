@@ -1,5 +1,5 @@
 <template>
-    <Image src="~/assets/telethon.jpg" @tap="home" width="195" marginTop="20"  />
+    <Image src="~/assets/ResourcePage/Header2.png" class="rootHeader root"  stretch="aspectFill"  @tap="home" width="100%" height="500px"  />
 </template>
 
 <script>
@@ -19,4 +19,7 @@
 </script>
 
 <style>
+.rootHeader{
+	margin-top : -30px;
+}
 </style>
