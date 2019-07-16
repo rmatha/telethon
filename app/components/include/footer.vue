@@ -1,11 +1,19 @@
 <template>
     <!-- Bottom navigation -->
 	<StackLayout dock="bottom" :class="getClassMenu" ref="logoContainer" backgroundColor="#fff">
-		<Image src="~/assets/ResourcePage/footer3.png" class="rootFooter root"  stretch="aspectFill" width="100%" height="200px"  @tap="loadMenu"/>
-		<GridLayout  rows="50" columns="*, *, *" >
-			<Image src="~/assets/icons/equipe.jpg" @tap="navProfil" row="0" col="0" />
+		<Image v-if="menuOn" src="~/assets/ResourcePage/footerDown.png" class="rootFooter root"  stretch="aspectFill" width="100%" height="200px"  @tap="loadMenu"/>
+		<Image v-else src="~/assets/ResourcePage/footerUp.png" class="rootFooter root"  stretch="aspectFill" width="100%" height="200px"  @tap="loadMenu"/>
+		<GridLayout  rows="100,100,100" columns="auto,auto" horizontalAlignment="center">
+			<!--<Image src="~/assets/icons/equipe.jpg" @tap="navProfil" row="0" col="0" />
 			<Image src="~/assets/icons/challenges.png" @tap="navChallenges" row="0" col="1" />
-			<Image src="~/assets/icons/Star-Red.png" @tap="navResultats" row="0" col="2" />
+			<Image src="~/assets/icons/Star-Red.png" @tap="navResultats" row="0" col="2" />-->
+			<Image  class="IconTeam" src="~/assets/icons/equipe_y.png" col="0" row="0"  />
+			<Label class="boutonDev" text="Equipe"  row="0" col="1" @tap="navProfil"  />
+			<Image  class="IconDefis" src="~/assets/icons/challenges_y.png" row="1" col="0"/>
+			<Label class="boutonDev" text="Défis" row="1" col="1" @tap="navChallenges"/>
+			<Image class="IconScore" src="~/assets/icons/resultat_y.png" row="2" col="0" />
+			<Label class="boutonDev" text="Score" row="2" col="1" @tap="navResultats"/>
+			
 		</GridLayout>
 	</StackLayout>
 </template>
@@ -30,7 +38,9 @@
 				return "menu" ;
 			}
         },
-        
+        mounted() {
+			this.menuOn = false;
+		},
 		methods: {
 			loadMenu(){
 				console.log("changement de menuOn");
@@ -38,12 +48,15 @@
 			},
 			navProfil() {
 				this.$navigateTo(profil);
+				this.menuOn = false;
 			},
 			navChallenges() {
 				this.$navigateTo(mesDefis);
+				this.menuOn = false;
 			},
 			navResultats() {
 				this.$navigateTo(resultats);
+				this.menuOn = false;
 			},
 		},
 		components: {
@@ -67,5 +80,17 @@
 		color : black;
 		height : 200px;
 	}
-
+	.boutonDev{
+  
+	  /* font */
+	  color: #fbc62d;
+	  font-weight: bold;
+	  font-style: normal;
+	  font-stretch: normal;
+	  font-size: 20px;
+	  horizontal-alignment : left;
+	  vertical-alignment : center;
+	  margin-left : 20px;
+	}
+	
 </style>

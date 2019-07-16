@@ -4,14 +4,19 @@
 			<Header dock="top" />
 			<Footer dock="bottom" />
 			<StackLayout dock="center" class="root" >
-				<Label :text="networkStatus" />
-				<button text="init monitoring reseau" @tap="checkNetwork" />
+				<label class="Info-main" text="Equipe"  horizontalAlignment="center"/>
+				<label class="Info-main" :text="$store.state.currentEquipe.nom"  />
+				<label class="Info-main" text="Défis : "   verticalAlignment="center" horizontalAlignment="center"/>
+				<label class="Info-main" :text="$store.state.currentEquipe.defis"  verticalAlignment="bottom" horizontalAlignment="center"/>
+				<label class="Info-main" text="Commune : "  verticalAlignment="center" horizontalAlignment="center"/>
+				<label class="Info-main" :text="$store.state.currentEquipe.commune"  /><Label :text="networkStatus" />
+				<!--<button text="init monitoring reseau" @tap="checkNetwork" />
 				<Button text="Réinitialiser les tables de la base" @tap="reinit" />
 				<Button text="Recharger l'équipe e cours" @tap="reinitEquipe" />
 				<Button text="Rechargerr les scores" @tap="reinitScore" />
 				<Label :text="currentEquipe" />
 				<Label text="Nombre de défis en base " />  
-				<Label :text="$store.state.defis.length" />
+				<Label :text="$store.state.defis.length" />-->
 				
 			</StackLayout>
 			
