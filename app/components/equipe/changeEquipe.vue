@@ -1,11 +1,11 @@
 <template>
-	<page>
+	<page class="page" actionBarHidden="true">
 		<GridLayout rows="auto, *, auto" columns="*">
 			<Header row="0" col="0" />
 			<ScrollView row="1" col="0" >
 				<StackLayout>  
 					<GridLayout rows="*" columns="*,*" marginBottom="5">
-						<Button row="0" col="0" text="Nouvelle équipe" v-if="isAdmin2" @tap="nouvelleEquipe" />
+						<Button row="0" col="0" text="Nouvelle équipe" @tap="nouvelleEquipe" />
 						<Button row="0" col="1" text="Equipe existante" @tap="equipeExistante" />
 					</GridLayout>
 					<StackLayout v-if="isNouvelleEquipe" >
@@ -83,10 +83,16 @@
 			console.log("nombre d'équipe en base : "+this.$store.state.equipes.length);
 
 			console.log("Le flag est passé dans le mounted de changeEquipe");
-			this.$store.state.currentEquipe.admin = 2;
-			this.$store.state.currentEquipe.commune = "Angoulême"; 
-			console.log("Admin est à :"+this.$store.state.currentEquipe.admin)
-			
+			//this.$store.state.currentEquipe.admin = 2;
+			//this.$store.state.currentEquipe.commune = "Angoulême"; 
+			//console.log("Admin est à :"+this.$store.state.currentEquipe.admin);
+			console.log("récupération du type : "+this.type);
+			if (this.type == "new") {
+				this.isNouvelleEquipe = true;
+			};
+			if (this.type == "search") {
+				this.isExistanteEquipe = true;
+			};
 			
         },
 		computed: {	
@@ -118,6 +124,7 @@
 			
 			
         },
+		props: ['type'],
 		data() {
             return {
                 isNouvelleEquipe : false,
