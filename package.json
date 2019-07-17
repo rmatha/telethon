@@ -12,6 +12,7 @@
   "license": "SEE LICENSE IN <your-license-filename>",
   "repository": "<fill-your-repository-here>",
   "dependencies": {
+    "@irman/nativescript-screen-orientation": "1.1.2",
     "ajv": "^6.10.0",
     "connectivity": "^1.0.2",
     "nativescript-camera": "^4.5.0",

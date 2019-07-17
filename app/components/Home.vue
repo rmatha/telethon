@@ -46,6 +46,7 @@
             };
         },
 		mounted() {
+
 			console.log("home ");
 			this.$store.dispatch("queryCurrentEquipe");
 			// vérification de la connectivité
