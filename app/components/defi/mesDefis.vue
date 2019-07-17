@@ -1,7 +1,9 @@
 <template>
     <page class="page" actionBarHidden="true">
-		<GridLayout rows="auto, *, auto" columns="*, *, *">
-			<Header row="0" col="0" colSpan="3"/>
+		<DockLayout stretchLastChild="true">
+        <Header dock="top" />
+        <Footer dock="bottom" />
+			<StackLayout dock="center" class="root" >
 			<StackLayout row="1" col="0" colSpan="3" width="100%" height="100%">
 				<ScrollView>
 					<StackLayout class="m-20">
@@ -56,8 +58,8 @@
 					</ListView>
 				</StackLayout> 
 			</StackLayout>
-			<Footer row="2" col="0" colSpan="3"/>
-		</GridLayout>
+			</StackLayout>
+		</DockLayout>
 		
 		
 	</page>

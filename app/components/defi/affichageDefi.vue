@@ -1,7 +1,9 @@
 <template>
     <page class="page" actionBarHidden="true">
-		<GridLayout rows="auto, *, auto" columns="*, *, *">
-			<Header row="0" col="0" colSpan="3"/>
+		<DockLayout stretchLastChild="true">
+        <Header dock="top" />
+        <Footer dock="bottom" />
+			<StackLayout dock="center" class="root" >
 			<StackLayout row="1" col="0" colSpan="3">
 				<GridLayout v-if="isCommune" rows="auto" columns="*,25,50,50">
 					<Label row="0" col="0" text="defi pour la commune" class="defiName"/>
@@ -38,8 +40,8 @@
 				  </v-template>
 				</ListView>
 			</StackLayout>
-			<Footer row="2" col="0" colSpan="3"/>
-		</GridLayout>
+			</StackLayout>
+		</DockLayout>
 		
 	</page>
 	

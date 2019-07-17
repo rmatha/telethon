@@ -1,7 +1,9 @@
 <template>
     <page class="page" actionBarHidden="true">
-		<GridLayout rows="auto, *, auto" columns="*, *, *">
-			<Header row="0" col="0" colSpan="3"/>
+		<DockLayout stretchLastChild="true">
+        <Header dock="top" />
+        <Footer dock="bottom" />
+			<StackLayout dock="center" class="root" >
 			<StackLayout row="1" col="0" colSpan="3">
 				<Label row="0" col="0" text="categorieNom" textAlignment="center" fontSize="24"/>
 				<GridLayout rows="auto" columns="*,50">
@@ -26,8 +28,8 @@
 				  </v-template>
 				</ListView>
 			</StackLayout>
-			<Footer row="2" col="0" colSpan="3"/>
-		</GridLayout>
+			</StackLayout>
+		</DockLayout>
 	</page>
 	
 	

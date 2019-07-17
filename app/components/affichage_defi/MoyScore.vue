@@ -1,5 +1,9 @@
 <template>
     <Page class="page">
+		<DockLayout stretchLastChild="true">
+			<Header dock="top" />
+			<Footer dock="bottom" />
+			<StackLayout dock="center" class="root" >
         <ActionBar class="action-bar">
             <Label class="action-bar-title" text="Home"></Label>
         </ActionBar>
@@ -11,7 +15,7 @@
 						<Span :text="messageAffichage"/>
 					</FormattedString>
 				</Label>
-				<li
+				<li>
 				<button text="charger mon tableau" @tap="charger" />
 				<button text="groupir mon tableau" @tap="groupir" />
 				<ListView for="moyenne in moyenneDefi">
@@ -26,6 +30,8 @@
 				</ListView>
 			</StackLayout>
 		</GridLayout>
+		</StackLayout>
+		</DockLayout>
     </Page>
 </template>
 

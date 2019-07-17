@@ -1,5 +1,9 @@
 <template>
     <page>
+      <DockLayout stretchLastChild="true">
+        <Header dock="top" />
+        <Footer dock="bottom" />
+			<StackLayout dock="center" class="root" >
 		<AbsoluteLayout class="iPhone-XXS-11">
 		<GridLayout rows="auto, *, auto" columns="*, *, *">
 			<Header row="0" col="0" colSpan="3"/>
@@ -13,6 +17,8 @@
 			<Footer row="2" col="0" colSpan="3"/>
 		</GridLayout>
 		<AbsoluteLayout/>
+    </StackLayout>
+    </DockLayout>
 	</page>
 	
 	

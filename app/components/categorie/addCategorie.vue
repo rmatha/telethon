@@ -1,7 +1,9 @@
 <template>
     <page>
-		<GridLayout rows="auto, *, auto" columns="*, *, *">
-			<Header row="0" col="0" colSpan="3"/>
+		<DockLayout stretchLastChild="true">
+			<Header dock="top" />
+			<Footer dock="bottom" />
+			<StackLayout dock="center" class="root" >
 			<StackLayout row="1" col="0" colSpan="3">
 					<Label row="0" col="0" text="Edition Catégorie " class="catTitle"/>
 					
@@ -12,9 +14,8 @@
 					
 				<Button text="Enregistrer" @tap="saveCategorie" />
 			</StackLayout>
-			<Footer row="2" col="0" colSpan="3"/>
-		</GridLayout>
-		
+			</StackLayout>
+		</DockLayout>
 	</page>
 	
 	
