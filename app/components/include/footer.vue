@@ -1,9 +1,9 @@
 <template>
     <!-- Bottom navigation -->
-	<StackLayout dock="bottom" :class="getClassMenu" ref="logoContainer" backgroundColor="#fff">
+	<StackLayout dock="bottom" :class="getClassMenu" ref="logoContainer" >
 		<Image v-if="menuOn" src="~/assets/ResourcePage/footerDown.png" class="rootFooter root"  stretch="aspectFill" width="100%" height="200px"  @tap="loadMenu"/>
 		<Image v-else src="~/assets/ResourcePage/footerUp.png" class="rootFooter root"  stretch="aspectFill" width="100%" height="200px"  @tap="loadMenu"/>
-		<GridLayout  rows="100,100,100" columns="auto,auto" horizontalAlignment="center">
+		<GridLayout  rows="100,100,100,*" columns="*,*" horizontalAlignment="center" class="innerFooter">
 			<!--<Image src="~/assets/icons/equipe.jpg" @tap="navProfil" row="0" col="0" />
 			<Image src="~/assets/icons/challenges.png" @tap="navChallenges" row="0" col="1" />
 			<Image src="~/assets/icons/Star-Red.png" @tap="navResultats" row="0" col="2" />-->
@@ -69,6 +69,10 @@
 
 
 <style>
+	.innerFooter {
+		background-color : #fff;
+		width : 100%;
+	}
 	.menu {
 		height : 200px;
 	}

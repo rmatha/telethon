@@ -8,6 +8,29 @@
 // Import common styles
 @import 'app-common';
 
-.page {
+.modify{
+	margin-right : 20px;
+}
+
+.page, .menu {
 	background-color : #fbc62d;
+}
+
+.label {
+	font-size : 20px;
+	font-weight: bold;
+	color : black;
+	text-decoration: underline;
+	margin-left : 20px;
+}
+
+.valeur {
+	font-size : 12px;
+	color : black;
+	margin-left : 60px;
+}
+
+
+.Titre {
+	font-size : 40px;
 }
