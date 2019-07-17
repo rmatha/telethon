@@ -59,7 +59,6 @@
             };
         },
 		mounted() {
-
 			console.log("home ");
 			this.$store.dispatch("queryCurrentEquipe");
 			// vérification de la connectivité
@@ -91,7 +90,7 @@
 				this.$navigateTo(changeEquipe, { props: {type : type}});
 			},
 			navEquipe() {
-				this.$navigateTo(Equipe);
+				this.$navigateTo(equipe);
 			},
 			titreEquipe() {
 				if (this.$store.state.currentEquipe.nom.length > 0) {
