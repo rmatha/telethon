@@ -4,7 +4,7 @@
             class="input" :name="label" />
         <TextField ref="textField" :secure="secure" row="1" @focus="onFocus"
             @blur="onBlur" borderBottomWidth="3" @textChange="onTextChange"
-            borderBottomColor="#cec8c8" padding="0" :text="valeur"/>
+            borderBottomColor="#fff" padding="0" :text="valeur"/>
     </GridLayout>
 </template>
 
@@ -77,7 +77,7 @@
                         .then(() => {}, () => {});
                 }
                 // reset border bottom color.
-                textField.borderBottomColor = new Color("#cec8c8");
+                textField.borderBottomColor = new Color("#fff");
             }
         }
     };

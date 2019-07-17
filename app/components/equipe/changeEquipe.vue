@@ -5,15 +5,16 @@
 			<ScrollView row="1" col="0" >
 				<StackLayout>  
 					<GridLayout rows="*" columns="*,*" marginBottom="5">
-						<Button row="0" col="0" text="Nouvelle équipe" @tap="nouvelleEquipe" />
-						<Button row="0" col="1" text="Equipe existante" @tap="equipeExistante" />
+						<Button :class="getClassButtonNouvelleEquipe" row="0" col="0" text="Nouvelle équipe" @tap="nouvelleEquipe" />
+						<Button :class="getClassButtonExistanteEquipe" row="0" col="1" text="Equipe existante" @tap="equipeExistante" /> 
+						<StackLayout row="0" colSpan="2" class="menuEquipe"> </StackLayout>
 					</GridLayout>
 					<StackLayout v-if="isNouvelleEquipe" >
-						<Label text="Création de la nouvelle équipe" verticalAlign="Center"/>
+						<Label text="Création de la nouvelle équipe" class="entetePage"/>
 						<FloatLabel placeholder="Nom de l'équipe" label="nom de l'équipe" :valeur="input.nom" @updateValeur="updateNomEquipe"/>
 						<GridLayout rows="30, auto" marginBottom="5">
 							<Label ref="labelVille" row="1" text="Ville du challenge Téléthon" opacity="0.4" fontSize="14" class="input" />
-							<TextField ref="textFieldVille" row="1" borderBottomColor="#cec8c8" padding="0" @focus="onFocus"
+							<TextField ref="textFieldVille" row="1" borderBottomColor="#fff" padding="0" @focus="onFocus"
 						@blur="onBlur" borderBottomWidth="3" @textChange="onTextChange" v-model="input.commune"/>
 						</GridLayout>
 						<ScrollView v-if="affichageVilles" >
@@ -32,13 +33,13 @@
 							<Image row="1" col="1" v-else class="imageCheck" src="~/assets/icons/checkFalse.png" @tap="updateCoordinateur"/>
 							<Label row="1" col="0" text="Equipe de coordination Téléthon" fontSize="14" class="labelCheck" />
 						</GridLayout>
-						<Button text="Créer l'équipe" @tap="creerEquipe" />
+						<Button text="Créer l'équipe" @tap="creerEquipe" class="boutonAction"/>
 					</StackLayout>
 					<StackLayout v-if="isExistanteEquipe" >
-						<Label text="Sélection de l'équipe" />
+						<Label text="Sélection de l'équipe" class="entetePage"/>
 						<GridLayout rows="30, auto" marginBottom="5">
 							<Label ref="labelVille" row="1" text="Ville du challenge Téléthon" opacity="0.4" fontSize="14" class="input" />
-							<TextField ref="textFieldVille" row="1" borderBottomColor="#cec8c8" padding="0" @focus="onFocus"
+							<TextField ref="textFieldVille" row="1" borderBottomColor="#fff" padding="0" @focus="onFocus"
 						@blur="onBlur" borderBottomWidth="3" @textChange="onTextChange" v-model="input.commune"/>
 						</GridLayout>
 						<ScrollView v-if="affichageVilles" >
@@ -49,7 +50,7 @@
 							</StackLayout>
 						</ScrollView>
 						<ListPicker v-if="affichageEquipes" ref="equipeEnCours" :items="equipesVille" textField="nom" @tap="selectEquipeExistante()"  />
-						<Label v-else text="Il n'existe pas encore d'équipe sur cette commune. Utiliser 'Créer une équipe'" />
+						<Label v-else textWrap="true" text="Il n'existe pas encore d'équipe sur cette commune. Utiliser 'Créer une équipe'" />
 						
 					</StackLayout>
 				</StackLayout>
@@ -96,7 +97,14 @@
 			
         },
 		computed: {	
-
+			getClassButtonNouvelleEquipe () {
+				console.log("isNouvelleEquipe : "+this.isNouvelleEquipe);
+				return this.isNouvelleEquipe ? "active" : "nonActive";
+			},
+			getClassButtonExistanteEquipe () {
+				console.log("isExistanteEquipe : "+this.isExistanteEquipe);
+				return this.isExistanteEquipe ? "active" : "nonActive";
+			},
 			isOrganisateur(){
 				if (this.input.admin == 1){
 					console.log("Le flag orga est vert");
@@ -363,5 +371,22 @@
 
 .labelCheck {
 	margin : 20px;
+}
+
+.menuEquipe {
+	border : 10px;
+	border-color : white;
+	height : 40px;
+	vertical-align : bottom;
+}
+
+.active {
+	background-color : white;
+	color : #fbc62d;
+}
+
+.nonActive {
+	background-color : #fbc62d;
+	color : white;
 }
 </style>

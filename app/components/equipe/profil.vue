@@ -13,7 +13,7 @@
 					<FloatLabel placeholder="Prénom" label="prenom" :valeur="myLastname" @updateValeur="updatePrenom"/>
 					<GridLayout rows="30, auto" marginBottom="5">
 						<Label ref="labelVille" row="1" text="Ville d'habitation" opacity="0.4" fontSize="14" class="input" />
-						<TextField ref="textFieldVille" row="1" borderBottomColor="#cec8c8" padding="0" @focus="onFocus"
+						<TextField ref="textFieldVille" row="1" borderBottomColor="#fff" padding="0" @focus="onFocus"
 					@blur="onBlur" borderBottomWidth="3" @textChange="onTextChange" />
 					</GridLayout>
 					<ScrollView v-if="affichageVilles" >
