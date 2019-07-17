@@ -4,14 +4,26 @@
 			<Header dock="top" />
 			<Footer dock="bottom" />
 			<StackLayout dock="center" class="root" >
-				<label class="TitreHome" text="Bonjour"  horizontalAlignment="center"/>
+				<label class="Titre" text="Bonjour"  horizontalAlignment="center"/>
 				<StackLayout v-if="$store.state.currentEquipe.nom">
-					<label class="label" text="Equipe :"  horizontalAlignment="center"/>
-					<label class="valeur" :text="$store.state.currentEquipe.nom"  />
-					<label class="label" text="Défis : "   verticalAlignment="center" horizontalAlignment="center"/>
-					<label class="valeur" :text="$store.state.currentEquipe.defis"  verticalAlignment="bottom" horizontalAlignment="center"/>
-					<label class="label" text="Commune : "  verticalAlignment="center" horizontalAlignment="center"/>
-					<label class="valeur" :text="$store.state.currentEquipe.commune"  /><Label :text="networkStatus" />
+					<GridLayout rows="*,*,*" columns="*,auto">
+						<StackLayout row="0" col="0">
+							<label class="label" text="Equipe :"  />
+							<label class="valeur" :text="$store.state.currentEquipe.nom"  />
+						</StackLayout>
+						<Image  src="~/assets/icons/modify.png" col="1" row="0" @tap="navEquipe" stretch="none" />
+						<StackLayout row="1" col="0">	
+							<label class="label" text="Défis : "  />
+							<label class="valeur" :text="$store.state.currentEquipe.defis"  verticalAlignment="bottom" horizontalAlignment="center"/>
+						</StackLayout>
+						<Image  src="~/assets/icons/modify.png" col="1" row="1" @tap="navEquipe" stretch="none" />
+						<StackLayout row="2" col="0">	
+							<label class="label" text="Commune : "/>
+							<label class="valeur" :text="$store.state.currentEquipe.commune"  /><Label :text="networkStatus" />
+						</StackLayout>
+						<Image  src="~/assets/icons/modify.png" col="1" row="2" @tap="navEquipe" stretch="none" class="modify"/>
+						
+					</GridLayout>
 				</StackLayout>
 				<StackLayout v-else>
 					<Label class="labelEquipeSelect" text="! Pas d'équipe sélectionnée !" horizontalAlignment="center" />
@@ -39,6 +51,7 @@
 <script>
 	const connectivity = require("connectivity");
 	import changeEquipe from "./equipe/changeEquipe";
+	import equipe from "./equipe/equipe";
     export default {
 		data() {
             return {
@@ -75,8 +88,10 @@
 		methods: {
 			navChangeEquipe(type) {
 				console.log("type : "+type);
-				
 				this.$navigateTo(changeEquipe, { props: {type : type}});
+			},
+			navEquipe() {
+				this.$navigateTo(Equipe);
 			},
 			titreEquipe() {
 				if (this.$store.state.currentEquipe.nom.length > 0) {
@@ -137,22 +152,4 @@
     };
 </script>
 <style>
-.page {
-	background-color : #fbc62d;
-}
-.TitreHome {
-	font-size : 40px;;
-	
-}
-.actionLabel {
-	margin : 0 20px;
-	color : white;
-	font-weight: bold;
-}
-.labelEquipeSelect {
-	margin : 80px 0;
-	font-size : 20px;
-	text-decoration: underline;
-	font-weight: bold;
-}
 </style>

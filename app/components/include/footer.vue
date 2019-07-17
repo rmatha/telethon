@@ -1,29 +1,23 @@
 <template>
     <!-- Bottom navigation -->
-	<StackLayout dock="bottom" :class="getClassMenu" ref="logoContainer" backgroundColor="#fff">
+	<StackLayout dock="bottom" :class="getClassMenu" ref="logoContainer" >
 		<Image v-if="menuOn" src="~/assets/ResourcePage/footerDown.png" class="rootFooter root"  stretch="aspectFill" width="100%" height="200px"  @tap="loadMenu"/>
 		<Image v-else src="~/assets/ResourcePage/footerUp.png" class="rootFooter root"  stretch="aspectFill" width="100%" height="200px"  @tap="loadMenu"/>
-		<GridLayout  rows="100,100,100" columns="auto,auto" horizontalAlignment="center">
+		<GridLayout  rows="105,105,105,*" columns="*,2*" horizontalAlignment="center" class="innerFooter">
 			<!--<Image src="~/assets/icons/equipe.jpg" @tap="navProfil" row="0" col="0" />
 			<Image src="~/assets/icons/challenges.png" @tap="navChallenges" row="0" col="1" />
 			<Image src="~/assets/icons/Star-Red.png" @tap="navResultats" row="0" col="2" />-->
-			<Image  class="IconTeam" src="~/assets/icons/equipe_y.png" col="0" row="0"  />
-			<Label class="boutonDev" text="Equipe"  row="0" col="1" @tap="navProfil"  />
-			<Image  class="IconDefis" src="~/assets/icons/challenges_y.png" row="1" col="0"/>
-			<Label class="boutonDev" text="Défis" row="1" col="1" @tap="navChallenges"/>
-			<Image class="IconScore" src="~/assets/icons/resultat_y.png" row="2" col="0" />
-			<Label class="boutonDev" text="Score" row="2" col="1" @tap="navResultats"/>
+			<Image  class="menuIcon" src="~/assets/icons/equipe_y.png" col="0" row="0"  />
+			<Label class="menuText" text="Equipe"  row="0" col="1" @tap="navProfil"  />
+			<Label class="menuBorder" text=""  row="0" col="0" colSpan="2" @tap="navProfil"  />
+			<Image  class="menuIcon" src="~/assets/icons/challenges_y.png" row="1" col="0"/>
+			<Label class="menuText" text="Défis" row="1" col="1" @tap="navChallenges"/>
+			<Label class="menuBorder" text=""  row="1" colSpan="2" @tap="navChallenges"  />
+			<Image class="menuIcon" src="~/assets/icons/resultat_y.png" row="2" col="0" />
+			<Label class="menuText" text="Score" row="2" col="1" @tap="navResultats"/>
+			<Label class="menuBorder" text=""  row="2" colSpan="2" @tap="navResultats"  />
 
-			<button class="boutonDev1" text="Equipe" col="0" row="0" @tap="navProfil"/>
-			<button class="boutonDev2" text="Défis" top="350" left="100" @tap="defis"/>
-			<button class="boutonDer1" text="ok" top="285" left="30"/>
-			<button class="boutonDer2" text="ok" top="350" left="30"/>
-			<button class="boutonDev3" text="Score" top="415" left="100" @tap="score"/>
-			<button class="boutonDer3" text="ok" top="415" left="30"/>
 
-			<Image class="IconTeam" src="~/assets/ResourceIcon/team - fullrez.png" top="283" left="55" />
-			<Image class="IconDefis" src="~/assets/ResourceIcon/challenges.png" top="347" left="55" />
-			<Image class="IconScore" src="~/assets/ResourceIcon/star.png" top="413" left="55" />
 			
 		</GridLayout>
 	</StackLayout>
@@ -82,6 +76,10 @@
 
 
 <style>
+	.innerFooter {
+		background-color : #fff;
+		width : 100%;
+	}
 	.menu {
 		height : 200px;
 	}
@@ -93,17 +91,52 @@
 		color : black;
 		height : 200px;
 	}
-	.boutonDev{
+
+	.menuIcon {
+		z-index: 2;
+		width : 10%;
+		margin-left: 15%;
+	}
+	.menuText{
   
 	  /* font */
-	  color: #fbc62d;
+	  background-color:#fbc62d;
+	  color: white;
 	  font-weight: bold;
 	  font-style: normal;
 	  font-stretch: normal;
 	  font-size: 20px;
 	  horizontal-alignment : left;
 	  vertical-alignment : center;
-	  margin-left : 20px;
+	  margin-right : 20px;
+	  border-radius: 30%;
+	  border-width: 2.5%;
+	  width : 60%;
+	  height: 14%;
+	  padding-top: 12.5%;
+	  padding-left: 75%;
+	  border-color: #fbc62d;
+	  z-index: 2;
+	}
+	.menuBorder{
+  
+	  /* font */
+	  background-color:white;
+	  color: #fbc62d;
+	  font-weight: bold;
+	  font-style: normal;
+	  font-stretch: normal;
+	  font-size: 20px;
+	  horizontal-alignment : center;
+	  vertical-alignment : right;
+	  margin-right :  10px;
+	  border-radius: 30%;
+	  border-width: 2.5%;
+	  width : 85%;
+	  height: 14%;
+	  z-index: 1;
+	  border-color: #fbc62d;
+
 	}
 	
 </style>

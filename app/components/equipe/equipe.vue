@@ -1,7 +1,9 @@
 <template>
 	<page class="page" actionBarHidden="true">
-		<GridLayout rows="auto, *, auto" columns="*">
-			<Header row="0" col="0" />
+		  <DockLayout stretchLastChild="true">
+        <Header dock="top" />
+        <Footer dock="bottom" />
+			<StackLayout dock="center" class="root" >
 			<ScrollView row="1" col="0" >
 				<StackLayout class="m-20">
 					<GridLayout rows="200" columns="*" >
@@ -38,10 +40,8 @@
 				</StackLayout>
 				
 			</ScrollView>
-			
-			<Footer row="2" col="0" />
-		</GridLayout>
-		
+			</StackLayout>
+	</DockLayout>
 	</page>
 </template>
 
@@ -182,7 +182,5 @@
         margin: 15;
     }
 
-    .description-label {
-        margin-bottom: 15;
-    }
+
 </style>

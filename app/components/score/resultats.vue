@@ -1,7 +1,9 @@
 <template>
     <Page class="page" actionBarHidden="true">
-		<GridLayout rows="auto, *, auto" columns="*, *, *">
-			<Header row="0" col="0" colSpan="3"/>
+	  <DockLayout stretchLastChild="true">
+        <Header dock="top" />
+        <Footer dock="bottom" />
+			<StackLayout dock="center" class="root" >
 			<StackLayout row="1" col="0" colSpan="3">
 				<GridLayout rows="auto" columns="*, auto">
 					<Label row="0" col="0" class="titleResultat" text="Moyenne de l'équipe" />
@@ -22,9 +24,8 @@
 				</ListView>
 				
 			</StackLayout>
-			<Footer row="2" col="0" colSpan="3"/>
-		</GridLayout>
-		
+		</StackLayout>
+		</DockLayout>
 	</page>
 	
 	
