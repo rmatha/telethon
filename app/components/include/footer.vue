@@ -40,6 +40,8 @@
         },
         mounted() {
 			this.menuOn = false;
+			var orientationModule = require("@irman/nativescript-screen-orientation");
+        	orientationModule.setCurrentOrientation("portrait");
 		},
 		methods: {
 			loadMenu(){
