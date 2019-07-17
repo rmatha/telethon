@@ -136,7 +136,7 @@
     };
 </script>
 <style>
-.root {
+.page {
 	background-color : #fbc62d;
 }
 .TitreHome {
