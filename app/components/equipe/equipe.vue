@@ -12,8 +12,8 @@
 						<Label width="90%" class="m-b-20 titreTelethon" :text="titreEquipe" textWrap="true" />
 						<Image width="10%" src="~/assets/icons/change.png" @tap="changeEquipe"/>
 					</StackLayout>
-					<Label text="Commune des défis Téléthon" />
-					<Label :text="$store.state.currentEquipe.commune" />
+					<Label class="label" text="Commune des défis Téléthon" />
+					<Label class="valeur" :text="$store.state.currentEquipe.commune" />
 
 					<Label text="Votre équipe est Organisateur" v-if="isOrganisateur"  />
 					<Label text="Votre équipe est Coordinateur " v-if="isCoordinateur" />

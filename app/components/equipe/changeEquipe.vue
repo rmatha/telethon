@@ -9,7 +9,7 @@
 						<Button row="0" col="1" text="Equipe existante" @tap="equipeExistante" />
 					</GridLayout>
 					<StackLayout v-if="isNouvelleEquipe" >
-						<Label text="Création de la nouvelle équipe" />
+						<Label text="Création de la nouvelle équipe" verticalAlign="Center"/>
 						<FloatLabel placeholder="Nom de l'équipe" label="nom de l'équipe" :valeur="input.nom" @updateValeur="updateNomEquipe"/>
 						<GridLayout rows="30, auto" marginBottom="5">
 							<Label ref="labelVille" row="1" text="Ville du challenge Téléthon" opacity="0.4" fontSize="14" class="input" />
@@ -24,13 +24,13 @@
 							</StackLayout>
 						</ScrollView>
 						<FloatLabel placeholder="Code de confidentialité" label="code de confidentialité" :valeur="input.code" @updateValeur="updateCodeEquipe" />
-						<GridLayout rows="auto,auto" columns="50,*" marginBottom="5">
-							<Image row="0" col="0" v-if="isOrganisateur" src="~/assets/icons/true.png" @tap="updateOrganisateur"/>
-							<Image row="0" col="0" v-else src="~/assets/icons/false.png" @tap="updateOrganisateur"/>
-							<Label row="0" col="1" text="Equipe organisatrice" fontSize="14" class="input" />
-							<Image row="1" col="0" v-if="isCoordinateur" src="~/assets/icons/true.png" @tap="updateCoordinateur"/>
-							<Image row="1" col="0" v-else src="~/assets/icons/false.png" @tap="updateCoordinateur"/>
-							<Label row="1" col="1" text="Equipe de coordination Téléthon" fontSize="14" class="input" />
+						<GridLayout rows="auto,auto" columns="*,50" marginBottom="5">
+							<Image row="0" col="1" v-if="isOrganisateur" class="imageCheck" src="~/assets/icons/checkTrue.png" @tap="updateOrganisateur"/>
+							<Image row="0" col="1" v-else  class="imageCheck"src="~/assets/icons/checkFalse.png" @tap="updateOrganisateur"/>
+							<Label row="0" col="0" text="Equipe organisatrice" fontSize="14" class="labelCheck" />
+							<Image row="1" col="1" v-if="isCoordinateur" class="imageCheck" src="~/assets/icons/checkTrue.png" @tap="updateCoordinateur"/>
+							<Image row="1" col="1" v-else class="imageCheck" src="~/assets/icons/checkFalse.png" @tap="updateCoordinateur"/>
+							<Label row="1" col="0" text="Equipe de coordination Téléthon" fontSize="14" class="labelCheck" />
 						</GridLayout>
 						<Button text="Créer l'équipe" @tap="creerEquipe" />
 					</StackLayout>
@@ -355,14 +355,13 @@
 .labelVille {
 	color : #ffffff;
 }
-.titreTelethon {
-	font-size : 38px;
-}
-.red {
-	color: #ff0000;
+
+.imageCheck {
+	width : 100px;
+	margin : 20px;
 }
 
-.green {
-	color : #00ff00;
+.labelCheck {
+	margin : 20px;
 }
 </style>
