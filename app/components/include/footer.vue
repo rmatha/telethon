@@ -13,6 +13,17 @@
 			<Label class="boutonDev" text="Défis" row="1" col="1" @tap="navChallenges"/>
 			<Image class="IconScore" src="~/assets/icons/resultat_y.png" row="2" col="0" />
 			<Label class="boutonDev" text="Score" row="2" col="1" @tap="navResultats"/>
+
+			<button class="boutonDev1" text="Equipe" col="0" row="0" @tap="navProfil"/>
+			<button class="boutonDev2" text="Défis" top="350" left="100" @tap="defis"/>
+			<button class="boutonDer1" text="ok" top="285" left="30"/>
+			<button class="boutonDer2" text="ok" top="350" left="30"/>
+			<button class="boutonDev3" text="Score" top="415" left="100" @tap="score"/>
+			<button class="boutonDer3" text="ok" top="415" left="30"/>
+
+			<Image class="IconTeam" src="~/assets/ResourceIcon/team - fullrez.png" top="283" left="55" />
+			<Image class="IconDefis" src="~/assets/ResourceIcon/challenges.png" top="347" left="55" />
+			<Image class="IconScore" src="~/assets/ResourceIcon/star.png" top="413" left="55" />
 			
 		</GridLayout>
 	</StackLayout>
