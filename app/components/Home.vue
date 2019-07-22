@@ -3,8 +3,11 @@
         <DockLayout stretchLastChild="true">
 			<Header dock="top" />
 			<Footer dock="bottom" />
-			<StackLayout dock="center" class="root" >
-				<label class="Titre" text="Bonjour"  horizontalAlignment="center"/>
+			<StackLayout v-if="chargement" dock="center" class="root" >
+				<label :text="libelleChargement" class="valeur chargement"  />
+			</StackLayout>
+			<StackLayout v-else dock="center" class="root" >
+				<label class="titre" text="Bonjour"  horizontalAlignment="center"/>
 				<StackLayout v-if="$store.state.currentEquipe.nom">
 					<GridLayout rows="*,*,*" columns="*,auto">
 						<StackLayout row="0" col="0">
@@ -56,26 +59,33 @@
 		data() {
             return {
 				networkStatus : "",
+				chargement : true,
+				libelleChargement : "test de la connexion internet",
+				connexion : false,
+				categories : []
             };
         },
 		mounted() {
 			console.log("home ");
-			this.$store.dispatch("queryCurrentEquipe");
+			//this.$store.dispatch("queryCurrentEquipe");
 			// vérification de la connectivité
-			/*this.networkStatus = "Monitoring network connection changes.";
-            connectivity.startMonitoring((newConnectionType) => {
-                switch (newConnectionType) {
-                case connectivity.connectionType.none:
-                    this.networkStatus = "No network connection available!";
-                    break;
-                case connectivity.connectionType.wifi:
-					this.networkStatus = "You are now on wifi!";
-                    break;
-                case connectivity.connectionType.mobile:
-					this.networkStatus = "You are now on a mobile data network!";
-                    break;
-                
-				});*/
+			this.checkNetwork();
+			
+			console.log("connexion : "+this.connexion);
+			if (this.connexion) {
+				// récupération de la liste des catégories
+				console.log("on récupère les catégories");
+				fetch(
+                    "https://telethon.citeyen.com/public/api/categories/list"
+                )
+				.then(response => response.json())
+                .then(data => {
+                    this.categories = data;
+                    console.log("nom de la premiere categories : " + data[0].nom);
+                    console.log("Nombre de categories : " + this.categories.length);
+					this.$store.dispatch("reloadCategories",data);
+                })
+			}
 			console.log("équipe en cours : "+JSON.stringify(this.$store.state.currentEquipe));
 		},
         computed: {
@@ -102,13 +112,16 @@
 				const connectionType = connectivity.getConnectionType();
 				switch (connectionType) {
 					case connectivity.connectionType.none:
-						alert("No network connection available!");
+						this.libelleChargement = "Pas de connexion internet disponible";
+						this.connexion = false;
 						break;
 					case connectivity.connectionType.wifi:
-						alert("You are on wifi!");
+						this.libelleChargement = "Connection WIFI valide";
+						this.connexion = true;
 						break;
 					case connectivity.connectionType.mobile:
-						alert("You are on a mobile data network!");
+						this.libelleChargement = "Connection mobile valide";
+						this.connexion = true;
 						break;
 				}
 			},
@@ -151,4 +164,8 @@
     };
 </script>
 <style>
+.chargement {
+	margin-top : 50%;
+	text-align : center;
+}
 </style>

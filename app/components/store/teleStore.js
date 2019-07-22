@@ -467,6 +467,23 @@ const store = new Vuex.Store({
 				console.log("DELETE ERROR categorie", error);
 			});
 		},
+		reloadCategories(context, data) {
+			context.state.database.execSQL("DELETE FROM categorie").then(id => {
+				console.log("Table Catégories vidée");
+			}, error => {
+				console.log("DELETE ERROR categorie", error);
+			});
+			for (var j = 0 ; j < data.length ; j++) {
+				console.log("intégration de la catégorie : "+data[j].nom);
+				context.state.database.execSQL("INSERT INTO categorie (nom) VALUES (?)", [data[j].nom]).then(id => {
+					//context.commit("saveProfil", { data: data });
+					
+				}, error => {
+					console.log("PROFIL INSERT ERROR", error);
+				});
+			}
+			context.commit("loadCategorie", { data: data });
+		},
 		deleteDefi(context, data) {
 			context.state.database.execSQL("DELETE FROM challenge where id = ?", [data.id]).then(id => {
 				//context.commit("saveChallenge", { data: data });
