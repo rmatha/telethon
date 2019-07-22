@@ -32,7 +32,7 @@
 				<button text="Récupérer les défis de ma ville" @tap="recupereDefis" />
 				
 				
-				<StackLayout v-if="isAdmin">
+<!--<StackLayout v-if="isAdmin">-->
 					<ScrollView >
 						<StackLayout class="m-20">
 							<StackLayout orientation="horizontal" backgroundcolor="#562389">

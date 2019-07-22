@@ -5,6 +5,13 @@
 			<Footer dock="bottom" />
 			<StackLayout v-if="chargement" dock="center" class="root" >
 				<label :text="libelleChargement" class="valeur chargement"  />
+				<button text="init monitoring reseau" @tap="checkNetwork" />
+				<Button text="Réinitialiser les tables de la base" @tap="reinit" />
+				<Button text="Recharger l'équipe e cours" @tap="reinitEquipe" />
+				<Button text="Rechargerr les scores" @tap="reinitScore" />
+				<Label :text="currentEquipe" />
+				<Label text="Nombre de défis en base " />  
+				<Label :text="$store.state.defis.length" />
 			</StackLayout>
 			<StackLayout v-else dock="center" class="root" >
 				<label class="titre" text="Bonjour"  horizontalAlignment="center"/>
@@ -37,13 +44,7 @@
 						<Label class="actionLabel" text="Sélectionner une équipe"  row="1" col="1" @tap="navChangeEquipe('search')"  />
 					</GridLayout>
 				</StackLayout>
-				<!--<button text="init monitoring reseau" @tap="checkNetwork" />
-				<Button text="Réinitialiser les tables de la base" @tap="reinit" />
-				<Button text="Recharger l'équipe e cours" @tap="reinitEquipe" />
-				<Button text="Rechargerr les scores" @tap="reinitScore" />
-				<Label :text="currentEquipe" />
-				<Label text="Nombre de défis en base " />  
-				<Label :text="$store.state.defis.length" />-->
+				
 				
 			</StackLayout>
 			
@@ -55,6 +56,8 @@
 	const connectivity = require("connectivity");
 	import changeEquipe from "./equipe/changeEquipe";
 	import equipe from "./equipe/equipe";
+	import axios from 'axios'
+	
     export default {
 		data() {
             return {
@@ -73,18 +76,34 @@
 			
 			console.log("connexion : "+this.connexion);
 			if (this.connexion) {
-				// récupération de la liste des catégories
-				console.log("on récupère les catégories");
-				fetch(
-                    "https://telethon.citeyen.com/public/api/categories/list"
-                )
-				.then(response => response.json())
-                .then(data => {
-                    this.categories = data;
-                    console.log("nom de la premiere categories : " + data[0].nom);
-                    console.log("Nombre de categories : " + this.categories.length);
-					this.$store.dispatch("reloadCategories",data);
-                })
+				//récuperation du numero de version locale 
+				this.$store.dispatch("queryCategorieVersion").then(() => {
+					console.log("Version catégories locale :");
+					console.log(JSON.stringify(this.$store.state.versionCategorie));
+					console.log(typeof(this.$store.state.versionCategorie));
+					// révupération de la version des catégories sur le serveur 
+					console.log("on récupère la version des catégories sur le serveur");
+					axios
+					.get('https://telethon.citeyen.com/public/api/categories/version')
+					.then(response => {
+						console.log("axios :"+JSON.stringify(response.data.version));
+						console.log("axios :"+typeof(response.data.version));
+						if (response.data.version > this.$store.state.versionCategorie) {
+							// mise a jour de la table de categories
+							console.log("MAJ des catégories");
+							axios
+							  .get('https://telethon.citeyen.com/public/api/categories/list')
+							  .then(responseList => {
+								this.libelleChargement = JSON.stringify(responseList);
+								console.log("nom de la premiere categories : " + responseList.data[0].nom);
+								console.log("Nombre de categories : " + responseList.data.length);
+								this.$store.dispatch("reloadCategories",{data : responseList.data,version : response.data.version});
+							  });
+						}else {
+							console.log("Pas besoin de mettre à jour");
+						}
+					})
+				});
 			}
 			console.log("équipe en cours : "+JSON.stringify(this.$store.state.currentEquipe));
 		},
@@ -124,29 +143,6 @@
 						this.connexion = true;
 						break;
 				}
-			},
-			monitorNetworkStart() {
-				
-				console.log("chargment du status");
-				this.networkStatus = "Monitoring network connection changes.";
-				connectivity.startMonitoring((newConnectionType) => {
-					switch (newConnectionType) {
-					case connectivity.connectionType.none:
-						this.networkStatus = "No network connection available!";
-						break;
-					case connectivity.connectionType.wifi:
-						this.networkStatus = "You are now on wifi!";
-						break;
-					case connectivity.connectionType.mobile:
-						this.networkStatus = "You are now on a mobile data network!";
-						break;
-					}
-				});
-			},
-			monitorNetworkStop() {
-				connectivity.stopMonitoring();
-				this.networkStatus =
-					"No longer monitoring network connection changes.";
 			},
 			reinit() {
 				this.$store.dispatch("deleteBase");

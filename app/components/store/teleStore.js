@@ -9,6 +9,7 @@ const store = new Vuex.Store({
     state: {
         database: null,
         data: [],
+		versionCategorie : "0",
 		profilsEquipe: 
 		[{
 			firstname : "",
@@ -51,6 +52,11 @@ const store = new Vuex.Store({
     mutations: {
 		init(state, data) {
 			state.database = data.database;
+		},
+		loadCategorieVersion(state, data) {
+			console.log("loadCategorieVersion : -----"+data.data);
+			state.versionCategorie = data.data ? data.data : 0;
+			console.log("store : Version categorie : "+state.versionCategorie);
 		},
 		loadCurrentEquipe(state, data) {
 			console.log("loadCurrentEquipe");
@@ -100,7 +106,7 @@ const store = new Vuex.Store({
 					id : data.data[i][0],
 					nom : data.data[i][1]
 				});
-				console.log("mutation load categorie : "+JSON.stringify(state.categorie));
+				console.log("mutation load categorie : "+JSON.stringify(state.categories));
 			}
 			
 		},
@@ -188,6 +194,12 @@ const store = new Vuex.Store({
 				db.execSQL("CREATE TABLE IF NOT EXISTS profil (id INTEGER PRIMARY KEY AUTOINCREMENT, firstname TEXT, lastname TEXT, telephone TEXT,commune TEXT, equipe INTEGER)").then(id => {
 					context.commit("init", { database: db });
 					console.log("Table person cree");
+				}, error => {
+					console.log("CREATE TABLE ERROR", error);
+				});
+				db.execSQL("CREATE TABLE IF NOT EXISTS configVersion (id INTEGER PRIMARY KEY AUTOINCREMENT, libelle type UNIQUE, valeur INTEGER)").then(id => {
+					context.commit("init", { database: db });
+					console.log("Table configVersion cree");
 				}, error => {
 					console.log("CREATE TABLE ERROR", error);
 				});
@@ -383,6 +395,16 @@ const store = new Vuex.Store({
 			});
 			//console.log("action query : "+JSON.stringify(data));
 		},
+		queryCategorieVersion(context) {
+			context.state.database.all("SELECT valeur FROM configVersion where libelle = 'categorie'").then(result => {
+			//context.state.database.all("SELECT * FROM configVersion").then(result => {
+				console.log("queryCategorieVersion : "+JSON.stringify(result));
+				context.commit("loadCategorieVersion", { data: result[0]});
+			}, error => {
+				console.log("SELECT ERROR versionCategorie", error);
+			});
+			//console.log("action query : "+JSON.stringify(data));
+		},
 		queryEquipes(context) {
 			console.log("queryEquipes");
 			context.state.database.all("SELECT id,nom,commune,code, admin FROM equipe ", []).then(result => {
@@ -467,22 +489,29 @@ const store = new Vuex.Store({
 				console.log("DELETE ERROR categorie", error);
 			});
 		},
-		reloadCategories(context, data) {
+		reloadCategories(context, tab) {
 			context.state.database.execSQL("DELETE FROM categorie").then(id => {
 				console.log("Table Catégories vidée");
 			}, error => {
 				console.log("DELETE ERROR categorie", error);
 			});
-			for (var j = 0 ; j < data.length ; j++) {
-				console.log("intégration de la catégorie : "+data[j].nom);
-				context.state.database.execSQL("INSERT INTO categorie (nom) VALUES (?)", [data[j].nom]).then(id => {
+			for (var j = 0 ; j < tab.data.length ; j++) {
+				console.log("intégration de la catégorie : "+tab.data[j].nom);
+				context.state.database.execSQL("INSERT INTO categorie (nom) VALUES (?)", [tab.data[j].nom]).then(id => {
 					//context.commit("saveProfil", { data: data });
 					
 				}, error => {
 					console.log("PROFIL INSERT ERROR", error);
 				});
 			}
-			context.commit("loadCategorie", { data: data });
+			console.log("MAJ de la version des catégories : "+tab.version);
+			context.state.database.execSQL("REPLACE INTO configVersion (libelle,valeur) VALUES ('categorie',?)",tab.version).then(id => {
+				console.log("Table configVersion MAJ");
+			}, error => {
+				console.log("UPDATE configVersion ", error);
+			});
+			context.commit("loadCategorieVersion", { data: tab.version });
+			context.commit("loadCategorie", { data: tab.data });
 		},
 		deleteDefi(context, data) {
 			context.state.database.execSQL("DELETE FROM challenge where id = ?", [data.id]).then(id => {
@@ -518,10 +547,10 @@ const store = new Vuex.Store({
 			});
 		},
 		deleteBase(context) {
-			context.state.database.execSQL("DROP TABLE equipe").then(id => {
-				console.log("Suppression de la table equipe");
+			context.state.database.execSQL("DROP TABLE configVersion").then(id => {
+				console.log("Suppression de la table configVersion");
 			}, error => {
-				console.log("DELETE ERROR challenge", error);
+				console.log("DELETE ERROR conf", error);
 			});
 			context.state.database.execSQL("DROP TABLE profil").then(id => {
 				console.log("Suppression de la table profil");
