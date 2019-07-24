@@ -4,20 +4,26 @@ const Vuex = require("vuex");
 const Sqlite = require("nativescript-sqlite");
 
 Vue.use(Vuex);
+	
 
 const store = new Vuex.Store({
     state: {
+		debug : true,
         database: null,
         data: [],
 		versionCategorie : "0",
-		profilsEquipe: 
-		[{
-			firstname : "",
-			lastname : "",
-			telephone : "",
-			commune :"",
-			equipe : -1,
-		}],
+		versionDefi : "0",
+		versionEquipe : "0",
+		updateCategorie : false,
+		updateDefi : false,
+		selectedCommune : null,
+		selectedCategorie : null,
+		selectedDefi : null,
+		selectedScore : null,
+		selectedEquipe : {},
+		isAdmin : true,
+		isOrganisateur : true,
+		profilsEquipe: [],
 		categories: [{
 			id : Number,
 			nom: ""
@@ -33,13 +39,6 @@ const store = new Vuex.Store({
 		}],
 		defisCommune: [],
 		nosDefis: [],
-		currentEquipe : {
-			id : -1,
-			nom : "",
-			commune : "",
-			code : "",
-			admin : 0,
-		},
 		equipes : [{
 			id : -1,
 			nom: "",
@@ -56,18 +55,27 @@ const store = new Vuex.Store({
 		loadCategorieVersion(state, data) {
 			console.log("loadCategorieVersion : -----"+data.data);
 			state.versionCategorie = data.data ? data.data : 0;
-			console.log("store : Version categorie : "+state.versionCategorie);
+		},
+		loadDefiVersion(state, data) {
+			console.log("loadCategorieDefi : -----"+data.data);
+			state.versionDefi = data.data ? data.data : 0;
+		},
+		loadEquipeVersion(state, data) {
+			console.log("loadCategorieEquipe : -----"+data.data);
+			state.versionEquipe = data.data ? data.data : 0;
 		},
 		loadCurrentEquipe(state, data) {
-			console.log("loadCurrentEquipe");
+			console.log("loadCurrentEquipe : data :"+JSON.stringify(data));
+			console.log("loadCurrentEquipe : data.length :"+data.data.length);
 			for(var i = 0; i < data.data.length; i++) {
-				state.currentEquipe.id = data.data[i][0];
-				state.currentEquipe.nom = data.data[i][1];
-				state.currentEquipe.commune = data.data[i][2];
-				state.currentEquipe.code = data.data[i][3];
-				state.currentEquipe.admin = data.data[i][4];
+				state.selectedEquipe.id = data.data[i][0];
+				state.selectedEquipe.nom = data.data[i][1];
+				state.selectedEquipe.commune = data.data[i][2];
+				state.selectedEquipe.code = data.data[i][3];
+				state.selectedEquipe.admin = data.data[i][4];
+				state.selectedEquipe.organisateur = data.data[i][5];
 			}
-			console.log("mutation load currentEquipe: "+JSON.stringify(state.currentEquipe));
+			console.log("mutation load currentEquipe: "+JSON.stringify(state.selectedEquipe));
 		},
 		
 		loadEquipes(state, data) {
@@ -80,6 +88,7 @@ const store = new Vuex.Store({
 					commune : data.data[i][2],
 					code : data.data[i][3],
 					admin : data.data[i][4],
+					organisateur : data.data[i][5],
 				});
 			}
 			console.log("mutation load loadEquipes: "+JSON.stringify(state.equipes));
@@ -215,7 +224,7 @@ const store = new Vuex.Store({
 				}, error => {
 					console.log("CREATE TABLE ERROR categorie", error);
 				});
-				db.execSQL("CREATE TABLE IF NOT EXISTS equipe (id INTEGER PRIMARY KEY AUTOINCREMENT, nom varchar(256), commune varchar(256), current tinyint(1), code varchar(256), admin INTEGER)").then(id => {
+				db.execSQL("CREATE TABLE IF NOT EXISTS equipe (id INTEGER PRIMARY KEY AUTOINCREMENT, nom TEXT, commune TEXT, current tinyint(1), code varchar(256), admin tinyint(1), organisateur tinyint(1),UNIQUE(nom,commune))").then(id => {
 					context.commit("init", { database: db });
 					console.log("Table equipe cree");
 				}, error => {
@@ -245,21 +254,22 @@ const store = new Vuex.Store({
 			});
 		},
 		insertProfil(context, data) {
-			console.log("id du participant : "+data.id+" : del'équipe : "+this.state.currentEquipe.id);
+			console.log("id du participant : "+data.id+" : del'équipe : "+this.state.selectedEquipe.id);
 			if (data.id < 0) {
 				console.log("insert d'un nouveau profil");
-				context.state.database.execSQL("INSERT INTO profil (firstname, lastname,telephone,equipe,commune) VALUES (?,?,?,?,?)", [data.firstname, data.lastname, data.telephone,this.state.currentEquipe.id,data.commune]).then(id => {
+				context.state.database.execSQL("INSERT INTO profil (firstname, lastname,telephone,equipe,commune) VALUES (?,?,?,?,?)", [data.firstname, data.lastname, data.telephone,this.state.selectedEquipe.id,data.commune]).then(id => {
 					//context.commit("saveProfil", { data: data });
-					context.dispatch("queryProfilsEquipe",data);
+					console.log("insertProfil add participant");
+					context.dispatch("queryProfilsEquipe");
 				}, error => {
 					console.log("PROFIL INSERT ERROR", error);
 				});
 			}
 			else {
 				console.log("update d'un nouveau profil");
-				context.state.database.execSQL("UPDATE profil set firstname = ?, lastname = ?,telephone =?, equipe = ?, commune = ? where id = ?", [data.firstname, data.lastname, data.telephone,this.state.currentEquipe.id,data.commune,data.id]).then(id => {
+				context.state.database.execSQL("UPDATE profil set firstname = ?, lastname = ?,telephone =?, equipe = ?, commune = ? where id = ?", [data.firstname, data.lastname, data.telephone,this.state.selectedEquipe.id,data.commune,data.id]).then(id => {
 					//context.commit("saveProfil", { data: data });
-					context.dispatch("queryProfilsEquipe",data);
+					context.dispatch("queryProfilsEquipe");
 				}, error => {
 					console.log("INSERT ERROR", error);
 				});
@@ -282,7 +292,7 @@ const store = new Vuex.Store({
 			}
 		},
 		insertCurrentEquipe(context, data) {
-			console.log("updateCurrentEquipe");
+			console.log("insertCurrentEquipe reset current");
 			// on annule l'équipe qui était sélectionnée 
 			context.state.database.execSQL("UPDATE equipe set current = 0", []).then(id => {
 				//context.commit("saveProfil", { data: data });
@@ -290,9 +300,10 @@ const store = new Vuex.Store({
 			}, error => {
 				console.log("INSERT ERROR", error);
 			});
-			context.state.database.execSQL("INSERT INTO equipe (nom,commune,current,code,admin) VALUES (?,?,1,?,?)", [data.nom,data.commune,data.code,data.admin]).then(id => {
+			console.log("insertCurrentEquipe insert equipe");
+			context.state.database.execSQL("INSERT INTO equipe (nom,commune,current,code,admin,organisateur) VALUES (?,?,1,?,?,?)", [data.nom,data.commune,data.code,data.admin,data.organisateur]).then(id => {
 				//context.commit("saveCategorie", { data: data });
-				context.dispatch("queryCurrentEquipe", data);
+				context.dispatch("queryCurrentEquipe");
 			}, error => {
 				console.log("INSERT ERROR categorie", error);
 			});
@@ -321,10 +332,8 @@ const store = new Vuex.Store({
 		},
 		insertNosDefis (context,data) {
 			console.log("insertNosDefis defi : "+JSON.stringify(data));
-			context.state.database.execSQL("INSERT INTO nosDefis (idDefi,idEquipe) VALUES (?,?)", [data.defi.id,this.state.currentEquipe.id]).then(id => {
-				//context.commit("saveDefi", { data: data });
-				//queryDefis(context, data : [id : data.categorie]);
-				context.dispatch("queryNosDefis", data.categorie);
+			context.state.database.execSQL("INSERT INTO nosDefis (idDefi,idEquipe) VALUES (?,?)", [data.defi.id,this.state.selectedEquipe.id]).then(id => {
+				context.dispatch("queryNosDefis");
 			}, error => {
 				console.log("INSERT ERROR defi", error);
 			});
@@ -332,10 +341,8 @@ const store = new Vuex.Store({
 		},
 		insertDefisCurrentCommune (context,data) {
 			console.log("insertDefisCurrentCommune defi : "+JSON.stringify(data));
-			context.state.database.execSQL("INSERT INTO defisCommune (idDefi,commune) VALUES (?,?)", [data.defi.id,this.state.currentEquipe.commune]).then(id => {
-				//context.commit("saveDefi", { data: data });
-				//queryDefis(context, data : [id : data.categorie]);
-				context.dispatch("queryDefisCurrentCommune", data.categorie);
+			context.state.database.execSQL("INSERT INTO defisCommune (idDefi,commune) VALUES (?,?)", [data.defi.id,this.state.selectedEquipe.commune]).then(id => {
+				context.dispatch("queryDefisCurrentCommune");
 			}, error => {
 				console.log("INSERT ERROR defi", error);
 			});
@@ -345,9 +352,7 @@ const store = new Vuex.Store({
 			if (data.id < 0) {
   				console.log("insertScore : insert");
 				context.state.database.execSQL("INSERT INTO score (idDefi,idProfil,score) VALUES (?,?,?)", [data.idDefi,data.idProfil,data.score]).then(id => {
-					//context.commit("saveDefi", { data: data });
-					//queryDefis(context, data : [id : data.categorie]);
-					context.dispatch("queryScoresEquipe", data.categorie);
+					context.dispatch("queryScoresEquipe");
 				}, error => {
 					console.log("INSERT ERROR score", error);
 				});
@@ -356,7 +361,7 @@ const store = new Vuex.Store({
 				console.log("insertScore : update");
 				context.state.database.execSQL("UPDATE score set idDefi = ?, idProfil = ?, score = ? where id = ?", [data.idDefi,data.idProfil,data.score,data.id]).then(id => {
 					//context.commit("saveDefi", { data: data });
-					context.dispatch("queryScoresEquipe", data.categorie);
+					context.dispatch("queryScoresEquipe");
 				}, error => {
 					console.log("update ERROR score", error);
 				});
@@ -374,7 +379,7 @@ const store = new Vuex.Store({
 			// on place la nouvelle equipe en current
 			context.state.database.execSQL("UPDATE equipe set current = 1 where nom = ? and commune = ?", [data.nom,data.commune]).then(id => {
 				//context.commit("saveProfil", { data: data });
-				context.dispatch("queryCurrentEquipe",data);
+				context.dispatch("queryCurrentEquipe");
 			}, error => {
 				console.log("INSERT ERROR", error);
 			});
@@ -382,50 +387,71 @@ const store = new Vuex.Store({
 		},
 		queryCurrentEquipe(context) {
 			console.log("queryCurrentEquipe");
-			context.state.database.all("SELECT id,nom,commune,code, admin FROM equipe where current = 1", []).then(result => {
+			context.state.database.all("SELECT id,nom,commune,code, admin,organisateur FROM equipe where current = 1").then(result => {
+				console.log("queryCurrentEquipe récupération : "+ JSON.stringify(result));
 				context.commit("loadCurrentEquipe", { data: result });
-				context.dispatch("queryProfilsEquipe",this.state.currentEquipe);
-				context.dispatch("queryDefis",this.state.currentEquipe);
-				context.dispatch("queryEquipes",this.state.currentEquipe);
-				context.dispatch("queryNosDefis",this.state.currentEquipe);
-				context.dispatch("queryDefisCurrentCommune",this.state.currentEquipe);
-				context.dispatch("queryScoresEquipe",this.state.currentEquipe);
+				/*;*/
 			}, error => {
 				console.log("SELECT ERROR", error);
 			});
 			//console.log("action query : "+JSON.stringify(data));
 		},
+		queryDonnees(context,data) {
+			console.log("queryDonnees : data :"+data);
+			context.dispatch("queryDefis");
+			context.dispatch("queryEquipes");
+			if (data) {
+				console.log("queryDonnees : selectedEquipes");
+				context.dispatch("queryNosDefis");
+				context.dispatch("queryProfilsEquipe");
+				context.dispatch("queryDefisCurrentCommune");
+				context.dispatch("queryScoresEquipe")
+			}
+		},
 		queryCategorieVersion(context) {
 			context.state.database.all("SELECT valeur FROM configVersion where libelle = 'categorie'").then(result => {
-			//context.state.database.all("SELECT * FROM configVersion").then(result => {
-				console.log("queryCategorieVersion : "+JSON.stringify(result));
 				context.commit("loadCategorieVersion", { data: result[0]});
 			}, error => {
 				console.log("SELECT ERROR versionCategorie", error);
 			});
-			//console.log("action query : "+JSON.stringify(data));
+		},
+		queryDefiVersion(context) {
+			context.state.database.all("SELECT valeur FROM configVersion where libelle = 'defi'").then(result => {
+				context.commit("loadDefiVersion", { data: result[0]});
+			}, error => {
+				console.log("SELECT ERROR versionDefi", error);
+			});
+		},
+		queryEquipeVersion(context) {
+			context.state.database.all("SELECT valeur FROM configVersion where libelle = 'equipe'").then(result => {
+				context.commit("loadEquipeVersion", { data: result[0]});
+			}, error => {
+				console.log("SELECT ERROR versionEquipe", error);
+			});
 		},
 		queryEquipes(context) {
 			console.log("queryEquipes");
-			context.state.database.all("SELECT id,nom,commune,code, admin FROM equipe ", []).then(result => {
+			context.state.database.all("SELECT id,nom,commune,code, admin, organisateur FROM equipe ", []).then(result => {
 				context.commit("loadEquipes", { data: result });
+				console.log("Liste des équipes : "+JSON.stringify(result));
 			}, error => {
 				console.log("SELECT ERROR", error);
 			});
 			//console.log("action query : "+JSON.stringify(data));
 		},
-		queryProfilsEquipe(context,data) {
-			console.log("queryProfilsEquipe : chargement des profils pour equipe "+this.state.currentEquipe.id);
-			context.state.database.all("SELECT id,firstname, lastname, telephone, equipe, commune FROM profil where equipe = ?", [this.state.currentEquipe.id]).then(result => {
+		queryProfilsEquipe(context) {
+			console.log("queryProfilsEquipe : chargement des profils pour equipe "+this.state.selectedEquipe.id);
+			context.state.database.all("SELECT id,firstname, lastname, telephone, equipe, commune FROM profil where equipe = ?", [this.state.selectedEquipe.id]).then(result => {
+				console.log("Liste des participants : "+JSON.stringify(result));
 				context.commit("loadProfilsEquipe", { data: result });
 			}, error => {
 				console.log("SELECT ERROR", error);
 			});
 			//console.log("action query : "+JSON.stringify(data));
 		},
-		queryScoresEquipe(context,data) {
-			console.log("queryScoresEquipe : chargement des score pour equipe "+this.state.currentEquipe.id);
-			context.state.database.all("SELECT score.id,idDefi, idProfil, score, challenge.nom, firstname, lastname from score, profil, challenge where score.idDefi = challenge.id and score.idProfil = profil.id and profil.equipe = ?",[this.state.currentEquipe.id]).then(result => {
+		queryScoresEquipe(context) {
+			console.log("queryScoresEquipe : chargement des score pour equipe "+this.state.selectedEquipe.id);
+			context.state.database.all("SELECT score.id,idDefi, idProfil, score, challenge.nom, firstname, lastname from score, profil, challenge where score.idDefi = challenge.id and score.idProfil = profil.id and profil.equipe = ?",[this.state.selectedEquipe.id]).then(result => {
 				console.log("Nombre de réponses : "+JSON.stringify(result));
 				context.commit("loadScoresEquipe", { data: result });
 			}, error => {
@@ -433,9 +459,9 @@ const store = new Vuex.Store({
 			});
 			//console.log("action query : "+JSON.stringify(data));
 		},
-		queryDefisCurrentCommune(context,data) {
-			console.log("querydefisCurrentCommune : chargement des defis pour la commune "+this.state.currentEquipe.commune);
-			context.state.database.all("SELECT id, idDefi, commune from defisCommune where commune = ?",[this.state.currentEquipe.commune]).then(result => {
+		queryDefisCurrentCommune(context) {
+			console.log("querydefisCurrentCommune : chargement des defis pour la commune "+this.state.selectedEquipe.commune);
+			context.state.database.all("SELECT id, idDefi, commune from defisCommune where commune = ?",[this.state.selectedEquipe.commune]).then(result => {
 				console.log("Nombre de réponses : "+JSON.stringify(result));
 				context.commit("loadDefisCurrentCommune", { data: result });
 			}, error => {
@@ -451,7 +477,7 @@ const store = new Vuex.Store({
 			});
 			//console.log("action query : "+JSON.stringify(data));
 		},
-		queryDefis(context,data) {
+		queryDefis(context) {
 			console.log("queryDefis");
 			context.state.database.all("SELECT * FROM challenge", []).then(result => {
 				context.commit("loadDefis", { data: result });
@@ -473,7 +499,7 @@ const store = new Vuex.Store({
 		},
 		queryNosDefis(context) {
 			console.log("queryNosDefis ");
-			context.state.database.all("SELECT * FROM nosDefis where idEquipe = ?", [this.state.currentEquipe.id]).then(result => {
+			context.state.database.all("SELECT * FROM nosDefis where idEquipe = ?", [this.state.selectedEquipe.id]).then(result => {
 				context.commit("loadNosDefis", { data: result });
 				console.log("queryNosDefis : NB : "+result.length);
 			}, error => {
@@ -497,7 +523,7 @@ const store = new Vuex.Store({
 			});
 			for (var j = 0 ; j < tab.data.length ; j++) {
 				console.log("intégration de la catégorie : "+tab.data[j].nom);
-				context.state.database.execSQL("INSERT INTO categorie (nom) VALUES (?)", [tab.data[j].nom]).then(id => {
+				context.state.database.execSQL("INSERT INTO categorie (id,nom) VALUES (?,?)", [tab.data[j].id,tab.data[j].nom]).then(id => {
 					//context.commit("saveProfil", { data: data });
 					
 				}, error => {
@@ -511,13 +537,54 @@ const store = new Vuex.Store({
 				console.log("UPDATE configVersion ", error);
 			});
 			context.commit("loadCategorieVersion", { data: tab.version });
-			context.commit("loadCategorie", { data: tab.data });
+			context.dispatch("queryCategorie");
+		},
+		reloadDefis(context, tab) {
+			context.state.database.execSQL("DELETE FROM challenge").then(id => {
+				console.log("Table challenge vidée");
+			}, error => {
+				console.log("DELETE ERROR challenge", error);
+			});
+			for (var j = 0 ; j < tab.data.length ; j++) {
+				console.log("intégration du défis : "+tab.data[j].nom);
+				context.state.database.execSQL("INSERT INTO challenge (id,nom,description_courte,description_longue,reglementation,bareme,categorie) VALUES (?,?,?,?,?,?,?)", [tab.data[j].id,tab.data[j].nom,tab.data[j].description_courte,tab.data[j].description_longue,tab.data[j].reglementation,tab.data[j].bareme,tab.data[j].categorie.id]).then(id => {
+					//context.commit("saveProfil", { data: data });
+					
+				}, error => {
+					console.log("challenge INSERT ERROR", error);
+				});
+			}
+			console.log("MAJ de la version des défis : "+tab.version);
+			context.state.database.execSQL("REPLACE INTO configVersion (libelle,valeur) VALUES ('defi',?)",tab.version).then(id => {
+				console.log("Table configVersion MAJ");
+			}, error => {
+				console.log("UPDATE configVersion ", error);
+			});
+			context.commit("loadDefiVersion", { data: tab.version });
+			context.dispatch("queryDefis");
+		},
+		reloadEquipes(context, tab) {
+			for (var j = 0 ; j < tab.data.length ; j++) {
+				context.state.database.execSQL("REPLACE INTO equipe (nom,commune,code,admin,organisateur) VALUES (?,?,?,?,?)", [tab.data[j].nom,tab.data[j].commune,tab.data[j].code,tab.data[j].admin,tab.data[j].organisateur]).then(id => {
+					console.log ("reloadEquipes : replace : "+tab.data["nom"]);
+				}, error => {
+					console.log("DELETE ERROR equipe", error);
+				});
+			}
+			console.log("MAJ de la version des équipes : "+tab.version);
+			context.state.database.execSQL("REPLACE INTO configVersion (libelle,valeur) VALUES ('equipe',?)",tab.version).then(id => {
+				console.log("Table configVersion MAJ");
+			}, error => {
+				console.log("UPDATE configVersion ", error);
+			});
+			context.commit("loadEquipeVersion", { data: tab.version });
+			context.dispatch("queryEquipes");
 		},
 		deleteDefi(context, data) {
 			context.state.database.execSQL("DELETE FROM challenge where id = ?", [data.id]).then(id => {
 				//context.commit("saveChallenge", { data: data });
 				context.dispatch("queryDefisCat", data.categorie);
-				context.dispatch("queryDefis", data.categorie);
+				context.dispatch("queryDefis");
 			}, error => {
 				console.log("DELETE ERROR challenge", error);
 			});
@@ -531,7 +598,7 @@ const store = new Vuex.Store({
 			});
 		},
 		deleteNosDefis(context, data) {
-			context.state.database.execSQL("DELETE FROM nosDefis where idDefi = ? and idEquipe = ?", [data.defi.id, this.state.currentEquipe.id]).then(id => {
+			context.state.database.execSQL("DELETE FROM nosDefis where idDefi = ? and idEquipe = ?", [data.defi.id, this.state.selectedEquipe.id]).then(id => {
 				//context.commit("saveChallenge", { data: data });
 				context.dispatch("queryNosDefis");
 			}, error => {
@@ -539,7 +606,7 @@ const store = new Vuex.Store({
 			});
 		},
 		deleteDefisCurrentCommune(context, data) {
-			context.state.database.execSQL("DELETE FROM defisCommune where idDefi = ? and commune = ?", [data.defi.id, this.state.currentEquipe.commune]).then(id => {
+			context.state.database.execSQL("DELETE FROM defisCommune where idDefi = ? and commune = ?", [data.defi.id, this.state.selectedEquipe.commune]).then(id => {
 				//context.commit("saveChallenge", { data: data });
 				context.dispatch("queryDefisCurrentCommune");
 			}, error => {
@@ -552,12 +619,19 @@ const store = new Vuex.Store({
 			}, error => {
 				console.log("DELETE ERROR conf", error);
 			});
-			context.state.database.execSQL("DROP TABLE profil").then(id => {
-				console.log("Suppression de la table profil");
+			context.state.database.execSQL("DROP TABLE equipe").then(id => {
+				console.log("Suppression de la table equipe");
 			}, error => {
 				console.log("DELETE ERROR score", error);
 			});
 		},
+		listEquipeBase(context, tab) {
+			context.state.database.execSQL("SELECT * FROM equipe").then(result => {
+				console.log("equipes :");
+			}, error => {
+				console.log("SELECT EQUIPE error", error);
+			});
+		}
 	}
 });
 

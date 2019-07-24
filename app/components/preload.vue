@@ -1,0 +1,160 @@
+<template>
+	<Page class="page" actionBarHidden="true">
+        <DockLayout stretchLastChild="true">
+			<Header dock="top" />
+			<StackLayout dock="bottom">
+				<button text="ouvrir l'application" @tap="home"/>
+			</StackLayout>
+			<StackLayout dock="center" class="preload" >
+				<ListView for="item in messages" class="preload">
+				  <v-template>
+					<label :text="item" textWrap="true"/>
+				  </v-template>
+				</ListView>
+			</StackLayout>
+			
+		</DockLayout>
+    </Page>
+</template>
+
+<script>
+	const connectivity = require("connectivity");
+	import home from "./home";
+	import axios from 'axios'
+	
+    export default {
+		data() {
+            return {
+				networkStatus : "",
+				messages : ["Chargement de l'application"],
+				connexion : false
+            };
+        },
+		mounted() {
+			// vérification de la connectivité
+			this.checkNetwork();
+			this.messages.push("Vérification de l'accès à internet");
+			
+			console.log("connexion : "+this.connexion);
+			if (this.connexion) {
+				this.messages.push("Vérification des catégories");
+				//récuperation du numero de version locale pour les categories
+				this.$store.dispatch("queryCategorieVersion").then(() => {
+					// révupération de la version des catégories sur le serveur 
+					axios
+					.get('https://telethon.citeyen.com/public/api/categories/version')
+					.then(response => {
+						if (response.data.version > this.$store.state.versionCategorie) {
+							// mise a jour de la table de categories
+							this.messages.push("MAJ des catégories à partir du serveur");
+							axios
+							  .get('https://telethon.citeyen.com/public/api/categories/list')
+							  .then(responseList => {
+								this.$store.dispatch("reloadCategories",{data : responseList.data,version : response.data.version});
+							  });
+						}else {
+							this.messages.push("Catégories à jour");
+						}
+					})
+				});
+				this.messages.push("Vérification des Défis");
+				this.$store.dispatch("queryDefiVersion").then(() => {
+					console.log("Version defi locale : "+this.$store.state.versionDefi);
+					// révupération de la version des catégories sur le serveur 
+					axios
+					.get('https://telethon.citeyen.com/public/api/defis/version')
+					.then(response => {
+						console.log("Version defi serveur :"+response.data.version); 
+						if (response.data.version > this.$store.state.versionDefi) {
+							// mise a jour de la table de categories
+							console.log("MAJ des défis à partir du serveur");
+							this.messages.push("MAJ des défis à partir du serveur");
+							axios
+							  .get('https://telethon.citeyen.com/public/api/defis/list')
+							  .then(responseList => {
+								console.log("Chargement des defis en base : "+JSON.stringify(responseList.data));
+								this.$store.dispatch("reloadDefis",{data : responseList.data,version : response.data.version});
+							  });
+						}else {
+							this.messages.push("Defis à jour");
+						}
+					})
+				});
+				this.messages.push("Vérification des équipes");
+				this.$store.dispatch("queryEquipeVersion").then(() => {
+					console.log("Version equipe locale : "+this.$store.state.versionDefi);
+					// révupération de la version des catégories sur le serveur 
+					axios
+					.get('https://telethon.citeyen.com/public/api/equipes/version')
+					.then(response => {
+						console.log("Version equipe serveur :"+response.data.version); 
+						if (response.data.version > this.$store.state.versionEquipe) {
+							// mise a jour de la table de categories
+							console.log("MAJ des equipes à partir du serveur");
+							this.messages.push("MAJ des équipes à partir du serveur");
+							axios
+							  .get('https://telethon.citeyen.com/public/api/equipes/list')
+							  .then(responseList => {
+								console.log("Chargement des equipes een base : "+JSON.stringify(responseList.data));
+								this.$store.dispatch("reloadEquipes",{data : responseList.data,version : response.data.version});
+							  });
+						}else {
+							this.messages.push("Equipes à jour");
+						}
+					})
+				});
+				
+				this.messages.push("Chargement de l'équipe en cours");
+				this.$store.dispatch("queryCurrentEquipe").then(() => {
+					console.log("équipe en cours second: "+JSON.stringify(this.$store.state.selectedEquipe));
+					this.messages.push("équipe en cours : "+this.$store.state.selectedEquipe.nom);
+				});
+				console.log("fin de chargement de l'equipe en cours !");
+				
+			
+			}
+			this.chargement = false;
+			console.log("équipe en cours root: "+JSON.stringify(this.$store.state.selectedEquipe));
+		},
+        computed: {
+			currentEquipe() {
+				var reponse = this.$store.state.selectedEquipe ? this.$store.state.selectedEquipe.nom : "Pas d'équipe  sélectionnée";
+				return reponse;
+			},
+			isEquipeSelected() {
+				var temp = this.$store.state.selectedEquipe.nom ? true : false;
+				console.log("isEquipeSelected : "+temp);
+				return temp;
+			}
+        },
+        
+		methods: {
+			checkNetwork() {
+				const connectionType = connectivity.getConnectionType();
+				switch (connectionType) {
+					case connectivity.connectionType.none:
+						this.messages.push("Pas de connexion internet disponible");
+						this.connexion = false;
+						break;
+					case connectivity.connectionType.wifi:
+						this.messages.push("Connection WIFI valide");
+						this.connexion = true;
+						break;
+					case connectivity.connectionType.mobile:
+						this.messages.push("Connection mobile valide");
+						this.connexion = true;
+						break;
+				}
+			},
+			home() {
+				this.$navigateTo(home);
+			},
+		}
+    };
+</script>
+<style>
+preload {
+	width : 100%;
+	background-color : #125678;
+}
+</style>

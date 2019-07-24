@@ -3,40 +3,38 @@
         <DockLayout stretchLastChild="true">
 			<Header dock="top" />
 			<Footer dock="bottom" />
-			<StackLayout v-if="chargement" dock="center" class="root" >
-				<label :text="libelleChargement" class="valeur chargement"  />
-				<button text="init monitoring reseau" @tap="checkNetwork" />
-				<Button text="Réinitialiser les tables de la base" @tap="reinit" />
-				<Button text="Recharger l'équipe e cours" @tap="reinitEquipe" />
-				<Button text="Rechargerr les scores" @tap="reinitScore" />
-				<Label :text="currentEquipe" />
-				<Label text="Nombre de défis en base " />  
-				<Label :text="$store.state.defis.length" />
-			</StackLayout>
-			<StackLayout v-else dock="center" class="root" >
-				<label class="titre" text="Bonjour"  horizontalAlignment="center"/>
-				<StackLayout v-if="$store.state.currentEquipe.nom">
+			
+			<StackLayout  dock="center" class="root" >
+				<label class="titre" text="Bonjour !"  horizontalAlignment="center"/>
+				<Button v-if="$store.state.debug" text="Lister les equipes" @tap="showEquipe" />
+				<Button v-if="$store.state.debug" text="effacer table" @tap="reinit" />
+				<button v-if="$store.state.debug" text="init monitoring reseau" @tap="checkNetwork" />
+				<Button v-if="$store.state.debug" text="Recharger l'équipe e cours" @tap="reinitEquipe" />
+				<Button v-if="$store.state.debug" text="Rechargerr les scores" @tap="reinitScore" />
+				
+				
+				<StackLayout  v-if="isEquipeSelected">
 					<GridLayout rows="*,*,*" columns="*,auto">
 						<StackLayout row="0" col="0">
 							<label class="label" text="Equipe :"  />
-							<label class="valeur" :text="$store.state.currentEquipe.nom"  />
+							<label class="valeur" :text="$store.state.selectedEquipe.nom"  />
 						</StackLayout>
 						<Image  src="~/assets/icons/modify.png" col="1" row="0" @tap="navEquipe" stretch="none" />
 						<StackLayout row="1" col="0">	
 							<label class="label" text="Défis : "  />
-							<label class="valeur" :text="$store.state.currentEquipe.defis"  verticalAlignment="bottom" horizontalAlignment="center"/>
+							<label class="valeur" :text="$store.state.selectedEquipe.defis"  verticalAlignment="bottom" horizontalAlignment="center"/>
 						</StackLayout>
 						<Image  src="~/assets/icons/modify.png" col="1" row="1" @tap="navEquipe" stretch="none" />
 						<StackLayout row="2" col="0">	
 							<label class="label" text="Commune : "/>
-							<label class="valeur" :text="$store.state.currentEquipe.commune"  /><Label :text="networkStatus" />
+							<label class="valeur" :text="$store.state.selectedEquipe.commune"  /><Label :text="networkStatus" />
 						</StackLayout>
 						<Image  src="~/assets/icons/modify.png" col="1" row="2" @tap="navEquipe" stretch="none" class="modify"/>
 						
 					</GridLayout>
 				</StackLayout>
 				<StackLayout v-else>
-					<Label class="labelEquipeSelect" text="! Pas d'équipe sélectionnée !" horizontalAlignment="center" />
+					<Label class="labelEquipeSelect" text="Pour commencer vous devez définir votre équipe" textWrap="true" horizontalAlignment="center" />
 					<GridLayout rows="100,100" columns="auto,auto" horizontalAlignment="center" >
 						<Image  src="~/assets/icons/equipeAdd.png" col="0" row="0" @tap="navChangeEquipe('new')" />
 						<Image  src="~/assets/icons/equipeSearch.png" col="1" row="0" @tap="navChangeEquipe('search')" />
@@ -62,55 +60,28 @@
 		data() {
             return {
 				networkStatus : "",
-				chargement : true,
-				libelleChargement : "test de la connexion internet",
 				connexion : false,
 				categories : []
             };
         },
 		mounted() {
 			console.log("home ");
-			//this.$store.dispatch("queryCurrentEquipe");
-			// vérification de la connectivité
-			this.checkNetwork();
+			// chargement des données en fonction de l'équipe en cours
+			var isEquipeSelected = this.$store.state.selectedEquipe.nom ? true : false;
+			this.$store.dispatch("queryDonnees", isEquipeSelected);
 			
-			console.log("connexion : "+this.connexion);
-			if (this.connexion) {
-				//récuperation du numero de version locale 
-				this.$store.dispatch("queryCategorieVersion").then(() => {
-					console.log("Version catégories locale :");
-					console.log(JSON.stringify(this.$store.state.versionCategorie));
-					console.log(typeof(this.$store.state.versionCategorie));
-					// révupération de la version des catégories sur le serveur 
-					console.log("on récupère la version des catégories sur le serveur");
-					axios
-					.get('https://telethon.citeyen.com/public/api/categories/version')
-					.then(response => {
-						console.log("axios :"+JSON.stringify(response.data.version));
-						console.log("axios :"+typeof(response.data.version));
-						if (response.data.version > this.$store.state.versionCategorie) {
-							// mise a jour de la table de categories
-							console.log("MAJ des catégories");
-							axios
-							  .get('https://telethon.citeyen.com/public/api/categories/list')
-							  .then(responseList => {
-								this.libelleChargement = JSON.stringify(responseList);
-								console.log("nom de la premiere categories : " + responseList.data[0].nom);
-								console.log("Nombre de categories : " + responseList.data.length);
-								this.$store.dispatch("reloadCategories",{data : responseList.data,version : response.data.version});
-							  });
-						}else {
-							console.log("Pas besoin de mettre à jour");
-						}
-					})
-				});
-			}
-			console.log("équipe en cours : "+JSON.stringify(this.$store.state.currentEquipe));
 		},
         computed: {
 			currentEquipe() {
-				return "Equipe en cours : "+this.$store.state.currentEquipe.nom;
+				var reponse = this.$store.state.selectedEquipe ? this.$store.state.selectedEquipe.nom : "Pas d'équipe  sélectionnée";
+				
+				return reponse;
 			},
+			isEquipeSelected() {
+				var temp = this.$store.state.selectedEquipe.nom ? true : false;
+				console.log("isEquipeSelected : "+temp);
+				return temp;
+			}
         },
         
 		methods: {
@@ -122,8 +93,8 @@
 				this.$navigateTo(equipe);
 			},
 			titreEquipe() {
-				if (this.$store.state.currentEquipe.nom.length > 0) {
-					return this.$store.state.currentEquipe.nom;
+				if (this.$store.state.selectedEquipe) {
+					return this.$store.state.selectedEquipe.nom;
 				}
 				return "Pas d'équipe en cours";
 			},
@@ -154,6 +125,12 @@
 			reinitScore() {
 				console.log("On recharge les scores !!");
 				this.$store.dispatch("queryScoresEquipe");
+			},
+			showEquipe() {
+				console.log("On affiche les équipes en base !!");
+				this.$store.dispatch("queryEquipes");
+				console.log("On affiche équipe en cours !!");
+				this.$store.dispatch("queryCurrentEquipe");
 			}
 
 		}
@@ -163,5 +140,15 @@
 .chargement {
 	margin-top : 50%;
 	text-align : center;
+}
+
+.labelEquipeSelect {
+	font-size : 18px;
+	margin : 10% 5%;
+	text-align : center;
+}
+
+.actionLabel {
+	margin : 0 10%;
 }
 </style>

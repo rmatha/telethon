@@ -2,7 +2,7 @@
     <!-- Bottom navigation -->
 	<StackLayout dock="bottom" :class="getClassMenu" ref="logoContainer" >
 		<Image v-if="menuOn" src="~/assets/ResourcePage/footerDown.png" class="rootFooter root"  stretch="aspectFill" width="100%" height="200px"  @swipe="loadMenu" @tap="loadMenu"/>
-		<Image v-else src="~/assets/ResourcePage/footerUp.png" class="rootFooter root"  stretch="aspectFill" width="100%" height="200px"  @swipe="loadMenu"/>
+		<Image v-else src="~/assets/ResourcePage/footerUp.png" class="rootFooter root"  stretch="aspectFill" width="100%" height="200px"  @tap="loadMenu" @swipe="loadMenu"/>
 		<GridLayout  rows="105,105,105,*" columns="*,2*" horizontalAlignment="center" class="innerFooter">
 			<!--<Image src="~/assets/icons/equipe.jpg" @tap="navProfil" row="0" col="0" />
 			<Image src="~/assets/icons/challenges.png" @tap="navChallenges" row="0" col="1" />

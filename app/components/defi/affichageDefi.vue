@@ -5,25 +5,19 @@
         <Footer dock="bottom" />
 			<StackLayout dock="center" class="root" >
 			<StackLayout row="1" col="0" colSpan="3">
-				<GridLayout v-if="isCommune" rows="auto" columns="*,25,50,50">
-					<Label row="0" col="0" text="defi pour la commune" class="defiName"/>
-					<Image row="0" col="1" src="~/assets/icons/Cross-red.png" @tap="supprimerDefiCommune(defi)"/>
-					<Image row="0" col="2" v-if="defiPresentCommune(defi.id)" src="~/assets/icons/Cross-red.png" @tap="enleverDefiCommune"/>
-					<Image row="0" col="2" v-else src="~/assets/icons/add-256.gif" @tap="ajouterDefiCommune"/>
-				</GridLayout>
-				<GridLayout v-else rows="auto" columns="*,25,50,50">
-					<Label row="0" col="0" :text="defi.nom" class="defiName"/>
-					<Image row="0" col="1" src="~/assets/icons/Cross-red.png" v-if="isAdmin2" @tap="supprimerDefi(defi)"/>
-					<Image row="0" col="2" v-if="defiPresent(defi.id)" src="~/assets/icons/Cross-red.png" @tap="enleverDefi"/>
+				<GridLayout rows="auto" columns="*,25,50,50">
+					<Label row="0" col="0" :text="$store.state.selectedDefi.nom" class="defiName"/>
+					<Image row="0" col="1" src="~/assets/icons/Cross-red.png" @tap="supprimerDefi"/>
+					<Image row="0" col="2" v-if="defiPresent($store.state.selectedDefi.id)" src="~/assets/icons/Cross-red.png" @tap="enleverDefi"/>
 					<Image row="0" col="2" v-else src="~/assets/icons/add-256.gif" @tap="ajouterDefi"/>				
 				</GridLayout>
 				<Label text="Description" class="defiLabel" />
-				<Label :text="defi.description_courte" class="defiDesc"/>
-				<StackLayout v-if="isNotCommune" orientation="horizontal" backgroundcolor="#562389">
+				<Label :text="$store.state.selectedDefi.description_courte" class="defiDesc"/>
+				<StackLayout  orientation="horizontal" backgroundcolor="#562389">
 					<Label width="85%" class="m-b-20" :text="titreScore" textWrap="true" />
 					<Image width="15%" src="~/assets/icons/add-256.gif" @tap="addScore"/>
 				</StackLayout>
-				<ListView v-if="isNotCommune" for="item in $store.state.scoresEquipe" height="100%" >
+				<ListView  for="item in $store.state.scoresEquipe" height="100%" >
 				  <v-template>
 					<GridLayout v-if="isCurrentDefi(item)" rows="*" columns="*,50" width="100%" margin="0" @tap="editScore(item)">
 						<GridLayout col="0" verticalAlignment="bottom">
@@ -56,34 +50,10 @@
 	import store from "../store/teleStore";
 	
 	export default {
-		props: ['defi','categorie','commune'],
 		computed: {
 			titreScore() {
 				return "Liste des scores : "+this.$store.state.scoresEquipe.length;
 			},
-			isCommune() {
-				if(this.commune) {
-					return true;
-				}
-				return false;
-			},
-			isNotCommune() {
-				if(this.commune) {
-					return false;
-				}
-				return true;
-			},
-
-			isAdmin2(){
-				if (this.$store.state.currentEquipe.admin == 2 ){
-					console.log("le flag est passé dans le mounted de affichageDefi");
-					console.log("la valeur d'admin est :"+this.$store.state.currentEquipe.admin);
-					return true;
-				};
-					
-				return false;
-			}
-
 		},
         data() {
             return {}
@@ -100,37 +70,41 @@
 			},
 			isCurrentDefi(item) {
 				console.log("isCurrentDefi : "+JSON.stringify(item));
-				console.log("isCurrentDefi : "+item.idDefi +" --- "+this.defi.id);
-				return item.idDefi == this.defi.id;
+				console.log("isCurrentDefi : "+item.idDefi +" --- "+this.$store.state.selectedDefi.id);
+				return item.idDefi == this.$store.state.selectedDefi.id;
 			},
 			editScore(item) {
 				console.log("Edit d'un score :"+item.id);
-				this.$navigateTo(addScore, { props: {score: item, categorie: this.categorie, defi: this.defi}});
+				this.$store.state.selectedScore = item;
+				this.$navigateTo(addScore);
 			},
 			addScore() {
 				console.log("Ajout d'un score");
-				this.$navigateTo(addScore, { props: {score : null, categorie: this.categorie, defi: this.defi}});
+				this.$store.state.selectedScore = null;
+				this.$navigateTo(addScore);
 			},
 			defiPresent(idDefiEncours) {
-				//console.log("NB nosDefis : "+this.$store.state.nosDefis.length);
-				var filterDefi = this.$store.state.nosDefis.filter(function(elem) {
-					console.log("elem.idDefi : "+elem.id+ "--idDefiEncours--"+idDefiEncours);
-					if (elem.id == idDefiEncours) return elem;
-				});
+				console.log("on vérifie si le défi est présent");
+				console.log("this.$store.state.selectedCommune"+this.$store.state.selectedCommune);
+				var filterDefi = []
+				if (this.$store.state.selectedCommune) {
+					filterDefi = this.$store.state.defisCommune.filter(function(elem) {
+						console.log("elem.idDefi : "+elem.id+ "--idDefiEncours--"+idDefiEncours);
+						if (elem.id == idDefiEncours) return elem;
+					});
+				}
+				else {
+					console.log("on passe par nosDefis");
+					filterDefi = this.$store.state.nosDefis.filter(function(elem) {
+						console.log("elem.idDefi : "+elem.id+ "--idDefiEncours--"+idDefiEncours);
+						if (elem.id == idDefiEncours) return elem;
+					});
+				}
 				if (filterDefi.length > 0) {
+					console.log("le défi a été trouvé");
 					return true;
 				}
-				return false;
-			},
-			defiPresentCommune(idDefiEncours) {
-				console.log("NB defiPresentCommune : "+this.$store.state.defisCommune.length);
-				var filterDefi = this.$store.state.defisCommune.filter(function(elem) {
-					console.log("elem.idDefi : "+elem.id+ "--idDefiEncours--"+idDefiEncours);
-					if (elem.id == idDefiEncours) return elem;
-				});
-				if (filterDefi.length > 0) {
-					return true;
-				}
+				console.log("le défi n'a pas été trouvé");
 				return false;
 			},
 			supprimerDefi(defi) {
@@ -139,22 +113,14 @@
 					console.log(data);
 					if (data) {
 						console.log("on supprime !");
-						this.$store.dispatch("deleteDefi", defi);
-						this.$navigateTo(listDefisCat, { props: {categorie: this.categorie}});
-					}
-					else {
-						console.log("pas touche !");
-					}
-				});
-			},
-			supprimerDefiCommune(defi) {
-				// affichage du modal de confirmation
-				this.$showModal(modal, { fullscreen: true, props: { textModal: "Voulez-vous supprimer le défi "+defi.nom+" pour la commune "+this.commune+" ?" }}).then( data => {
-					console.log(data);
-					if (data) {
-						console.log("on supprime !");
-						//this.$store.dispatch("deleteDefiCommune", defi);
-						//this.$navigateTo(listDefisCat, { props: {categorie: this.categorie, commune : this.commune}});
+						if (this.$store.state.selectedCommune) {
+							this.$store.dispatch("deleteDefiCommune", defi);
+						}
+						else {
+							this.$store.dispatch("deleteDefi", defi);
+						}
+						this.$store.state.selectedDefi = null;
+						this.$navigateTo(listDefisCat);
 					}
 					else {
 						console.log("pas touche !");
@@ -162,24 +128,25 @@
 				});
 			},
 			enleverDefi() {
-				console.log("on enleve de la liste de nosDefis");
-				this.$store.dispatch("deleteNosDefis", {defi : this.defi});
+				if (this.$store.state.selectedCommune) {
+					console.log("on enleve de la liste de defisCommune");
+					this.$store.dispatch("deleteDefisCurrentCommune", {defi : this.$store.state.selectedDefi});
+				}
+				else {
+					console.log("on enleve de la liste de nosDefis");
+					this.$store.dispatch("deleteNosDefis", {defi : this.$store.state.selectedDefi});
+				}
 			},
 			ajouterDefi() {
-				console.log("on ajoute de la liste de nosDefis");
-				this.$store.dispatch("insertNosDefis", {defi : this.defi,equipe : this.$store.state.currentEquipe});
-				
+				if (this.$store.state.selectedCommune) {
+					console.log("on ajoute de la liste de defisCommune");
+					this.$store.dispatch("insertDefisCurrentCommune", {defi : this.$store.state.selectedDefi,equipe : this.$store.state.currentEquipe});
+				}
+				else {
+					console.log("on ajoute de la liste de nosDefis");
+					this.$store.dispatch("insertNosDefis", {defi : this.$store.state.selectedDefi,equipe : this.$store.state.currentEquipe});
+				}
 			},
-			enleverDefiCommune() {
-				console.log("on enleve de la liste de defisCommune");
-				this.$store.dispatch("deleteDefisCurrentCommune", {defi : this.defi});
-			},
-			ajouterDefiCommune() {
-				console.log("on ajoute de la liste de defisCommune");
-				this.$store.dispatch("insertDefisCurrentCommune", {defi : this.defi,equipe : this.$store.state.currentEquipe});
-				
-			}
-			
 		},
     };
 </script>

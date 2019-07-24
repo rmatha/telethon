@@ -26,21 +26,21 @@
 	export default {
 		computed: {
 			selectedIndexScore() {
-				if(this.score) {
-					return this.score.score;
+				if(this.$store.state.selectedScore) {
+					return this.$store.state.selectedScore.score;
 				}
 				return 10;
 			},
 			participant() {
-				if (this.score) {
-					let profilEnCours = this.$store.state.profilsEquipe.find(e => e.id == this.score.idProfil);
+				if (this.$store.state.selectedScore) {
+					let profilEnCours = this.$store.state.profilsEquipe.find(e => e.id == this.$store.state.selectedScore.idProfil);
 					return profilEnCours.firstname+ " "+profilEnCours.lastname;
 
 				}
 				return ""
 			},
 			isNouveauScore() {
-				return this.score == null;
+				return this.$store.state.selectedScore == null;
 			},
 			defiNom() {
 				return "Defi : "+this.defi.nom;
@@ -55,17 +55,17 @@
             }
         },
 		mounted() {
-			if (this.score) {
-				this.id = this.score.id
+			if (this.$store.state.selectedScore) {
+				this.id = this.$store.state.selectedScore.id
 			}
         },
 		methods: {
 			saveScore() {
 				// récupération de l'ID du profil
 				let idProfil = -1;
-				if (this.score) {
+				if (this.$store.state.selectedScore) {
 					console.log("SaveScore update :");
-					idProfil = this.score.idProfil;
+					idProfil = this.$store.state.selectedScore.idProfil;
 				}
 				else {
 					let indexProfil = this.$refs.profilEnCours.nativeView;
@@ -78,7 +78,8 @@
 				console.log("Récupération de l'index : "+indexScore+" : ayant pour valeur : "+score);
 				console.log("sauvegarde des valeurs : "+this.id+"-"+this.defi.id+"-"+idProfil+"-"+score);
 				this.$store.dispatch("insertScore", {id : this.id ,idDefi : this.defi.id,idProfil : idProfil, score : score});
-				this.$navigateTo(affichageDefi, { props: {defi: this.defi, categorie: this.categorie}});
+				this.$store.state.selectedScore = null;
+				this.$navigateTo(affichageDefi);
             },
 			
 		},

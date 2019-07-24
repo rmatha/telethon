@@ -30,9 +30,6 @@
 				</ListView>
 				
 				<button text="Récupérer les défis de ma ville" @tap="recupereDefis" />
-				
-				
-<!--<StackLayout v-if="isAdmin">-->
 					<ScrollView >
 						<StackLayout class="m-20">
 							<StackLayout orientation="horizontal" backgroundcolor="#562389">
@@ -72,21 +69,7 @@
 	export default {
 		computed: {
 			sousTitreCommune() {
-				return "Liste des challenges pour la commune  : "+this.$store.state.currentEquipe.commune;
-			},
-
-            isAdmin(){
-				if (this.$store.state.currentEquipe.admin > 0){
-					return true;
-				}
-				return false;
-			},
-
-			isAdmin2(){
-				if (this.$store.state.currentEquipe.admin > 1){
-					return true;
-				}
-				return false;
+				return "Liste des challenges pour la commune  : "+this.$store.state.selectedEquipe.commune;
 			},
 
 		},
@@ -94,7 +77,7 @@
 			recupereDefis() {
 				console.log("Récupération des défis de la commune");
 				let titre = "Les défis de votre commune ont été chargés dans vos défis";
-				if (this.$store.state.currentEquipe.commune.length > 0) {
+				if (this.$store.state.selectedEquipe.commune.length > 0) {
 					console.log("defis de la commune : "+this.$store.state.defisCommune);
 					if (this.$store.state.defisCommune.length > 0) {
 						console.log("R2cupération des défis OK");
@@ -119,19 +102,26 @@
 			},
             affichageCat() {
 				console.log("liste des challenges");
+				this.$store.state.selectedCommune = null;
                 this.$navigateTo(listeChallengesCat);
             },
 			affichageCatCommune() {
 				console.log("liste des challenges");
-                this.$navigateTo(listeChallengesCat, { props: {commune : this.$store.state.currentEquipe.commune}});
+				this.$store.state.selectedCommune = this.$store.state.selectedEquipe.commune;
+                this.$navigateTo(listeChallengesCat);
 			},
 			getDefi(item) {
 				console.log("affichage du defi : "+item.nom + ": "+item.id);
-				this.$navigateTo(affichageDefi, { props: {defi: item, categorie: this.categorie}});
+				this.$store.state.selectedCategorie = this.categorie;
+                this.$store.state.selectedDefi = item;
+				this.$store.state.selectedCommune = null;
+                this.$navigateTo(affichageDefi);
 			},
 			getDefiCommune(item) {
 				console.log("affichage du defi : "+item.nom + ": "+item.id);
-				this.$navigateTo(affichageDefi, { props: {defi: item, categorie: this.categorie, commune : this.$store.state.currentEquipe.commune}});
+				this.$store.state.selectedCategorie = this.categorie;
+                this.$store.state.selectedDefi = item;
+				this.$store.state.selectedCommune = this.$store.state.selectedEquipe.commune;
 			},
 			
 			getDefiNom(idDefi) {

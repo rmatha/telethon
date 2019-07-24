@@ -26,12 +26,12 @@
 								</GridLayout>
 							</StackLayout>
 						</ScrollView>
-						<FloatLabel placeholder="Code de confidentialité" label="code de confidentialité" :valeur="input.code" @updateValeur="updateCodeEquipe" />
+						<FloatLabel placeholder="Mot de passe" label="code de confidentialité" :valeur="input.code" @updateValeur="updateCodeEquipe" />
 						<GridLayout rows="auto,auto" columns="*,50" marginBottom="5">
-							<Image row="0" col="1" v-if="isOrganisateur" class="imageCheck" src="~/assets/icons/checkTrue.png" @tap="updateOrganisateur"/>
+							<Image row="0" col="1" v-if="input.organisateur" class="imageCheck" src="~/assets/icons/checkTrue.png" @tap="updateOrganisateur"/>
 							<Image row="0" col="1" v-else  class="imageCheck"src="~/assets/icons/checkFalse.png" @tap="updateOrganisateur"/>
 							<Label row="0" col="0" text="Equipe organisatrice" fontSize="14" class="labelCheck" />
-							<Image row="1" col="1" v-if="isCoordinateur" class="imageCheck" src="~/assets/icons/checkTrue.png" @tap="updateCoordinateur"/>
+							<Image row="1" col="1" v-if="input.admin" class="imageCheck" src="~/assets/icons/checkTrue.png" @tap="updateCoordinateur"/>
 							<Image row="1" col="1" v-else class="imageCheck" src="~/assets/icons/checkFalse.png" @tap="updateCoordinateur"/>
 							<Label row="1" col="0" text="Equipe de coordination Téléthon" fontSize="14" class="labelCheck" />
 						</GridLayout>
@@ -85,9 +85,9 @@
 			console.log("nombre d'équipe en base : "+this.$store.state.equipes.length);
 
 			console.log("Le flag est passé dans le mounted de changeEquipe");
-			//this.$store.state.currentEquipe.admin = 2;
-			//this.$store.state.currentEquipe.commune = "Angoulême"; 
-			//console.log("Admin est à :"+this.$store.state.currentEquipe.admin);
+			//this.$store.state.selectedEquipe.admin = 2;
+			//this.$store.state.selectedEquipe.commune = "Angoulême"; 
+			//console.log("Admin est à :"+this.$store.state.selectedEquipe.admin);
 			console.log("récupération du type : "+this.type);
 			if (this.type == "new") {
 				this.isNouvelleEquipe = true;
@@ -113,25 +113,6 @@
 					
 				}
 			},
-
-			isCoordinateur(){
-				if (this.input.admin == 2){
-
-					console.log("Le flag coord est vert");
-					return(true) ;
-				}
-
-			},
-
-			isAdmin2(){
-				if (this.$store.state.currentEquipe.admin == 2){
-					console.log("le flag est passé dans isAdmin2 et a retourné un true");
-					return(true);
-				}
-			}
-
-			
-			
         },
 		props: ['type'],
 		data() {
@@ -143,7 +124,8 @@
                     nom: "",
                     commune: "",
 					code : "",
-					admin : 0,
+					admin : false,
+					organisateur : false,
 				},
 				villesRef: [],
                 villes: [],
@@ -167,8 +149,7 @@
 					console.log(`Dialog result: ${result.result}, text: ${result.text}`);
 					if (result.result & (result.text == "16340")) {
 						console.log("c'est un orga");
-						this.input.admin = 1;
-						console.log(this.input.admin)
+						this.input.organisateur = true;
 					}
 					else {
 						alert("Erreur mauvais code");
@@ -191,8 +172,8 @@
 				}).then(result => {
 					console.log(`Dialog result: ${result.result}, text: ${result.text}`);
 					if (result.result & (result.text == "16340")) {
-						console.log("c'est une coordination");
-						this.input.admin = 2;
+						console.log("c'est un admin");
+						this.input.admin = true;
 					}
 					else {
 						alert("Erreur mauvais code");
@@ -259,7 +240,7 @@
 					});
 				}
 				else {
-					console.log("on peut créer la nouvelle équipe");
+					console.log("on peut créer la nouvelle équipe : "+JSON.stringify(this.input));
 					this.$store.dispatch("insertCurrentEquipe", this.input);
 					alert({
 					  title: "Création d'équipe confirmée",
@@ -361,10 +342,6 @@
 </script>
 
 <style>
-.labelVille {
-	color : #ffffff;
-}
-
 .imageCheck {
 	width : 100px;
 	margin : 20px;
@@ -375,9 +352,8 @@
 }
 
 .menuEquipe {
-	border : 10px;
-	border-color : white;
-	height : 40px;
+	background-color : #fff;
+	height : 20px;
 	vertical-align : bottom;
 }
 

@@ -6,36 +6,44 @@
 			<StackLayout dock="center" class="root" >
 			<ScrollView row="1" col="0" >
 				<StackLayout class="m-20">
-					<GridLayout rows="200" columns="*" >
+					<!--<GridLayout rows="200" columns="*" >
 						<Image row="0" col="0" v-if="imageSrc" :src="imageSrc" class="imageEquipe" @tap="takePicture"></Image>
 						<Label  row="0" col="0" v-else text="Appuyer pour changer votre image d'équipe" @tap="takePicture" />
-					</GridLayout>
-					<StackLayout orientation="horizontal" >
-						<Label width="90%" class="m-b-20 titreTelethon" :text="titreEquipe" textWrap="true" />
-						<Image width="10%" src="~/assets/icons/change.png" @tap="changeEquipe"/>
-					</StackLayout>
-					<Label class="label" text="Commune des défis Téléthon" />
-					<Label class="valeur" :text="$store.state.currentEquipe.commune" />
+					</GridLayout>-->
+					<StackLayout v-if="$store.state.selectedEquipe" >
+						<GridLayout rows="auto" columns="*,50" >
+							<Label row="0" col="0" class="m-b-20 titreTelethon" :text="titreEquipe" textWrap="true" />
+							<Image row="0" col="1" class="actionButton" src="~/assets/icons/change.png" @tap="changeEquipe"/>
+						</GridLayout>
+						<Label text="Votre équipe est Organisateur" v-if="$store.state.selectedEquipe.organisateur"  />
+						<Label text="Votre équipe est Coordinateur " v-if="$store.state.selectedEquipe.admin" />
+						<Label class="label" text="Commune des défis Téléthon" />
+						<Label class="valeur" :text="$store.state.selectedEquipe.commune" />
 
-					<Label text="Votre équipe est Organisateur" v-if="isOrganisateur"  />
-					<Label text="Votre équipe est Coordinateur " v-if="isCoordinateur" />
+						
+					</StackLayout>
+					<StackLayout v-else>
+						<button text="créer ou sélectionner son equipe" @tap="changeEquipe" />
+					</StackLayout>
 
 					
-					<StackLayout orientation="horizontal" >
+					<StackLayout  v-if="$store.state.selectedEquipe">
+						<GridLayout rows="auto" columns="*,50" >
+							<Label row="0" col="0" class="label" text="Liste des participants de l'équipe" textWrap="true" />
+							<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="addParticipant"/>
+						</GridLayout>
 						
-						<Label width="85%" class="m-b-20" text="Liste des participants de l'équipe" textWrap="true" />
-						<Image width="15%" src="~/assets/icons/add-256.gif" @tap="addParticipant"/>
 						
 					</StackLayout>
-					<Button text="test" @tap="gotest" />
-					<ScrollView >
+					<ScrollView v-if="$store.state.selectedEquipe">
 						<StackLayout >
 							<GridLayout v-for="participant in $store.state.profilsEquipe" rows="40" columns="*"  >
-								<Label :text="libelleProfil(participant)" class="labelVille" @tap="editParticipant(participant)"/>
+								<Label :text="libelleProfil(participant)" class="valeur" @tap="editParticipant(participant)"/>
 							</GridLayout>
 						</StackLayout>
-						
 					</ScrollView>
+					
+					
 					
 				</StackLayout>
 				
@@ -59,36 +67,17 @@
 	
     export default {
         mounted() {
-			console.log(this.EtatAdmin);
-			console.log("Le flag est passé dans le mounted de equipe");
-			
-			console.log("Admin est à :"+this.$store.state.currentEquipe.admin)
+			console.log("Equipe en cours est à :"+JSON.stringify(this.$store.state.selectedEquipe));
+			console.log("Liste des participants : "+JSON.stringify(this.$store.state.profilsEquipe));
+			console.log("nombre des participants : "+this.$store.state.profilsEquipe.lenght);
 
 
         },
 		computed: {			
 			titreEquipe() {
-				if (this.$store.state.currentEquipe.nom.length > 0) {
-					return this.$store.state.currentEquipe.nom;
-				}
-				return "Pas d'équipe en cours";
+				var reponse = this.$store.state.selectedEquipe ? this.$store.state.selectedEquipe.nom : "Pas d'équipe  sélectionnée";
+				return reponse;
 			},
-			isOrganisateur(){
-						if (this.$store.state.currentEquipe.admin == 1){
-							console.log("vous etes organisateur") 
-							return true;
-						};
-					
-				return false;
-			},
-			isCoordinateur(){
-				if (this.$store.state.currentEquipe.admin == 2 ){
-					console.log("vous etes Coordinateur") 
-					return true;
-				};
-					
-				return false;
-			}
         },
 
 	
@@ -163,7 +152,7 @@
 
 <style>
 .labelVille {
-	color : #000000;
+	color : black;
 }
 .titreTelethon {
 	font-size : 38px;

@@ -67,7 +67,7 @@
         },
 		computed: {
 			titreProfil() {
-				return "Ajout d'un participant pour l'équipe "+this.$store.state.currentEquipe.nom
+				return "Ajout d'un participant pour l'équipe "+this.$store.state.selectedEquipe.nom
 			},
             myFirstname() {
 				return this.input.firstname;
@@ -117,7 +117,7 @@
 					console.log("R2cupération des informations du participant");
 				}
 				
-				console.log("Equipe en cours : "+this.$store.state.currentEquipe.nom);
+				console.log("Equipe en cours : "+this.$store.state.selectedEquipe.nom);
 				
             },
 			deleteProfil() {
@@ -205,9 +205,7 @@
 </script>
 
 <style>
-.labelVille {
-	color : #ffffff;
-}
+
 .titreTelethon {
 	font-size : 38px;
 }

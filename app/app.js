@@ -3,7 +3,7 @@ import _ from 'lodash';
 Object.defineProperty(Vue.prototype, '$_', { value: _ });
 
 
-import Home from "./components/Home";
+import preload from "./components/preload";
 import FloatLabel from './components/include/FloatLabel';
 //import Fonticon from "nativescript-vue-fonticon";
 import Footer from "./components/include/footer";
@@ -30,6 +30,6 @@ Vue.component('Header',Header);
 
 new Vue({
 
-    render: h => h('frame',[h(Home)]),
+    render: p => p('frame',[p(preload)]),
     store:teleStore
 }).$start();
