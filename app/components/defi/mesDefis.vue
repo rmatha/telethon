@@ -1,60 +1,50 @@
 <template>
     <page class="page" actionBarHidden="true">
 		<DockLayout stretchLastChild="true">
-        <Header dock="top" />
-        <Footer dock="bottom" />
+			<Header dock="top" />
+			<Footer dock="bottom" />
 			<StackLayout dock="center" class="root" >
-			<StackLayout row="1" col="0" colSpan="3" width="100%" height="100%">
 				<ScrollView>
-					<StackLayout class="m-20">
-						<StackLayout orientation="horizontal" backgroundcolor="#562389">
-							<Label width="85%" class="m-b-20 titreTelethon" text="Mes challenges" textWrap="true" />
-							<Image src="~/assets/icons/add-256.gif" width="15%" @tap="affichageCat"/>
-						</StackLayout>
+					<StackLayout>
+						<GridLayout rows="auto" columns="*,50">
+							<Label row="0" col="0" class="m-b-20 titreTelethon" text="Mes Défis" textWrap="true" />
+							<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="affichageCat"/>
+						</GridLayout>
+						<ListView for="item in $store.state.nosDefis"  >
+						  <v-template>
+							<GridLayout rows="*" columns="*,50" width="100%" margin="0" @tap="getDefi(item)">
+								<GridLayout col="0" verticalAlignment="bottom">
+									<StackLayout paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16">
+										<Label :text="item.nom" class="defiTitle" />
+										<Label :text="item.description_courte" class="defiDescription" />
+									</StackLayout>
+								</GridLayout>
+								<Image col="1" src="~/assets/icons/right.png" height="30px"/>
+							</GridLayout>
+						  </v-template>
+						</ListView>
 						
+						<button class="boutonAction recup" text="Récupérer les défis de ma ville" @tap="recupereDefis" />
+						<GridLayout rows="auto" columns="*,50">
+							<Label row="0" col="0" class="m-b-20 titreTelethon" :text="sousTitreCommune" textWrap="true" />
+							<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="affichageCatCommune"/> 
+						</GridLayout>
+									
+						<ListView for="item in $store.state.defisCommune"  >
+						  <v-template>
+							<GridLayout rows="*" columns="*,50" width="100%" margin="0" @tap="getDefiCommune(item)">
+								<GridLayout col="0" verticalAlignment="bottom">
+									<StackLayout paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16">
+										<Label :text="item.nom" class="defiTitle" />
+										<Label :text="item.description_courte" class="defiDescription" />
+									</StackLayout>
+								</GridLayout>
+								<Image col="1" src="~/assets/icons/right.png" height="30px"/>
+							</GridLayout>
+						  </v-template>
+						</ListView> 
 					</StackLayout>
 				</ScrollView>
-				<Label text="liste des challenges de l'équipe"/>
-				<ListView for="item in $store.state.nosDefis"  >
-				  <v-template>
-					<GridLayout rows="*" columns="*,50" width="100%" margin="0" @tap="getDefi(item)">
-						<GridLayout col="0" verticalAlignment="bottom">
-							<StackLayout paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16">
-								<Label :text="item.nom" class="defiTitle" />
-								<Label :text="item.description_courte" class="defiDescription" />
-							</StackLayout>
-						</GridLayout>
-						<Image col="1" src="~/assets/icons/right.png" height="30px"/>
-					</GridLayout>
-				  </v-template>
-				</ListView>
-				
-				<button text="Récupérer les défis de ma ville" @tap="recupereDefis" />
-					<ScrollView >
-						<StackLayout class="m-20">
-							<StackLayout orientation="horizontal" backgroundcolor="#562389">
-								<Label width="85%" class="m-b-20 titreTelethon" text="Challenges de ma commune" textWrap="true" />
-								<Image src="~/assets/icons/add-256.gif" width="15%" @tap="affichageCatCommune"/> 
-							</StackLayout>
-							
-						</StackLayout>
-					</ScrollView>
-					<Label :text="sousTitreCommune"/>
-					<ListView for="item in $store.state.defisCommune"  >
-					  <v-template>
-						<GridLayout rows="*" columns="*,50" width="100%" margin="0" @tap="getDefiCommune(item)">
-							<GridLayout col="0" verticalAlignment="bottom">
-								<StackLayout paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16">
-									<Label :text="item.nom" class="defiTitle" />
-									<Label :text="item.description_courte" class="defiDescription" />
-								</StackLayout>
-							</GridLayout>
-							<Image col="1" src="~/assets/icons/right.png" height="30px"/>
-						</GridLayout>
-					  </v-template>
-					</ListView>
-				</StackLayout> 
-			</StackLayout>
 			</StackLayout>
 		</DockLayout>
 		
@@ -69,7 +59,7 @@
 	export default {
 		computed: {
 			sousTitreCommune() {
-				return "Liste des challenges pour la commune  : "+this.$store.state.selectedEquipe.commune;
+				return "Défis pour : "+this.$store.state.selectedEquipe.commune;
 			},
 
 		},
@@ -122,6 +112,7 @@
 				this.$store.state.selectedCategorie = this.categorie;
                 this.$store.state.selectedDefi = item;
 				this.$store.state.selectedCommune = this.$store.state.selectedEquipe.commune;
+                this.$navigateTo(affichageDefi);
 			},
 			
 			getDefiNom(idDefi) {
@@ -140,4 +131,7 @@
 </script>
 
 <style>
+.recup {
+	margin : 20px;
+}
 </style>

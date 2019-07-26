@@ -4,13 +4,13 @@
 			<Header row="0" col="0" />
 			<ScrollView row="1" col="0" >
 				<StackLayout class="m-20"> 
-					<StackLayout orientation="horizontal" backgroundcolor="#562389">
-						<Label width="70%" class="m-b-20" :text="titreProfil" textWrap="true" />
-						<Button width="15%" class="fa fa-3x red" :text="'fa-times' | fonticon"  backgroundColor="#ffffff" @tap="deleteProfil"/>
-						<Button width="15%" class="fa fa-2x green" :text="'fa-check' | fonticon"  backgroundColor="#ffffff" @tap="save"/>
-					</StackLayout>
-					<FloatLabel placeholder="Nom" label="nom" :valeur="myFirstname" @updateValeur="updateNom"/>
-					<FloatLabel placeholder="Prénom" label="prenom" :valeur="myLastname" @updateValeur="updatePrenom"/>
+					<GridLayout rows="auto" columns="*,50,50" >
+							<Label row="0" col="0" class="m-b-20 label" text="Participant :" textWrap="true" />
+							<Image row="0" col="1" class="actionButton" src="~/assets/icons/delete.png" @tap="deleteProfil"/>
+							<Image row="0" col="2" class="actionButton" src="~/assets/icons/save.png" @tap="save"/>
+						</GridLayout>
+					<FloatLabel placeholder="Pseudo" label="Pseudo" :valeur="myFirstname" @updateValeur="updateNom"/>
+					<!--<FloatLabel placeholder="Prénom" label="prenom" :valeur="myLastname" @updateValeur="updatePrenom"/>-->
 					<GridLayout rows="30, auto" marginBottom="5">
 						<Label ref="labelVille" row="1" text="Ville d'habitation" opacity="0.4" fontSize="14" class="input" />
 						<TextField ref="textFieldVille" row="1" borderBottomColor="#fff" padding="0" @focus="onFocus"
@@ -25,9 +25,7 @@
 					</ScrollView>
 					<label ref="villeCode" />
 					<FloatLabel placeholder="Téléphone" label="telephone" :valeur="myTelephone" @updateValeur="updateTelephone"/>
-					<Label text="debut bdd" />
-					<Label :text="$store.profil" />
-					<Label text="fin bdd" />
+					
 					
 				</StackLayout>
 				
@@ -109,6 +107,7 @@
 				console.log("sauvegarde des informations : "+this.input.id+" : "+this.input.firstname);
 			    console.log("sauvegarde des informations : "+this.input.lastname+" : "+this.input.equipe);
 			    this.$store.dispatch("insertProfil", this.input);
+				this.updateEquipe = true;
 				this.$navigateTo(equipe);
             },
             load() {
@@ -127,6 +126,7 @@
 					if (data) {
 						console.log("on supprime !");
 						this.$store.dispatch("deleteProfil", this.input);
+						this.updateEquipe = true;
 						this.$navigateTo(equipe);
 					}
 					else {

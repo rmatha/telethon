@@ -8,7 +8,7 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
-		debug : true,
+		debug : false,
         database: null,
         data: [],
 		versionCategorie : "0",
@@ -16,6 +16,7 @@ const store = new Vuex.Store({
 		versionEquipe : "0",
 		updateCategorie : false,
 		updateDefi : false,
+		updateEquipe : false,
 		selectedCommune : null,
 		selectedCategorie : null,
 		selectedDefi : null,
@@ -349,21 +350,21 @@ const store = new Vuex.Store({
 		
 		},
 		insertScore(context, data) {
-			if (data.id < 0) {
-  				console.log("insertScore : insert");
-				context.state.database.execSQL("INSERT INTO score (idDefi,idProfil,score) VALUES (?,?,?)", [data.idDefi,data.idProfil,data.score]).then(id => {
-					context.dispatch("queryScoresEquipe");
-				}, error => {
-					console.log("INSERT ERROR score", error);
-				});
-			}
-			else {
-				console.log("insertScore : update");
+			if (data.id) {
+  				console.log("insertScore : update");
 				context.state.database.execSQL("UPDATE score set idDefi = ?, idProfil = ?, score = ? where id = ?", [data.idDefi,data.idProfil,data.score,data.id]).then(id => {
 					//context.commit("saveDefi", { data: data });
 					context.dispatch("queryScoresEquipe");
 				}, error => {
 					console.log("update ERROR score", error);
+				});
+			}
+			else {
+				console.log("insertScore : insert");
+				context.state.database.execSQL("INSERT INTO score (idDefi,idProfil,score) VALUES (?,?,?)", [data.idDefi,data.idProfil,data.score]).then(id => {
+					context.dispatch("queryScoresEquipe");
+				}, error => {
+					console.log("INSERT ERROR score", error);
 				});
 			}
 		},
@@ -547,7 +548,7 @@ const store = new Vuex.Store({
 			});
 			for (var j = 0 ; j < tab.data.length ; j++) {
 				console.log("intégration du défis : "+tab.data[j].nom);
-				context.state.database.execSQL("INSERT INTO challenge (id,nom,description_courte,description_longue,reglementation,bareme,categorie) VALUES (?,?,?,?,?,?,?)", [tab.data[j].id,tab.data[j].nom,tab.data[j].description_courte,tab.data[j].description_longue,tab.data[j].reglementation,tab.data[j].bareme,tab.data[j].categorie.id]).then(id => {
+				context.state.database.execSQL("INSERT INTO challenge (id,nom,description_courte,description_longue,reglementation,bareme,categorie) VALUES (?,?,?,?,?,?,?)", [tab.data[j].id,tab.data[j].nom,tab.data[j].description,tab.data[j].description_longue,tab.data[j].reglementation,tab.data[j].bareme,tab.data[j].categorie.id]).then(id => {
 					//context.commit("saveProfil", { data: data });
 					
 				}, error => {

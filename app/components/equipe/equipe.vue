@@ -11,9 +11,10 @@
 						<Label  row="0" col="0" v-else text="Appuyer pour changer votre image d'équipe" @tap="takePicture" />
 					</GridLayout>-->
 					<StackLayout v-if="$store.state.selectedEquipe" >
-						<GridLayout rows="auto" columns="*,50" >
+						<GridLayout rows="auto" columns="*,50,50" >
 							<Label row="0" col="0" class="m-b-20 titreTelethon" :text="titreEquipe" textWrap="true" />
 							<Image row="0" col="1" class="actionButton" src="~/assets/icons/change.png" @tap="changeEquipe"/>
+							<Image row="0" col="2" class="actionButton" src="~/assets/icons/upload.png" @tap="uploadEquipe"/>
 						</GridLayout>
 						<Label text="Votre équipe est Organisateur" v-if="$store.state.selectedEquipe.organisateur"  />
 						<Label text="Votre équipe est Coordinateur " v-if="$store.state.selectedEquipe.admin" />
@@ -30,7 +31,7 @@
 					<StackLayout  v-if="$store.state.selectedEquipe">
 						<GridLayout rows="auto" columns="*,50" >
 							<Label row="0" col="0" class="label" text="Liste des participants de l'équipe" textWrap="true" />
-							<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="addParticipant"/>
+							<Image row="0" col="1" src="~/assets/icons/addUser.png" @tap="addParticipant"/>
 						</GridLayout>
 						
 						
@@ -63,7 +64,7 @@
 	import store from "../store/teleStore.js";
 	const imageSourceModule = require("tns-core-modules/image-source");
 	const fileSystemModule = require("tns-core-modules/file-system");
-	import test from "./test";
+	import axios from 'axios'
 	
     export default {
         mounted() {
@@ -139,9 +140,30 @@
 			},
 
 
-			gotest() {
-				console.log("test");
-				this.$navigateTo(test);
+			uploadEquipe() {
+				confirm({
+				  title: "Sauvegarde de l'équipe",
+				  message: "Confirmez-vous la sauvegarde de l'équipe sur le serveur ?",
+				  okButtonText: "OUAIP",
+				  cancelButtonText: "NOOOOON"
+				}).then(result => {
+				  console.log(result);
+				  if (result) {
+					console.log("On sauvegarde sur le serveur");
+					console.log("Equipe :"+JSON.stringify(this.$store.state.selectedEquipe));
+					console.log("PArticipants :"+JSON.stringify(this.$store.state.profilsEquipe));
+					axios.post("https://telethon.citeyen.com/public/api/equipe/upload", {
+						equipe : this.$store.state.selectedEquipe,
+						participant : this.$store.state.profilsEquipe,
+					})
+					.then(function(response) {
+						console.log("response : "+response);
+					})
+					.catch(function(error) {
+						console.log("error : "+error);
+					});
+				  }
+				});
 			},
 			
 			

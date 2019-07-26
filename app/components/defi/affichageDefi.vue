@@ -4,19 +4,13 @@
         <Header dock="top" />
         <Footer dock="bottom" />
 			<StackLayout dock="center" class="root" >
-			<StackLayout row="1" col="0" colSpan="3">
-				<GridLayout rows="auto" columns="*,25,50,50">
-					<Label row="0" col="0" :text="$store.state.selectedDefi.nom" class="defiName"/>
-					<Image row="0" col="1" src="~/assets/icons/Cross-red.png" @tap="supprimerDefi"/>
-					<Image row="0" col="2" v-if="defiPresent($store.state.selectedDefi.id)" src="~/assets/icons/Cross-red.png" @tap="enleverDefi"/>
-					<Image row="0" col="2" v-else src="~/assets/icons/add-256.gif" @tap="ajouterDefi"/>				
-				</GridLayout>
-				<Label text="Description" class="defiLabel" />
+				<Label row="0" col="0" :text="$store.state.selectedDefi.nom" class="sousTitre"/>
+				<Label class="label" text="Description :"  />
 				<Label :text="$store.state.selectedDefi.description_courte" class="defiDesc"/>
-				<StackLayout  orientation="horizontal" backgroundcolor="#562389">
-					<Label width="85%" class="m-b-20" :text="titreScore" textWrap="true" />
-					<Image width="15%" src="~/assets/icons/add-256.gif" @tap="addScore"/>
-				</StackLayout>
+				<GridLayout rows="auto" columns="*,50" >
+					<Label row="0" col="0" class="label m-b-20" text="Liste des scores :" textWrap="true" />
+					<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="addScore"/>
+				</GridLayout>
 				<ListView  for="item in $store.state.scoresEquipe" height="100%" >
 				  <v-template>
 					<GridLayout v-if="isCurrentDefi(item)" rows="*" columns="*,50" width="100%" margin="0" @tap="editScore(item)">
@@ -29,11 +23,12 @@
 						<Label col="1" :text="item.score" class="defiTitle" />
 					</GridLayout>
 							
-							
-							
 				  </v-template>
 				</ListView>
-			</StackLayout>
+				<Button class="boutonAction" v-if="defiPresent($store.state.selectedDefi.id)" :text="enleverDefiLabel" @tap="enleverDefi"/>
+				<Button class="boutonAction" v-else :text="ajouterDefiLabel" @tap="ajouterDefi"/>	
+				<Button class="boutonAction" text="Supprimer le défi de la base" @tap="supprimerDefi"/>
+					
 			</StackLayout>
 		</DockLayout>
 		
@@ -51,15 +46,24 @@
 	
 	export default {
 		computed: {
-			titreScore() {
-				return "Liste des scores : "+this.$store.state.scoresEquipe.length;
+			ajouterDefiLabel() {
+				if(this.$store.state.selectedCommune) {
+					return "Ajouter à ma commune";
+				}
+				return "Ajouter à mes défis"
+			},
+			enleverDefiLabel() {
+				if(this.$store.state.selectedCommune) {
+					return "Enlever de ma commune";
+				}
+				return "Enlever de mes défis"
 			},
 		},
         data() {
             return {}
         },
 		mounted() {
-			console.log("affichageDefi : commune : "+this.commune);
+			console.log("Defi : "+JSON.stringify(this.$store.state.selectedDefi));
         },
 		methods: {
 			getProfilNom(item) {
@@ -152,12 +156,7 @@
 </script>
 
 <style>
-.defiName {
-	color : black;
-	font-weight: bold;
-	font-size: 20px;
-	text-align : center;
-}
+
 .defiDesc {
 	color : black;
 	font-size: 10px;
@@ -165,9 +164,4 @@
 	
 }
 
-.defiLabel {
-	font-weight: bold;
-	font-size: 15px;
-	text-decoration: underline;
-}
 </style>

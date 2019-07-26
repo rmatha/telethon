@@ -17,19 +17,20 @@
 					<GridLayout rows="*,*,*" columns="*,auto">
 						<StackLayout row="0" col="0">
 							<label class="label" text="Equipe :"  />
-							<label class="valeur" :text="$store.state.selectedEquipe.nom"  />
+							<label class="valeur" :text="nomEquipe"  />
+							<label class="valeur" :text="nbParticipantsEquipe"  />
 						</StackLayout>
 						<Image  src="~/assets/icons/modify.png" col="1" row="0" @tap="navEquipe" stretch="none" />
 						<StackLayout row="1" col="0">	
 							<label class="label" text="Défis : "  />
-							<label class="valeur" :text="$store.state.selectedEquipe.defis"  verticalAlignment="bottom" horizontalAlignment="center"/>
+							<label class="valeur" :text="nbDefisEquipe"  />
 						</StackLayout>
-						<Image  src="~/assets/icons/modify.png" col="1" row="1" @tap="navEquipe" stretch="none" />
+						<Image  src="~/assets/icons/modify.png" col="1" row="1" @tap="navMesDefis" stretch="none" />
 						<StackLayout row="2" col="0">	
-							<label class="label" text="Commune : "/>
-							<label class="valeur" :text="$store.state.selectedEquipe.commune"  /><Label :text="networkStatus" />
+							<label class="label" text="Score : "/>
+							<label class="valeur" text="coming soon !!!"  /><Label :text="networkStatus" />
 						</StackLayout>
-						<Image  src="~/assets/icons/modify.png" col="1" row="2" @tap="navEquipe" stretch="none" class="modify"/>
+						<Image  src="~/assets/icons/modify.png" col="1" row="2" @tap="navScore" stretch="none" class="modify"/>
 						
 					</GridLayout>
 				</StackLayout>
@@ -54,6 +55,8 @@
 	const connectivity = require("connectivity");
 	import changeEquipe from "./equipe/changeEquipe";
 	import equipe from "./equipe/equipe";
+	import mesDefis from "./defi/mesDefis";
+	import resultats from "./score/resultats";
 	import axios from 'axios'
 	
     export default {
@@ -72,6 +75,19 @@
 			
 		},
         computed: {
+			nomEquipe() {
+				return "Nom de l'équipe : "+this.$store.state.selectedEquipe.nom;
+			},
+			nbParticipantsEquipe() {
+				return "Nombre de particpants : "+this.$store.state.profilsEquipe.length;
+			},
+			nbDefisEquipe() {
+				var messageDefi = "Pas de défis enregistrés pour l'équipe... Utilisez le bouton à droite pour gérer vos défis !";
+				if (this.$store.state.nosDefis.length > 0) {
+					messageDefi ="Nombre de défis pour l'équipe : "+this.$store.state.nosDefis.length;
+				}
+				return messageDefi;
+			},
 			currentEquipe() {
 				var reponse = this.$store.state.selectedEquipe ? this.$store.state.selectedEquipe.nom : "Pas d'équipe  sélectionnée";
 				
@@ -86,8 +102,13 @@
         
 		methods: {
 			navChangeEquipe(type) {
-				console.log("type : "+type);
 				this.$navigateTo(changeEquipe, { props: {type : type}});
+			},
+			navMesDefis() {
+				this.$navigateTo(mesDefis);
+			},
+			navScore() {
+				this.$navigateTo(resultats);
 			},
 			navEquipe() {
 				this.$navigateTo(equipe);

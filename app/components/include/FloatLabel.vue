@@ -31,14 +31,22 @@
         },
         methods: {
 			onTextChange: function() {
-				
-                let textField = this.$refs.textField.nativeView;
-                console.log("onTextChange saisie " + textField.text);
-               
-				console.log("onTextChange label " + textField.name);
-                //ApplicationSettings.setString(textField.name, textField.text);
-           
-                //this.firstTx = textField.text;
+				const label = this.$refs.label.nativeView;
+                const textField = this.$refs.textField.nativeView;
+
+                // animate the label sliding up and less transparent.
+                label
+                    .animate({
+                        translate: {
+                            x: 0,
+                            y: -25
+                        },
+                        opacity: 1
+                    })
+                    .then(() => {}, () => {});
+
+                // set the border bottom color to green to indicate focus
+                textField.borderBottomColor = new Color("#00b47e");
 				this.$emit("updateValeur",textField.text);
             },
             onFocus: function() {
