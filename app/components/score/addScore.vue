@@ -8,7 +8,7 @@
 				<Label class="sousTitre" :text="defiNom" textWrap="true"/>
 				<GridLayout rows="auto,auto,auto" columns="*,*" > 
 					<Label row="0" col="0" class="label" text="Participant" verticalAlignment="center"/>
-					<ListPicker row="1" col="0" v-if="isNouveauScore" ref="profilEnCours" :items="$store.state.profilsEquipe" textField="firstname" />
+					<ListPicker row="1" col="0" v-if="isNouveauScore" ref="profilEnCours" :items="$store.state.participants" textField="firstname" />
 					<Label row="1" col="0" v-else :text="participant" verticalAlignment="center" horizontalAlignment="center"/>
 					<Label row="0" col="1" text="Score"  verticalAlignment="center"/>
 					<ListPicker row="1" col="1" ref="scoreEnCours" :items="scoresRef" :selectedIndex="selectedIndexScore" />
@@ -35,7 +35,7 @@
 			},
 			participant() {
 				if (this.$store.state.selectedScore) {
-					let profilEnCours = this.$store.state.profilsEquipe.find(e => e.id == this.$store.state.selectedScore.idProfil);
+					let profilEnCours = this.$store.state.participants.find(e => e.id == this.$store.state.selectedScore.idProfil);
 					return profilEnCours.firstname+ " "+profilEnCours.lastname;
 
 				}
@@ -66,7 +66,7 @@
 				}
 				else {
 					let indexProfil = this.$refs.profilEnCours.nativeView;
-					idProfil = this.$store.state.profilsEquipe[indexProfil.selectedIndex].id;
+					idProfil = this.$store.state.participants[indexProfil.selectedIndex].id;
 					console.log("Récupération de l'index : "+indexProfil+" : ayant pour id : "+idProfil);
 				}
 				let indexScore = this.$refs.scoreEnCours.nativeView;

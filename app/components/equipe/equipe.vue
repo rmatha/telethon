@@ -4,51 +4,55 @@
         <Header dock="top" />
         <Footer dock="bottom" />
 			<StackLayout dock="center" class="root" >
-			<ScrollView row="1" col="0" >
-				<StackLayout class="m-20">
-					<!--<GridLayout rows="200" columns="*" >
-						<Image row="0" col="0" v-if="imageSrc" :src="imageSrc" class="imageEquipe" @tap="takePicture"></Image>
-						<Label  row="0" col="0" v-else text="Appuyer pour changer votre image d'équipe" @tap="takePicture" />
-					</GridLayout>-->
-					<StackLayout v-if="$store.state.selectedEquipe" >
-						<GridLayout rows="auto" columns="*,50,50" >
-							<Label row="0" col="0" class="m-b-20 titreTelethon" :text="titreEquipe" textWrap="true" />
-							<Image row="0" col="1" class="actionButton" src="~/assets/icons/change.png" @tap="changeEquipe"/>
-							<Image row="0" col="2" class="actionButton" src="~/assets/icons/upload.png" @tap="uploadEquipe"/>
-						</GridLayout>
-						<Label text="Votre équipe est Organisateur" v-if="$store.state.selectedEquipe.organisateur"  />
-						<Label text="Votre équipe est Coordinateur " v-if="$store.state.selectedEquipe.admin" />
-						<Label class="label" text="Commune des défis Téléthon" />
-						<Label class="valeur" :text="$store.state.selectedEquipe.commune" />
-
-						
-					</StackLayout>
-					<StackLayout v-else>
-						<button text="créer ou sélectionner son equipe" @tap="changeEquipe" />
-					</StackLayout>
-
-					
-					<StackLayout  v-if="$store.state.selectedEquipe">
-						<GridLayout rows="auto" columns="*,50" >
-							<Label row="0" col="0" class="label" text="Liste des participants de l'équipe" textWrap="true" />
-							<Image row="0" col="1" src="~/assets/icons/addUser.png" @tap="addParticipant"/>
-						</GridLayout>
-						
-						
-					</StackLayout>
-					<ScrollView v-if="$store.state.selectedEquipe">
-						<StackLayout >
-							<GridLayout v-for="participant in $store.state.profilsEquipe" rows="40" columns="*"  >
-								<Label :text="libelleProfil(participant)" class="valeur" @tap="editParticipant(participant)"/>
+				<ScrollView row="1" col="0" >
+					<StackLayout class="m-20">
+						<!--<GridLayout rows="200" columns="*" >
+							<Image row="0" col="0" v-if="imageSrc" :src="imageSrc" class="imageEquipe" @tap="takePicture"></Image>
+							<Label  row="0" col="0" v-else text="Appuyer pour changer votre image d'équipe" @tap="takePicture" />
+						</GridLayout>-->
+						<StackLayout v-if="$store.state.selectedEquipe" >
+							<GridLayout rows="auto" columns="*,50,50" >
+								<Label row="0" col="0" class="m-b-20 titreTelethon" :text="titreEquipe" textWrap="true" />
+								<Image row="0" col="1" class="actionButton" src="~/assets/icons/change.png" @tap="changeEquipe"/>
+								<Image row="0" col="2" class="actionButton" src="~/assets/icons/upload.png" @tap="uploadEquipe"/>
 							</GridLayout>
+							<Label text="Votre équipe est Organisateur" v-if="$store.state.selectedEquipe.organisateur"  />
+							<Label text="Votre équipe est Coordinateur " v-if="$store.state.selectedEquipe.admin" />
+							<Label class="label" text="Commune des défis Téléthon" />
+							<Label class="valeur" :text="$store.state.selectedEquipe.commune" />
+
+							
 						</StackLayout>
-					</ScrollView>
+						<StackLayout v-else>
+							<button text="créer ou sélectionner son equipe" @tap="changeEquipe" />
+						</StackLayout>
+
+						
+						<StackLayout  v-if="$store.state.selectedEquipe">
+							<GridLayout rows="auto" columns="*,50" >
+								<Label row="0" col="0" class="label" text="Liste des participants de l'équipe" textWrap="true" />
+								<Image row="0" col="1" src="~/assets/icons/addUser.png" @tap="addParticipant"/>
+							</GridLayout>
+							
+							
+						</StackLayout>
+						<ScrollView v-if="$store.state.selectedEquipe">
+							<StackLayout v-if="$store.state.participants.length">
+								<GridLayout v-for="participant in $store.state.participants" rows="40" columns="*"  >
+									<Label :text="libelleProfil(participant)" class="valeur" @tap="editParticipant(participant)"/>
+								</GridLayout>
+							</StackLayout>
+							<StackLayout v-else >
+								<Label text="! Pas de particpants inscrits !" textWrap="true" class="valeur" @tap="editParticipant(participant)"/>
+								<Label text="Ajouter des participants via le bouton à droite" textWrap="true" class="valeur" @tap="editParticipant(participant)"/>
+							</StackLayout>
+						</ScrollView>
+						
+						
+						
+					</StackLayout>
 					
-					
-					
-				</StackLayout>
-				
-			</ScrollView>
+				</ScrollView>
 			</StackLayout>
 	</DockLayout>
 	</page>
@@ -69,8 +73,8 @@
     export default {
         mounted() {
 			console.log("Equipe en cours est à :"+JSON.stringify(this.$store.state.selectedEquipe));
-			console.log("Liste des participants : "+JSON.stringify(this.$store.state.profilsEquipe));
-			console.log("nombre des participants : "+this.$store.state.profilsEquipe.lenght);
+			console.log("Liste des participants : "+JSON.stringify(this.$store.state.participants));
+			console.log("nombre des participants : "+this.$store.state.participants.lenght);
 
 
         },
@@ -151,17 +155,35 @@
 				  if (result) {
 					console.log("On sauvegarde sur le serveur");
 					console.log("Equipe :"+JSON.stringify(this.$store.state.selectedEquipe));
-					console.log("PArticipants :"+JSON.stringify(this.$store.state.profilsEquipe));
-					axios.post("https://telethon.citeyen.com/public/api/equipe/upload", {
-						equipe : this.$store.state.selectedEquipe,
-						participant : this.$store.state.profilsEquipe,
-					})
-					.then(function(response) {
-						console.log("response : "+response);
-					})
-					.catch(function(error) {
-						console.log("error : "+error);
-					});
+					console.log("Participants :"+JSON.stringify(this.$store.state.participants));
+					axios
+						  .post('https://www.telethon.citeyen.com/public/api/equipes/upload', {
+							Equipe : this.$store.state.selectedEquipe,
+							Participants : this.$store.state.participants,
+						  })
+						  .then(response => {
+							console.log("update OK");
+							alert({
+							  title: "Chargement de l'équipe",
+							  message: "L'équipe a été sauvegardé sur le serveur",
+							  okButtonText: "OK"
+							}).then(() => {
+							  console.log("Alert dialog closed");
+							  this.$navigateTo(mesDefis);
+							});
+						  })
+						  .catch(error => {
+							console.log("updatete KO : "+error);
+							alert({
+							  title: "Problème de sauvegarde",
+							  message: "La sauvegarde n'est pas possible actuellement. Mais vous pouvez continuer à utiliser cette équipe pour saisir les participants et les scores. Vous pourrez faire la sauvegarde plus tard",
+							  okButtonText: "OK"
+							}).then(() => {
+							  console.log("Alert dialog closed");
+							  this.$navigateTo(mesDefis);
+							});
+						  })
+					
 				  }
 				});
 			},

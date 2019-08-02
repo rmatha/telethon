@@ -4,6 +4,9 @@
 			<Header dock="top" />
 			<StackLayout dock="bottom">
 				<button text="ouvrir l'application" @tap="home"/>
+				<Button text="reload equipes" @tap="reloadEquipes" />
+				<Button text="reload catégories" @tap="reloadCategories" />
+				<Button text="reload defis" @tap="reloadDefis" />
 			</StackLayout>
 			<StackLayout dock="center" class="preload" >
 				<ListView for="item in messages" class="preload">
@@ -20,7 +23,7 @@
 <script>
 	const connectivity = require("connectivity");
 	import home from "./home";
-	import axios from 'axios'
+	import axios from 'axios';
 	
     export default {
 		data() {
@@ -32,11 +35,46 @@
         },
 		mounted() {
 			// vérification de la connectivité
-			this.checkNetwork();
 			this.messages.push("Vérification de l'accès à internet");
+			const connectionType = connectivity.getConnectionType();
+			if (connectionType !== connectivity.connectionType.none) {
+				this.reloadCategories();
+				this.reloadDefis();
+				this.reloadEquipes();
+				
+				this.messages.push("Chargement de l'équipe en cours");
+				this.$store.dispatch("queryCurrentEquipe").then(() => {
+					console.log("équipe en cours second: "+JSON.stringify(this.$store.state.selectedEquipe));
+					this.messages.push("équipe en cours : "+this.$store.state.selectedEquipe.nom);
+					// chargement des participants 
+					this.$store.dispatch("queryParticipants").then(() => {
+						console.log("preload : chargement Participants OK");
+						
+					});
+				});
+				console.log("fin de chargement de l'equipe en cours !");
+			}
+			this.chargement = false;
+			console.log("équipe en cours root: "+JSON.stringify(this.$store.state.selectedEquipe));
+		},
+        computed: {
+			currentEquipe() {
+				var reponse = this.$store.state.selectedEquipe ? this.$store.state.selectedEquipe.nom : "Pas d'équipe  sélectionnée";
+				return reponse;
+			},
+			isEquipeSelected() {
+				var temp = this.$store.state.selectedEquipe.nom ? true : false;
+				console.log("isEquipeSelected : "+temp);
+				return temp;
+			}
+        },
+        
+		methods: {
 			
-			console.log("connexion : "+this.connexion);
-			if (this.connexion) {
+			home() {
+				this.$navigateTo(home);
+			},
+			reloadCategories() {
 				this.messages.push("Vérification des catégories");
 				//récuperation du numero de version locale pour les categories
 				this.$store.dispatch("queryCategorieVersion").then(() => {
@@ -57,6 +95,8 @@
 						}
 					})
 				});
+			},
+			reloadDefis() {
 				this.messages.push("Vérification des Défis");
 				this.$store.dispatch("queryDefiVersion").then(() => {
 					console.log("Version defi locale : "+this.$store.state.versionDefi);
@@ -80,6 +120,8 @@
 						}
 					})
 				});
+			},
+			reloadEquipes() {
 				this.messages.push("Vérification des équipes");
 				this.$store.dispatch("queryEquipeVersion").then(() => {
 					console.log("Version equipe locale : "+this.$store.state.versionDefi);
@@ -95,59 +137,14 @@
 							axios
 							  .get('https://telethon.citeyen.com/public/api/equipes/list')
 							  .then(responseList => {
-								console.log("Chargement des equipes een base : "+JSON.stringify(responseList.data));
+								console.log("Chargement des equipes en base : "+JSON.stringify(responseList.data));
 								this.$store.dispatch("reloadEquipes",{data : responseList.data,version : response.data.version});
 							  });
 						}else {
-							this.messages.push("Equipes à jour");
+							this.messages.push("Equipes à jour ");
 						}
 					})
 				});
-				
-				this.messages.push("Chargement de l'équipe en cours");
-				this.$store.dispatch("queryCurrentEquipe").then(() => {
-					console.log("équipe en cours second: "+JSON.stringify(this.$store.state.selectedEquipe));
-					this.messages.push("équipe en cours : "+this.$store.state.selectedEquipe.nom);
-				});
-				console.log("fin de chargement de l'equipe en cours !");
-				
-			
-			}
-			this.chargement = false;
-			console.log("équipe en cours root: "+JSON.stringify(this.$store.state.selectedEquipe));
-		},
-        computed: {
-			currentEquipe() {
-				var reponse = this.$store.state.selectedEquipe ? this.$store.state.selectedEquipe.nom : "Pas d'équipe  sélectionnée";
-				return reponse;
-			},
-			isEquipeSelected() {
-				var temp = this.$store.state.selectedEquipe.nom ? true : false;
-				console.log("isEquipeSelected : "+temp);
-				return temp;
-			}
-        },
-        
-		methods: {
-			checkNetwork() {
-				const connectionType = connectivity.getConnectionType();
-				switch (connectionType) {
-					case connectivity.connectionType.none:
-						this.messages.push("Pas de connexion internet disponible");
-						this.connexion = false;
-						break;
-					case connectivity.connectionType.wifi:
-						this.messages.push("Connection WIFI valide");
-						this.connexion = true;
-						break;
-					case connectivity.connectionType.mobile:
-						this.messages.push("Connection mobile valide");
-						this.connexion = true;
-						break;
-				}
-			},
-			home() {
-				this.$navigateTo(home);
 			},
 		}
     };

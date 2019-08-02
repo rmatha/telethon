@@ -47,7 +47,6 @@
     export default {
         mounted() {
 			console.log("chargment de la base");
-			//this.$store.dispatch("queryProfil");
             console.log("mounted Chargement des villes de Charente"); 
             fetch(
                     "https://geo.api.gouv.fr/departements/16/communes?fields=nom,code&format=json&geometry=centre"
@@ -106,7 +105,7 @@
 			save() {
 				console.log("sauvegarde des informations : "+this.input.id+" : "+this.input.firstname);
 			    console.log("sauvegarde des informations : "+this.input.lastname+" : "+this.input.equipe);
-			    this.$store.dispatch("insertProfil", this.input);
+			    this.$store.dispatch("insertParticipant", this.input);
 				this.updateEquipe = true;
 				this.$navigateTo(equipe);
             },
@@ -125,7 +124,7 @@
 					console.log(data);
 					if (data) {
 						console.log("on supprime !");
-						this.$store.dispatch("deleteProfil", this.input);
+						this.$store.dispatch("deleteParticipant", this.input);
 						this.updateEquipe = true;
 						this.$navigateTo(equipe);
 					}

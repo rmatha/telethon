@@ -67,6 +67,8 @@
 <script>
 
 	import equipe from "./equipe";
+	import axios from 'axios';
+	
 	
     export default {
         mounted() {
@@ -95,6 +97,8 @@
 			if (this.type == "search") {
 				this.isExistanteEquipe = true;
 			};
+			console.log("rechargement de la table des equipes au cas où");
+			this.$store.dispatch("queryEquipes");
 			
         },
 		computed: {	
@@ -188,9 +192,9 @@
 			selectEquipeExistante() { 
 				// récupération de la commune sélectionnée
 				let indexEquipe = this.$refs.equipeEnCours.nativeView;
-				let nom = this.equipesVille[indexEquipe.selectedIndex].nom;
-				let code = this.equipesVille[indexEquipe.selectedIndex].code;
-				console.log("selectEquipeExistante : sélectionde l'équipe :"+nom+" : sur la commune : "+this.input.commune+ " est le code : "+ code);
+				this.input.nom = this.equipesVille[indexEquipe.selectedIndex].nom;
+				this.input.code = this.equipesVille[indexEquipe.selectedIndex].code;
+				console.log("selectEquipeExistante : sélectionde l'équipe :"+this.input.nom+" : sur la commune : "+this.input.commune+ " est le code : "+ this.input.code);
 				prompt({
 				  title: "Code de l'équipe",
 				  message: "Veuillez saisir le code de l'équipe:",
@@ -198,20 +202,37 @@
 				  cancelButtonText: "Cancel",
 				  defaultText: "",
 				}).then(result => {
-					console.log(`Dialog result: ${result.result}, text: ${result.text}`);
-					if (result.result & (result.text == code)) {
-						alert({
-						  title: "Sélection d'équipe",
-						  message: "L'équipe "+nom+" de la commune "+this.input.commune+" est sélectionnée",
-						  okButtonText: "OK"
-						}).then(() => {
-						  this.input.nom = nom;
-						  this.input.code = code;
-						  this.$store.dispatch("updateCurrentEquipe", this.input);
-						  this.$navigateTo(equipe);
+					if (result.result & (result.text == this.input.code)) {
+						console.log("slection ok");
+						this.$store.dispatch("updateCurrentEquipe",this.input).then(() => {
+							console.log("updateCurrentEquipe : Equipe chargée");
+							console.log("updateCurrentEquipe : Recherche axios pour les partcipants");
+							let params = {};
+							params["equipe"] = this.input.nom;
+							params["commune"] = this.input.commune;
+							axios
+								.get('https://telethon.citeyen.com/public/api/participants/list', {params : params})
+								.then(response => {
+									console.log("updateCurrentEquipe : Liste des participants serveur :"+JSON.stringify(response.data.participants));//.data.participants); 
+									this.$store.dispatch("downloadParticipants", response.data.participants);
+									console.log("updateCurrentEquipe : Validation du chargement des participants");
+									alert({
+									  title: "Sélection d'équipe",
+									  message: "L'équipe "+this.input.nom+" de la commune "+this.input.commune+" est sélectionnée",
+									  okButtonText: "OK"
+									}).then(() => {
+									  console.log("changeEquipe :Chargement de l'équipe");
+									  this.$navigateTo(equipe);
+										
+									});
+								})
+								.catch(error => console.log("updateCurrentEquipe : ERROR : "+error));
+							
 						});
+						
 					}
 					else {
+						console.log("selction equipe KO");
 						alert({
 						  title: "Sélection d'équipe",
 						  message: "Le code n'est pas correct",
@@ -241,13 +262,14 @@
 				}
 				else {
 					console.log("on peut créer la nouvelle équipe : "+JSON.stringify(this.input));
-					this.$store.dispatch("insertCurrentEquipe", this.input);
-					alert({
-					  title: "Création d'équipe confirmée",
-					  message: "Vous allez être redirigé pour intégrer les membres à votre équipe",
-					  okButtonText: "OK"
-					}).then(() => {
-					  this.$navigateTo(equipe);
+					this.$store.dispatch("insertCurrentEquipe", this.input).then(() => {
+						alert({
+						  title: "Création d'équipe confirmée",
+						  message: "Vous allez être redirigé pour intégrer les membres à votre équipe",
+						  okButtonText: "OK"
+						}).then(() => {
+						  this.$navigateTo(equipe);
+						});
 					});
 				};
 			},

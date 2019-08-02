@@ -7,10 +7,9 @@
 			<StackLayout  dock="center" class="root" >
 				<label class="titre" text="Bonjour !"  horizontalAlignment="center"/>
 				<Button v-if="$store.state.debug" text="Lister les equipes" @tap="showEquipe" />
-				<Button v-if="$store.state.debug" text="effacer table" @tap="reinit" />
-				<button v-if="$store.state.debug" text="init monitoring reseau" @tap="checkNetwork" />
+				<Button v-if="$store.state.debug" text="effacer tablesss" @tap="reinit" />
 				<Button v-if="$store.state.debug" text="Recharger l'équipe e cours" @tap="reinitEquipe" />
-				<Button v-if="$store.state.debug" text="Rechargerr les scores" @tap="reinitScore" />
+				<Button v-if="$store.state.debug" text="Recharger les scores" @tap="reinitScore" />
 				
 				
 				<StackLayout  v-if="isEquipeSelected">
@@ -19,6 +18,7 @@
 							<label class="label" text="Equipe :"  />
 							<label class="valeur" :text="nomEquipe"  />
 							<label class="valeur" :text="nbParticipantsEquipe"  />
+							<label class="valeur" :text="synchroEquipe"  />
 						</StackLayout>
 						<Image  src="~/assets/icons/modify.png" col="1" row="0" @tap="navEquipe" stretch="none" />
 						<StackLayout row="1" col="0">	
@@ -52,12 +52,12 @@
 </template>
 
 <script>
-	const connectivity = require("connectivity");
 	import changeEquipe from "./equipe/changeEquipe";
 	import equipe from "./equipe/equipe";
 	import mesDefis from "./defi/mesDefis";
 	import resultats from "./score/resultats";
-	import axios from 'axios'
+	import axios from 'axios';
+	const connectivity = require("connectivity");
 	
     export default {
 		data() {
@@ -67,19 +67,15 @@
 				categories : []
             };
         },
-		mounted() {
-			console.log("home ");
-			// chargement des données en fonction de l'équipe en cours
-			var isEquipeSelected = this.$store.state.selectedEquipe.nom ? true : false;
-			this.$store.dispatch("queryDonnees", isEquipeSelected);
-			
-		},
-        computed: {
+		computed: {
+			synchroEquipe() {
+				
+			},
 			nomEquipe() {
 				return "Nom de l'équipe : "+this.$store.state.selectedEquipe.nom;
 			},
 			nbParticipantsEquipe() {
-				return "Nombre de particpants : "+this.$store.state.profilsEquipe.length;
+				return "Nombre de particpants : "+this.$store.state.participants.length;
 			},
 			nbDefisEquipe() {
 				var messageDefi = "Pas de défis enregistrés pour l'équipe... Utilisez le bouton à droite pour gérer vos défis !";
@@ -99,6 +95,33 @@
 				return temp;
 			}
         },
+        mounted() {
+			console.log("home ");
+			// chargement des données en fonction de l'équipe en cours
+			//this.$store.dispatch("queryDonnees", isEquipeSelected);
+			// vérification si une connexion est disponible
+			const connectionType = connectivity.getConnectionType();
+			if (connectionType !== connectivity.connectionType.none) {
+				// vérification de la version de l'equipe en cours 
+				console.log("Reseau OK");
+				
+			}
+			else {
+				console.log("Pas de réseau !!!");
+			}
+			console.log("HOME : chargement de l'équipe en cours !!");
+			this.$store.dispatch("queryCurrentEquipe").then(() => {
+				if (this.$store.state.selectedEquipe.nom) {
+					console.log("HOME : on a bien récupéré l'équipe :"+this.$store.state.selectedEquipe.nom);
+					//on peut mettre a jour les tables mesDefis et participants
+				}
+				else {
+					console.log("PAs d'équipe en cours !!!");
+				}
+			});
+			
+			
+		},
         
 		methods: {
 			navChangeEquipe(type) {
@@ -119,23 +142,7 @@
 				}
 				return "Pas d'équipe en cours";
 			},
-			checkNetwork() {
-				const connectionType = connectivity.getConnectionType();
-				switch (connectionType) {
-					case connectivity.connectionType.none:
-						this.libelleChargement = "Pas de connexion internet disponible";
-						this.connexion = false;
-						break;
-					case connectivity.connectionType.wifi:
-						this.libelleChargement = "Connection WIFI valide";
-						this.connexion = true;
-						break;
-					case connectivity.connectionType.mobile:
-						this.libelleChargement = "Connection mobile valide";
-						this.connexion = true;
-						break;
-				}
-			},
+			
 			reinit() {
 				this.$store.dispatch("deleteBase");
 			},
@@ -148,10 +155,8 @@
 				this.$store.dispatch("queryScoresEquipe");
 			},
 			showEquipe() {
-				console.log("On affiche les équipes en base !!");
-				this.$store.dispatch("queryEquipes");
-				console.log("On affiche équipe en cours !!");
-				this.$store.dispatch("queryCurrentEquipe");
+				console.log("HOME : On affiche les équipes en base !!");
+				this.$store.dispatch("listEquipeBase");
 			}
 
 		}

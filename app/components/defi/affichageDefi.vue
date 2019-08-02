@@ -4,31 +4,34 @@
         <Header dock="top" />
         <Footer dock="bottom" />
 			<StackLayout dock="center" class="root" >
-				<Label row="0" col="0" :text="$store.state.selectedDefi.nom" class="sousTitre"/>
-				<Label class="label" text="Description :"  />
-				<Label :text="$store.state.selectedDefi.description_courte" class="defiDesc"/>
-				<GridLayout rows="auto" columns="*,50" >
-					<Label row="0" col="0" class="label m-b-20" text="Liste des scores :" textWrap="true" />
-					<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="addScore"/>
-				</GridLayout>
-				<ListView  for="item in $store.state.scoresEquipe" height="100%" >
-				  <v-template>
-					<GridLayout v-if="isCurrentDefi(item)" rows="*" columns="*,50" width="100%" margin="0" @tap="editScore(item)">
-						<GridLayout col="0" verticalAlignment="bottom">
-							<StackLayout paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16">
-								<Label :text="getProfilNom(item)" class="defiTitle" />
-								
-							</StackLayout>
+				<ScrollView row="1" col="0" >
+					<StackLayout class="m-20">
+						<Label row="0" col="0" :text="$store.state.selectedDefi.nom" class="sousTitre"/>
+						<Label class="label" text="Description :"  />
+						<Label :text="$store.state.selectedDefi.description_courte" class="defiDesc"/>
+						<GridLayout rows="auto" columns="*,50" >
+							<Label row="0" col="0" class="label m-b-20" text="Liste des scores :" textWrap="true" />
+							<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="addScore"/>
 						</GridLayout>
-						<Label col="1" :text="item.score" class="defiTitle" />
-					</GridLayout>
-							
-				  </v-template>
-				</ListView>
-				<Button class="boutonAction" v-if="defiPresent($store.state.selectedDefi.id)" :text="enleverDefiLabel" @tap="enleverDefi"/>
-				<Button class="boutonAction" v-else :text="ajouterDefiLabel" @tap="ajouterDefi"/>	
-				<Button class="boutonAction" text="Supprimer le défi de la base" @tap="supprimerDefi"/>
-					
+						<ListView  for="item in $store.state.scoresEquipe" height="100%" >
+						  <v-template>
+							<GridLayout v-if="isCurrentDefi(item)" rows="*" columns="*,50" width="100%" margin="0" @tap="editScore(item)">
+								<GridLayout col="0" verticalAlignment="bottom">
+									<StackLayout paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16">
+										<Label :text="getProfilNom(item)" class="defiTitle" />
+										
+									</StackLayout>
+								</GridLayout>
+								<Label col="1" :text="item.score" class="defiTitle" />
+							</GridLayout>
+									
+						  </v-template>
+						</ListView>
+						<Button class="boutonAction" v-if="defiPresent($store.state.selectedDefi.id)" :text="enleverDefiLabel" @tap="enleverDefi"/>
+						<Button class="boutonAction" v-else :text="ajouterDefiLabel" @tap="ajouterDefi"/>	
+						<Button class="boutonAction" text="Supprimer le défi de la base" @tap="supprimerDefi"/>
+					</StackLayout>
+				</ScrollView>
 			</StackLayout>
 		</DockLayout>
 		
@@ -67,9 +70,9 @@
         },
 		methods: {
 			getProfilNom(item) {
-				console.log("getProfilNom : "+ JSON.stringify(this.$store.state.profilsEquipe));
+				console.log("getProfilNom : "+ JSON.stringify(this.$store.state.participants));
 				console.log("getProfilNom : "+ item.idProfil);
-				let profilEnCours = this.$store.state.profilsEquipe.find(e => e.id == item.idProfil);
+				let profilEnCours = this.$store.state.participants.find(e => e.id == item.idProfil);
 				return profilEnCours.firstname + " " +profilEnCours.lastname;
 			},
 			isCurrentDefi(item) {
