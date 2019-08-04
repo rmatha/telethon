@@ -3,7 +3,7 @@
         <DockLayout stretchLastChild="true">
 			<Header dock="top" />
 			<StackLayout dock="bottom">
-				<button text="ouvrir l'application" @tap="home"/>
+				<button text="ouvrir l'application" @tap="accueil"/>
 				<Button text="reload equipes" @tap="reloadEquipes" />
 				<Button text="reload catégories" @tap="reloadCategories" />
 				<Button text="reload defis" @tap="reloadDefis" />
@@ -22,8 +22,8 @@
 
 <script>
 	const connectivity = require("connectivity");
-	import home from "./home";
 	import axios from 'axios';
+	import accueil from './accueil';
 	
     export default {
 		data() {
@@ -71,8 +71,8 @@
         
 		methods: {
 			
-			home() {
-				this.$navigateTo(home);
+			accueil() {
+				this.$navigateTo(accueil);
 			},
 			reloadCategories() {
 				this.messages.push("Vérification des catégories");
@@ -124,7 +124,7 @@
 			reloadEquipes() {
 				this.messages.push("Vérification des équipes");
 				this.$store.dispatch("queryEquipeVersion").then(() => {
-					console.log("Version equipe locale : "+this.$store.state.versionDefi);
+					console.log("Version equipe locale : "+this.$store.state.versionEquipe);
 					// révupération de la version des catégories sur le serveur 
 					axios
 					.get('https://telethon.citeyen.com/public/api/equipes/version')

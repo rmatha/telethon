@@ -72,7 +72,7 @@
 				
 			},
 			nomEquipe() {
-				return "Nom de l'équipe : "+this.$store.state.selectedEquipe.nom;
+				return "Nom de l'équipe: "+this.$store.state.selectedEquipe? this.$store.state.selectedEquipe.nom : "Pas d'équipe sélectionnée";
 			},
 			nbParticipantsEquipe() {
 				return "Nombre de particpants : "+this.$store.state.participants.length;
@@ -90,7 +90,7 @@
 				return reponse;
 			},
 			isEquipeSelected() {
-				var temp = this.$store.state.selectedEquipe.nom ? true : false;
+				var temp = this.$store.state.selectedEquipe ? true : false;
 				console.log("isEquipeSelected : "+temp);
 				return temp;
 			}
@@ -111,7 +111,7 @@
 			}
 			console.log("HOME : chargement de l'équipe en cours !!");
 			this.$store.dispatch("queryCurrentEquipe").then(() => {
-				if (this.$store.state.selectedEquipe.nom) {
+				if (this.$store.state.selectedEquipe) {
 					console.log("HOME : on a bien récupéré l'équipe :"+this.$store.state.selectedEquipe.nom);
 					//on peut mettre a jour les tables mesDefis et participants
 				}
@@ -140,7 +140,7 @@
 				if (this.$store.state.selectedEquipe) {
 					return this.$store.state.selectedEquipe.nom;
 				}
-				return "Pas d'équipe en cours";
+				return "Pas d'équipe en courss";
 			},
 			
 			reinit() {

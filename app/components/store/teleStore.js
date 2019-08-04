@@ -21,10 +21,10 @@ const store = new Vuex.Store({
 		updateDefi : false,
 		updateEquipe : false,
 		selectedCommune : null,
-		selectedCategorie : null,
+		selectedCategorie : {},
 		selectedDefi : null,
 		selectedScore : null,
-		selectedEquipe : {},
+		selectedEquipe : null,
 		isAdmin : true,
 		isOrganisateur : true,
 		participants: [],
@@ -54,6 +54,8 @@ const store = new Vuex.Store({
 			state.versionEquipe = data.data ? data.data : 0;
 		},
 		loadCurrentEquipe(state, data) {
+			console.log("loadCurrentEquipe : "+JSON.stringify(data));
+			state.selectedEquipe = {};
 			for(var i = 0; i < data.data.length; i++) {
 				state.selectedEquipe.id = data.data[i][0];
 				state.selectedEquipe.nom = data.data[i][1];
@@ -61,6 +63,7 @@ const store = new Vuex.Store({
 				state.selectedEquipe.code = data.data[i][3];
 				state.selectedEquipe.admin = data.data[i][4];
 				state.selectedEquipe.organisateur = data.data[i][5];
+				state.selectedEquipe.version = data.data[i][6];
 			}
 			console.log("mutation load currentEquipe: "+JSON.stringify(state.selectedEquipe));
 		},
@@ -76,6 +79,8 @@ const store = new Vuex.Store({
 					code : data.data[i][3],
 					admin : data.data[i][4],
 					organisateur : data.data[i][5],
+					current : data.data[i][6],
+					version : data.data[i][7],
 				});
 			}
 			console.log("mutation load loadEquipes: "+JSON.stringify(state.equipes));
@@ -210,7 +215,7 @@ const store = new Vuex.Store({
 				}, error => {
 					console.log("CREATE TABLE ERROR categorie", error);
 				});
-				db.execSQL("CREATE TABLE IF NOT EXISTS equipe (id INTEGER PRIMARY KEY AUTOINCREMENT, nom TEXT, commune TEXT, current tinyint(1), code varchar(256), admin tinyint(1), organisateur tinyint(1),UNIQUE(nom,commune))").then(id => {
+				db.execSQL("CREATE TABLE IF NOT EXISTS equipe (id INTEGER PRIMARY KEY AUTOINCREMENT, nom TEXT, commune TEXT, current tinyint(1), code varchar(256), admin tinyint(1), organisateur tinyint(1),version INTEGER, UNIQUE(nom,commune))").then(id => {
 					context.commit("init", { database: db });
 					console.log("Table equipe cree");
 				}, error => {
@@ -391,14 +396,12 @@ const store = new Vuex.Store({
 		},
 		queryCurrentEquipe(context) {
 			console.log("queryCurrentEquipe");
-			context.state.database.all("SELECT id,nom,commune,code, admin,organisateur FROM equipe where current = 1").then(result => {
-				console.log("queryCurrentEquipe récupération : "+ JSON.stringify(result));
+			context.state.database.all("SELECT id,nom,commune,code, admin,organisateur,version FROM equipe where current = 1").then(result => {
+				console.log("queryCurrentEquipe : récupération : "+ JSON.stringify(result));
 				context.commit("loadCurrentEquipe", { data: result });
-				/*;*/
 			}, error => {
-				console.log("SELECT ERROR", error);
+				console.log("queryCurrentEquipe : SELECT ERROR", error);
 			});
-			//console.log("action query : "+JSON.stringify(data));
 		},
 		queryDonnees(context,data) {
 			console.log("queryDonnees : data :"+data);
@@ -436,7 +439,7 @@ const store = new Vuex.Store({
 		},
 		queryEquipes(context) {
 			console.log("queryEquipes");
-			context.state.database.all("SELECT id,nom,commune,code, admin, organisateur, current FROM equipe ", []).then(result => {
+			context.state.database.all("SELECT id,nom,commune,code, admin, organisateur ,version FROM equipe ", []).then(result => {
 				context.commit("loadEquipes", { data: result });
 				console.log("Liste des équipes : "+JSON.stringify(result));
 			}, error => {
@@ -570,7 +573,7 @@ const store = new Vuex.Store({
 		},
 		reloadEquipes(context, tab) {
 			for (var j = 0 ; j < tab.data.length ; j++) {
-				context.state.database.execSQL("REPLACE INTO equipe (nom,commune,code,admin,organisateur) VALUES (?,?,?,?,?)", [tab.data[j].nom,tab.data[j].commune,tab.data[j].code,tab.data[j].admin,tab.data[j].organisateur]).then(id => {
+				context.state.database.execSQL("REPLACE INTO equipe (nom,commune,code,admin,organisateur,version) VALUES (?,?,?,?,?,?)", [tab.data[j].nom,tab.data[j].commune,tab.data[j].code,tab.data[j].admin,tab.data[j].organisateur,tab.data[j].version]).then(id => {
 					console.log ("reloadEquipes : replace : "+tab.data["nom"]);
 				}, error => {
 					console.log("DELETE ERROR equipe", error);
@@ -640,17 +643,63 @@ const store = new Vuex.Store({
 			});
 		},
 		listEquipeBase(context) {
-			context.state.database.all("SELECT id,nom,commune,code, admin,organisateur FROM equipe").then(result => {
+			context.state.database.all("SELECT id,nom,commune,code, admin,organisateur,version,current  FROM equipe").then(result => {
 				console.log("equipes :"+JSON.stringify(result));
 			}, error => {
 				console.log("SELECT EQUIPE error", error);
 			});
-			context.state.database.execSQL("SELECT id,firstname,lastname FROM participant").then(result => {
+			context.state.database.all("SELECT id,firstname FROM participant").then(result => {
 				console.log("participants :"+JSON.stringify(result));
 			}, error => {
 				console.log("SELECT EQUIPE error", error);
 			});
 		},
+		incrementeConfigVersion(context,data) {
+			console.log("incrementeConfigVersion : data :"+JSON.stringify(data));
+			let valeur = 0;
+			let valide = true;
+			switch (data.type) {
+				case 'categorie':
+					console.log('incrementeConfigVersion : On récupérere la version de catégorie');
+					valeur = state.versionCategorie;
+				case 'equipe':
+					console.log('incrementeConfigVersion : On récupérere la version de equipe');
+					valeur = state.versionEquipe;
+				case 'defi':
+					console.log('incrementeConfigVersion : On récupérere la version de defi');
+					valeur = state.versionDefi;
+				break;
+				
+				default:
+					console.log('incrementeConfigVersion : Sorry, we are out of ' + data.type + '.');
+					valide = false;
+				break;
+			if (valide) {
+				console.log("incrementeConfigVersion : on peut incrementer !");
+				valeur++;
+				context.state.database.execSQL("REPLACE INTO configVersion (libelle,valeur) VALUES ('?',?)",data,valeur).then(id => {
+					console.log("incrementeConfigVersion : increment OK !");
+				});
+			}
+			else {
+				console.log("incrementeConfigVersion : pas moyen d'increnter configVersion");
+			}
+}
+
+			context.state.database.execSQL("REPLACE INTO configVersion (libelle,valeur) VALUES ('categorie',?)",tab.version).then(id => {
+				console.log("reloadCategories : Table configVersion MAJ");
+			}, error => {
+				console.log("reloadCategories :UPDATE configVersion ", error);
+			});
+		},
+		incrementeVersionEquipe(context,data) {
+			console.log("incrementeVersionEquipe : "+data.version);
+			let versionEquipe = data.version;
+			context.state.database.execSQL("UPDATE equipe set version = ? where current = 1",data.version).then(id => {
+				state.selectedEquipe.version = versionEquipe;
+			});
+
+		}
 		
 		
 	}

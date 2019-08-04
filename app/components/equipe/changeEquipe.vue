@@ -223,7 +223,7 @@
 									}).then(() => {
 									  console.log("changeEquipe :Chargement de l'équipe");
 									  this.$navigateTo(equipe);
-										
+									  
 									});
 								})
 								.catch(error => console.log("updateCurrentEquipe : ERROR : "+error));

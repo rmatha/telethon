@@ -61,6 +61,8 @@
  
 <script>
 
+	
+	const connectivity = require("connectivity");
 	import profil from "./profil";
 	import changeEquipe from "./changeEquipe";
 	import { Image } from "tns-core-modules/ui/image";
@@ -75,6 +77,63 @@
 			console.log("Equipe en cours est à :"+JSON.stringify(this.$store.state.selectedEquipe));
 			console.log("Liste des participants : "+JSON.stringify(this.$store.state.participants));
 			console.log("nombre des participants : "+this.$store.state.participants.lenght);
+			// vérification des version de la version de l'équipe sur le serveur 
+			const connectionType = connectivity.getConnectionType();
+			console.log("etat de la connexion : "+connectionType);
+			if (connectionType !== connectivity.connectionType.none) {
+				console.log("On peut récupérer la version de l'équipe sur le serveur");
+				if (this.$store.state.selectedEquipe) {
+					console.log("Version equipe locale : "+this.$store.state.selectedEquipe.version);
+					let params = {};
+					params["nom"] = this.$store.state.selectedEquipe.nom;
+					params["commune"] = this.$store.state.selectedEquipe.commune;
+					axios
+						.get('https://telethon.citeyen.com/public/api/equipes/version', {params : params})
+						.then(response => {
+							console.log("Version de l'équipe sur le serveur : "+response.data.version);
+							let versionEquipeServeur = response.data.version;
+							if (versionEquipeServeur > this.$store.state.selectedEquipe.version) {
+								console.log("on doit demander si on récupère les nouveaux participants du serveur");
+								confirm({
+									title: "Mise à jour de l'équipe",
+									message: "Une version plus récente a été trouvé sur le serveur. Voulez-vous récupérer la mise à jour ?",
+									okButtonText: "OUI",
+									cancelButtonText: "NON"
+								}).then(result => {
+									if (result) {
+										let params = {};
+										params["equipe"] = this.$store.state.selectedEquipe.nom;
+										params["commune"] = this.$store.state.selectedEquipe.commune;
+										axios
+											.get('https://telethon.citeyen.com/public/api/participants/list', {params : params})
+											.then(response => {
+												console.log("equipe mounted : Liste des participants serveur :"+JSON.stringify(response.data.participants));//.data.participants); 
+												this.$store.dispatch("downloadParticipants", response.data.participants);
+												console.log("equipe mounted  : Validation du chargement des participants");
+												alert({
+												  title: "Sélection d'équipe",
+												  message: "L'équipe "+this.$store.state.selectedEquipe.nom+" de la commune "+this.$store.state.selectedEquipe.commune+" est mise à jour",
+												  okButtonText: "OK"
+												}).then(() => {
+												  console.log("equipe mounted  :Chargement de l'équipe");
+												  
+												  this.$store.dispatch("incrementeVersionEquipe", {"version" : versionEquipeServeur} );
+												  this.$navigateTo(equipe);
+												  
+												});
+											})
+											.catch(error => console.log("updateCurrentEquipe : ERROR : "+error));
+									}
+								});
+								
+							}
+						})
+						.catch(error => console.log("equipe : mounted : ERROR : "+error));
+						
+							
+				}
+			
+			};
 
 
         },
@@ -127,7 +186,7 @@
 				});
 			},
 			libelleProfil(participantTemp) {
-				return participantTemp.firstname +" " +participantTemp.lastname;
+				return participantTemp.firstname;
 			},
 			addParticipant(participantTemp) {
 				console.log("Ajout d'un aprticipant :"+participantTemp);
@@ -148,8 +207,8 @@
 				confirm({
 				  title: "Sauvegarde de l'équipe",
 				  message: "Confirmez-vous la sauvegarde de l'équipe sur le serveur ?",
-				  okButtonText: "OUAIP",
-				  cancelButtonText: "NOOOOON"
+				  okButtonText: "OK",
+				  cancelButtonText: "NON"
 				}).then(result => {
 				  console.log(result);
 				  if (result) {
@@ -169,7 +228,12 @@
 							  okButtonText: "OK"
 							}).then(() => {
 							  console.log("Alert dialog closed");
-							  this.$navigateTo(mesDefis);
+							  this.$store.dispatch("incrementeVersionEquipe").then(() => {
+								console.log("uploadEquipe : incrementation configVersion OK");
+							  })
+							  .catch(error => {
+								  console.log("uploadEquipe : Pb incrementation : "+error);
+							  });
 							});
 						  })
 						  .catch(error => {
