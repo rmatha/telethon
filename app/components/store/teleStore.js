@@ -135,7 +135,8 @@ const store = new Vuex.Store({
 		},
 		loadDefisCurrentCommune(state, data) {
 			state.defisCommune = [];
-			
+			console.log("telestore : loadDefisCurrentCommune data: "+JSON.stringify(data));
+			console.log("telestore : loadDefisCurrentCommune defis: "+JSON.stringify(this.state.defis));
 			for (var i = 0 ; i < this.state.defis.length; i++) {
 				for (var j = 0 ; j < data.data.length ; j++) {
 					console.log(i+" : "+ this.state.defis[i].id + " : "+j+" : "+data.data[j][1]);
@@ -172,7 +173,7 @@ const store = new Vuex.Store({
 			
 		},
 		loadScoresEquipe(state, data) {
-			console.log("loadScoresEquipe : ");
+			console.log("loadScoresEquipe ");
 			state.scoresEquipe = [];
 			for(var i = 0; i < data.data.length; i++) {
 				state.scoresEquipe.push({
@@ -300,10 +301,10 @@ const store = new Vuex.Store({
 		insertDefi(context, data) {
 			if (data.id == 0) {
 				console.log("insertDefi : insert");
-				context.state.database.execSQL("INSERT INTO defi (nom,description_courte,description_longue,reglementation,bareme,categorie) VALUES (?,?,?,?,?,?)", [data.nom,data.description_courte,data.description_longue,data.reglementation,data.bareme,data.categorie]).then(id => {
+				context.state.database.execSQL("INSERT INTO defi (nom,description_courte,description_longue,reglementation,bareme,categorie) VALUES (?,?,?,?,?,?)", [data.nom,data.description_courte,data.description_longue,data.reglementation,data.bareme,this.state.selectedCategorie.id]).then(id => {
 					//context.commit("saveDefi", { data: data });
 					//queryDefis(context, data : [id : data.categorie]);
-					context.dispatch("queryDefisCat", data.categorie);
+					context.dispatch("queryDefis", data.categorie);
 				}, error => {
 					console.log("INSERT ERROR defi", error);
 				});
@@ -312,15 +313,15 @@ const store = new Vuex.Store({
 				console.log("insertDefi : update");
 				context.state.database.execSQL("UPDATE defi set nom = ?, description_courte = ?, description_longue = ?, reglementation = ?, bareme = ? where id = ?", [data.nom,data.description_courte,data.description_longue,data.reglementation,data.bareme, data.id]).then(id => {
 					//context.commit("saveDefi", { data: data });
-					context.dispatch("queryDefisCat", data.categorie);
+					context.dispatch("queryDefis", data.categorie);
 				}, error => {
 					console.log("update ERROR defi", error);
 				});
 			}
 		},
 		insertNosDefis (context,data) {
-			console.log("insertNosDefis defi : "+JSON.stringify(data));
-			context.state.database.execSQL("INSERT INTO nosDefis (idDefi,idEquipe) VALUES (?,?)", [data.defi.id,this.state.selectedEquipe.id]).then(id => {
+			console.log("insertNosDefis defi : "+JSON.stringify(this.state.selectedDefi));
+			context.state.database.execSQL("INSERT INTO nosDefis (idDefi,idEquipe) VALUES (?,?)", [this.state.selectedDefi.id,this.state.selectedEquipe.id]).then(id => {
 				context.dispatch("queryNosDefis");
 			}, error => {
 				console.log("INSERT ERROR defi", error);
@@ -347,7 +348,7 @@ const store = new Vuex.Store({
 				});
 			}
 			else {
-				console.log("insertScore : insert");
+				console.log("insertScore : insert : data "+JSON.stringify(data));
 				context.state.database.execSQL("INSERT INTO score (idDefi,idParticipant,score) VALUES (?,?,?)", [data.idDefi,data.idParticipant,data.score]).then(id => {
 					context.dispatch("queryScoresEquipe");
 				}, error => {
@@ -459,7 +460,7 @@ const store = new Vuex.Store({
 		},
 		queryScoresEquipe(context) {
 			console.log("queryScoresEquipe : chargement des score pour equipe "+this.state.selectedEquipe.id);
-			context.state.database.all("SELECT score.id,idDefi, idParticipant, score, defi.nom, firstname, lastname from score, participant, defi where score.idDefi = defi.id and score.idParticipant = particpant.id ").then(result => {
+			context.state.database.all("SELECT score.id,idDefi, idParticipant, score, defi.nom, firstname, lastname from score, participant, defi where score.idDefi = defi.id and score.idParticipant = participant.id ").then(result => {
 				console.log("Nombre de réponses : "+JSON.stringify(result));
 				context.commit("loadScoresEquipe", { data: result });
 			}, error => {
@@ -494,17 +495,17 @@ const store = new Vuex.Store({
 				console.log("SELECT ERROR defis", error);
 			});
 			//console.log("action query : "+JSON.stringify(data));
-		},
+		},/*
 		queryDefisCat(context,data) {
 			console.log("queryDefisCat : ID cat : "+data.id);
 			context.state.database.all("SELECT * FROM defi where categorie = ?", [data.id]).then(result => {
-				context.commit("loadDefis", { data: result });
+				context.commit("loadDefisCat", { data: result });
 				console.log("queryDefis : NB : "+result.length);
 			}, error => {
 				console.log("SELECT ERROR defis CAT", error);
 			});
 			//console.log("action query : "+JSON.stringify(data));
-		},
+		},*/
 		queryNosDefis(context) {
 			console.log("queryNosDefis ");
 			context.state.database.all("SELECT * FROM nosDefis where idEquipe = ?", [this.state.selectedEquipe.id]).then(result => {

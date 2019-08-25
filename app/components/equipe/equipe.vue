@@ -36,18 +36,18 @@
 							
 							
 						</StackLayout>
-						<ScrollView v-if="$store.state.selectedEquipe">
-							<StackLayout v-if="$store.state.participants.length">
-								<GridLayout v-for="participant in $store.state.participants" rows="40" columns="*"  >
+						<ListView v-if="$store.state.selectedEquipe" for="participant in $store.state.participants" height="100%" > 
+							<v-template>
+								<GridLayout rows="40" columns="*"  >
 									<Label :text="libelleProfil(participant)" class="valeur" @tap="editParticipant(participant)"/>
 								</GridLayout>
-							</StackLayout>
-							<StackLayout v-else >
-								<Label text="! Pas de particpants inscrits !" textWrap="true" class="valeur" @tap="editParticipant(participant)"/>
-								<Label text="Ajouter des participants via le bouton à droite" textWrap="true" class="valeur" @tap="editParticipant(participant)"/>
-							</StackLayout>
-						</ScrollView>
+							</v-template>
+						</ListView>
 						
+						<StackLayout v-else >
+							<Label text="! Pas de particpants inscrits !" textWrap="true" class="valeur" @tap="editParticipant(participant)"/>
+							<Label text="Ajouter des participants via le bouton à droite" textWrap="true" class="valeur" @tap="editParticipant(participant)"/>
+						</StackLayout>
 						
 						
 					</StackLayout>

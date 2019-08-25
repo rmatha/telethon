@@ -6,7 +6,7 @@
 			<StackLayout dock="center" class="root" >
 			<StackLayout row="1" col="0" colSpan="3">
 				<Label row="0" col="0" text="categorieNom" textAlignment="center" fontSize="24"/>
-				<GridLayout rows="auto" columns="*,50">
+				<GridLayout  rows="auto" columns="*,50">
 					<Label row="0" col="0" text="Liste des défis" textAlignment="center" fontSize="24"/>
 					<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="addDefi(categorie)"/>
 					

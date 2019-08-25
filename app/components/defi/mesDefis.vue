@@ -5,21 +5,17 @@
 			<Footer dock="bottom" />
 			<StackLayout dock="center" class="root" >
 				<ScrollView>
-					<StackLayout>
+					<StackLayout width="100%" height="100%">
 						<GridLayout rows="auto" columns="*,50">
 							<Label row="0" col="0" class="m-b-20 titreTelethon" text="Mes Défis" textWrap="true" />
 							<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="affichageCat"/>
 						</GridLayout>
-						<ListView for="item in $store.state.nosDefis"  >
+						<ListView for="item in $store.state.nosDefis" >
 						  <v-template>
-							<GridLayout rows="*" columns="*,50" width="100%" margin="0" @tap="getDefi(item)">
-								<GridLayout col="0" verticalAlignment="bottom">
-									<StackLayout paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16">
-										<Label :text="item.nom" class="defiTitle" />
-										<Label :text="item.description_courte" class="defiDescription" />
-									</StackLayout>
-								</GridLayout>
-								<Image col="1" src="~/assets/icons/right.png" height="30px"/>
+							<GridLayout rows="auto,*" columns="*,50"  margin="0" @tap="getDefi(item)">
+								<Label col="0" raw="0" :text="item.nom" class="defiTitle" />
+								<Label col="0" row="1" :text="item.description_courte" class="defiDescription" />
+								<Image col="1" row="0" rowSpan="2" src="~/assets/icons/right.png" height="30px"/>
 							</GridLayout>
 						  </v-template>
 						</ListView>
@@ -30,9 +26,9 @@
 							<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="affichageCatCommune"/> 
 						</GridLayout>
 									
-						<ListView for="item in $store.state.defisCommune"  >
+						<ListView for="item in $store.state.defisCommune" >
 						  <v-template>
-							<GridLayout rows="*" columns="*,50" width="100%" margin="0" @tap="getDefiCommune(item)">
+							<GridLayout rows="*" columns="*,50"  margin="0" @tap="getDefiCommune(item)">
 								<GridLayout col="0" verticalAlignment="bottom">
 									<StackLayout paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16">
 										<Label :text="item.nom" class="defiTitle" />
@@ -63,7 +59,12 @@
 			},
 
 		},
-        methods: {
+		
+		mounted() {
+			console.log("mesDefis : mounted : mesDefis "+JSON.stringify(this.$store.state.nosDefis));
+			console.log("mesDefis : mounted : defisCommune "+JSON.stringify(this.$store.state.defisCommune));
+		},
+		methods: {
 			recupereDefis() {
 				console.log("Récupération des défis de la commune");
 				let titre = "Les défis de votre commune ont été chargés dans vos défis";

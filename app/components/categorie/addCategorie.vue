@@ -55,6 +55,7 @@
 			saveCategorie() {
 				console.log("on sauvegarde la catégorie : "+this.categorie.id +" : "+this.categorie.nom);
 			    this.$store.dispatch("insertCategorie", this.categorie);
+				this.$store.state.updateCategorie = true;
 				this.$navigateTo(listCategorie);
             },
 			updateCatNom(catName) {

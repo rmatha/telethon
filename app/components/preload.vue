@@ -49,6 +49,18 @@
 					// chargement des participants 
 					this.$store.dispatch("queryParticipants").then(() => {
 						console.log("preload : chargement Participants OK");
+						// chargement des defis de la commune
+						this.$store.dispatch("queryDefis").then(() => {
+							console.log("preload : chargement  defis commune OK");
+							// chargement des defis de l'équipe
+							this.$store.dispatch("queryNosDefis").then(() => {
+								console.log("preload : chargement mes defis OK");
+								// chargement des defis de l'équipe
+								this.$store.dispatch("queryDefisCurrentCommune").then(() => {
+									console.log("preload : chargement des defis OK");
+								});
+							});
+						});
 						
 					});
 				});

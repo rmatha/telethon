@@ -79,7 +79,7 @@
 				}
 				else {
 					console.log("sauvegarde des valeurs 2 : "+this.$store.state.selectedDefi.id+"-"+idProfil+"-"+score);
-					this.$store.dispatch("insertScore", {idDefi : this.$store.state.selectedDefi.id,idProfil : idProfil, score : score});
+					this.$store.dispatch("insertScore", {idDefi : this.$store.state.selectedDefi.id,idParticipant : idProfil, score : score});
 				}
 				this.$store.state.selectedScore = null;
 				this.$navigateTo(affichageDefi);

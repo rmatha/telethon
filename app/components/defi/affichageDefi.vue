@@ -5,17 +5,17 @@
         <Footer dock="bottom" />
 			<StackLayout dock="center" class="root" >
 				<ScrollView row="1" col="0" >
-					<StackLayout class="m-20">
-						<Label row="0" col="0" :text="$store.state.selectedDefi.nom" class="sousTitre"/>
+					<StackLayout width="100%" height="100%">
+						<Label :text="$store.state.selectedDefi.nom" class="sousTitre"/>
 						<Label class="label" text="Description :"  />
 						<Label :text="$store.state.selectedDefi.description_courte" class="defiDesc"/>
-						<GridLayout rows="auto" columns="*,50" >
+						<GridLayout v-if="notCommune" rows="auto" columns="*,50" >
 							<Label row="0" col="0" class="label m-b-20" text="Liste des scores :" textWrap="true" />
 							<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="addScore"/>
 						</GridLayout>
-						<ListView  for="item in $store.state.scoresEquipe" height="100%" >
+						<ListView  v-if="notCommune" for="item in $store.state.scoresEquipe">
 						  <v-template>
-							<GridLayout v-if="isCurrentDefi(item)" rows="*" columns="*,50" width="100%" margin="0" @tap="editScore(item)">
+							<GridLayout v-if="isCurrentDefi(item)" rows="auto" columns="*,50" width="100%" margin="0" @tap="editScore(item)">
 								<GridLayout col="0" verticalAlignment="bottom">
 									<StackLayout paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16">
 										<Label :text="getProfilNom(item)" class="defiTitle" />
@@ -61,19 +61,38 @@
 				}
 				return "Enlever de mes défis"
 			},
+			
+			notCommune() {
+				console.log("listDefisCat : notCommune :"+this.$store.state.selectedCommune);
+				if (this.$store.state.selectedCommune == null) {
+					return true;
+				}
+				return false;
+			},
 		},
         data() {
             return {}
         },
 		mounted() {
-			console.log("Defi : "+JSON.stringify(this.$store.state.selectedDefi));
+			console.log("Chargement des scores");
+			this.$store.dispatch("queryScoresEquipe").then(() => {
+				console.log("preload : chargement des scores  OK");
+			});
+			
         },
 		methods: {
+			scoreDefi() {
+				
+				return this.$store.state.score.filter(item => {
+					console.log("affichageDefi : scoreDefi : "+item.id +" : "+this.$store.state.selectedDefi.id); 
+					return item.id == this.$store.state.selectedDefi.id;
+				});
+			},
 			getProfilNom(item) {
-				console.log("getProfilNom : "+ JSON.stringify(this.$store.state.participants));
-				console.log("getProfilNom : "+ item.idProfil);
-				let profilEnCours = this.$store.state.participants.find(e => e.id == item.idProfil);
-				return profilEnCours.firstname + " " +profilEnCours.lastname;
+				console.log("affichageDEfi : getProfilNom participants: "+ JSON.stringify(this.$store.state.participants));
+				console.log("affichageDEfi : getProfilNom item: "+ JSON.stringify(item));
+				let profilEnCours = this.$store.state.participants.find(e => e.id == item.idParticipant);
+				return profilEnCours.firstname;
 			},
 			isCurrentDefi(item) {
 				console.log("isCurrentDefi : "+JSON.stringify(item));
@@ -143,6 +162,13 @@
 					console.log("on enleve de la liste de nosDefis");
 					this.$store.dispatch("deleteNosDefis", {defi : this.$store.state.selectedDefi});
 				}
+				alert({
+					  title: "Ajout du défi",
+					  message: "Le défis a été supprimer de la liste",
+					  okButtonText: "OK"
+					}).then(() => {
+					  console.log("Alert dialog closed");
+					});
 			},
 			ajouterDefi() {
 				if (this.$store.state.selectedCommune) {
@@ -153,6 +179,13 @@
 					console.log("on ajoute de la liste de nosDefis");
 					this.$store.dispatch("insertNosDefis", {defi : this.$store.state.selectedDefi,equipe : this.$store.state.currentEquipe});
 				}
+				alert({
+					  title: "Ajout du défi",
+					  message: "Le défis a été ajouté à la liste",
+					  okButtonText: "OK"
+					}).then(() => {
+					  console.log("Alert dialog closed");
+					});
 			},
 		},
     };

@@ -4,29 +4,29 @@
 			<Header dock="top" />
 			<Footer dock="bottom" />
 			<StackLayout dock="center" class="root" >
-			<StackLayout row="1" col="0" colSpan="3" width="100%" height="100%">
-				<GridLayout rows="auto" columns="*,50">
-					<Label row="0" col="0" text="Liste des catégories" class="label"/>
-					<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="addCat()"/>
-					
-				</GridLayout>
-				<ListView for="item in $store.state.categories" height="100%" > 
-				  <v-template>
-					<GridLayout rows="*" columns="*" margin="0"  >
-						<Image :src="lienCat(item.nom)" height="25%" @tap="selectCategorie(item)"/>
-						<GridLayout verticalAlignment="bottom">
-							<StackLayout paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16">
-								<Label :text="item.nom"  />
-								<Label :text="item.nom" class="catTitle" />
-								<Label :text="nbDefis(item)" class="catNBDefis" />
-								<Button text="modifier" v-if="$store.state.selectedEquipe.admin" @tap="addCat(item)" />
-								<Button text="Supprimer" v-if="$store.state.selectedEquipe.admin" @tap="deleteCat(item)" />
-							</StackLayout>
-						</GridLayout>
+				<StackLayout width="100%" height="100%">
+					<GridLayout rows="auto" columns="*,50">
+						<Label row="0" col="0" text="Liste des catégories" class="label"/>
+						<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="addCat()"/>
+						
 					</GridLayout>
-				  </v-template>
-				</ListView>
-			</StackLayout>
+					<ListView for="item in $store.state.categories" height="100%" > 
+					  <v-template>
+						<GridLayout rows="*" columns="*" margin="0"  >
+							<Image :src="lienCat(item.nom)" height="25%" @tap="selectCategorie(item)"/>
+							<GridLayout verticalAlignment="top" rows="auto,auto" columns="auto,*,auto">
+								<Label row="0" col="0" colspan="2" :text="item.nom" class="catTitle" />
+								<Label row="1" col="0" colspan="2" :text="nbDefis(item)" class="catNBDefis" />
+								<Image row="0" col="2" class="imageActions" src="~/assets/icons/actions.png" v-if="$store.state.selectedEquipe.admin" @tap="showActions(item)"/>
+								<StackLayout :key="selectedCategorie" row="0" col="1" colspan="2" rowSpan="2">
+									<Button text="modifier" @tap="addCat(item)" />
+									<Button text="Supprimer" @tap="deleteCat(item)" />
+								</StackLayout>
+							</GridLayout>
+						</GridLayout>
+					  </v-template>
+					</ListView>
+				</StackLayout>
 			</StackLayout>
 		</DockLayout>
 	</page>
@@ -57,7 +57,7 @@
         },
         data() {
             return {
-				
+				selectedCategorie : null,
             }
         },
 		mounted() {
@@ -66,9 +66,24 @@
             console.log("chargement dans la variable");
         },
 		methods: {
-			
+			showActions(itemRef) {
+				this.selectedCategorie = itemRef;
+				console.log("listCategorie showActions : nouvelleCategorie :"+this.selectedCategorie);
+			},
+			isShowActions(itemRef) {
+				console.log("listCategorie isShowActions : itemRef "+itemRef);
+				console.log("listCategorie isShowActions : this.selectedCategorie "+this.selectedCategorie);
+				if (itemRef == this.selectedCategorie) {
+					return true;
+				};
+				return false;
+			},
 			nbDefis(itemRef) {
+				console.log("listCategorie state.defis :"+JSON.stringify(this.$store.state.defis));
+				console.log("listCategorie itemRef:"+JSON.stringify(itemRef));
+				
 				var nbDefisCat = this.$store.state.defis.filter(item => {
+					console.log("listCategorie : "+item.categorie +" : "+itemRef.id); 
 					return item.categorie == itemRef.id;
 				});
 				return "Nombre de défis : "+nbDefisCat.length;
@@ -91,12 +106,17 @@
 			},
 			deleteCat(categorie) {
 				// affichage du modal de confirmation
-				this.$showModal(modal, { fullscreen: true, props: { textModal: "Voulez-vous supprimer la catégorie "+categorie.nom+" ?" }}).then( data => {
-					console.log(data);
-					if (data) {
+				confirm({
+				  title: "Confirmation",
+				  message: "Voulez-vous supprimer la catégorie "+categorie.nom+" ?",
+				  okButtonText: "oui",
+				  cancelButtonText: "non"
+				}).then(result => {	console.log(result);
+					if (result) {
 						console.log("on supprime !");
 						this.$store.dispatch("deleteCategorie", categorie);
 						this.$store.dispatch("queryCategorie");
+						this.$store.state.updateCategorie = true;
 					}
 					else {
 						console.log("pas touche !");
