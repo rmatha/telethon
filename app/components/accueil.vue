@@ -5,10 +5,10 @@
 			<Footer dock="bottom" />
 			
 			<StackLayout  dock="center" class="root" >
-				<label class="titre" text="Bonjour !"  horizontalAlignment="center"/>
+				<label class="titre mb50" text="Bonjour !"  horizontalAlignment="center"/>
 				<Button v-if="$store.state.debug" text="Lister les equipes" @tap="showEquipe" />
 				<Button v-if="$store.state.debug" text="effacer tablesss" @tap="reinit" />
-				<Button v-if="$store.state.debug" text="Recharger l'équipe e cours" @tap="reinitEquipe" />
+				<Button v-if="$store.state.debug" text="Recharger l'équipe enn cours" @tap="reinitEquipe" />
 				<Button v-if="$store.state.debug" text="Recharger les scores" @tap="reinitScore" />
 				
 				

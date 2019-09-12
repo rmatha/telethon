@@ -4,12 +4,11 @@
         <Header dock="top" />
         <Footer dock="bottom" />
 			<StackLayout dock="center" class="root" >
-			<StackLayout row="1" col="0" colSpan="3">
-				<Label row="0" col="0" text="categorieNom" textAlignment="center" fontSize="24"/>
+			<StackLayout>
+				<Label row="0" col="0" class="titre mb50" :text="$store.state.selectedCategorie.nom" textAlignment="center" />
 				<GridLayout  rows="auto" columns="*,50">
 					<Label row="0" col="0" text="Liste des défis" textAlignment="center" fontSize="24"/>
-					<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="addDefi(categorie)"/>
-					
+					<Image row="0" col="1" v-if="$store.state.isAdmin" src="~/assets/icons/add-256.gif" @tap="addDefi"/>
 				</GridLayout>
 				<ListView key="$store.state.defis" for="item in defisCat" height="100%" >
 				  <v-template>
@@ -37,7 +36,7 @@
 
 <script>
 	import affichageDefi from "./affichageDefi";
-	import addDefi from "./addDefi";
+	import editDefi from "./editDefi";
 	import store from "../store/teleStore.js";
 	
 	export default {
@@ -62,10 +61,12 @@
 			getDefi(item) {
 				console.log("affichage du defi");
 				this.$store.state.selectedDefi = item;
+				console.log("affichage du defi"+JSON.stringify(item));
 				this.$navigateTo(affichageDefi);
 			},
-			addDefi(categorie) {
-				this.$navigateTo(addDefi);
+			addDefi() {
+				this.$store.state.selectedDefi = null;
+				this.$navigateTo(editDefi);
 			}, 
 		},
     };

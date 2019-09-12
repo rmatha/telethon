@@ -6,9 +6,10 @@
 			<StackLayout dock="center" class="root" >
 				<ScrollView>
 					<StackLayout width="100%" height="100%">
-						<GridLayout rows="auto" columns="*,50">
+						<GridLayout rows="auto" columns="*,50,50">
 							<Label row="0" col="0" class="m-b-20 titreTelethon" text="Mes Défis" textWrap="true" />
-							<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="affichageCat"/>
+							<Image row="0" col="1" class="actionButton" src="~/assets/icons/upload.png" @tap="uploadDefis"/>
+							<Image row="0" col="2" src="~/assets/icons/add-256.gif" @tap="affichageCat"/>
 						</GridLayout>
 						<ListView for="item in $store.state.nosDefis" >
 						  <v-template>
@@ -53,18 +54,88 @@
 	import affichageDefi from "./affichageDefi";
 	
 	export default {
+		
+		mounted() {
+			console.log("mesDefis : mounted : mesDefis "+JSON.stringify(this.$store.state.nosDefis));
+			console.log("mesDefis : mounted : defisCommune "+JSON.stringify(this.$store.state.defisCommune));
+		},
+		data() {
+            return {
+				defisUpdated : null,
+            };
+        },
 		computed: {
 			sousTitreCommune() {
 				return "Défis pour : "+this.$store.state.selectedEquipe.commune;
 			},
 
 		},
-		
-		mounted() {
-			console.log("mesDefis : mounted : mesDefis "+JSON.stringify(this.$store.state.nosDefis));
-			console.log("mesDefis : mounted : defisCommune "+JSON.stringify(this.$store.state.defisCommune));
-		},
 		methods: {
+			uploadDefis() {
+				confirm({
+				  title: "Sauvegarde des défis ",
+				  message: "Confirmez-vous la sauvegarde des modifications faites sur les défis (suppressions, modifications et ajouts)?",
+				  okButtonText: "OK",
+				  cancelButtonText: "NON"
+				}).then(result => {
+				  console.log(result);
+				  if (result) {
+					console.log("On sauvegarde sur le serveur");
+					console.log("defis :"+JSON.stringify(this.$store.state.defis));
+					this.defisUpdated = this.$store.state.defis.filter(item => {
+						console.log("defi a upload :"+item.nom+" : "+item.updated); 
+						return item.updated == "1";
+					});
+					console.log("mesDefis : uploadDefi : nombre de défis à MAJ : "+this.defisUpdated.length);
+					console.log("mesDefis : uploadDefi : "+JSON.stringify(this.defisUpdated));
+					axios
+						  .post('https://www.telethon.citeyen.com/public/api/defis/upload', {
+							defis : this.defisUpdated,
+						  })
+						  .then(response => {
+							console.log("update OK");
+							alert({
+							  title: "Mise à jour des défis",
+							  message: "Les défis ont été mis à jour sur le serveur",
+							  okButtonText: "OK"
+							}).then(() => {
+							  console.log("Alert dialog closed");
+							  /* mise a jour de la version locale à partir de la version serveur
+							  let params = {};
+  							  params["nom"] = this.$store.state.selectedEquipe.nom;
+							  params["commune"] = this.$store.state.selectedEquipe.commune;
+							  axios
+								.get('https://telethon.citeyen.com/public/api/equipes/version', {params : params})
+								.then(response => {
+									console.log("Version de l'équipe sur le serveur : "+response.data.version);
+									let versionEquipeServeur = response.data.version;
+									this.$store.dispatch("incrementeVersionEquipe", {"version" : versionEquipeServeur} ).then(() => {
+									console.log("uploadEquipe : incrementation configVersion OK");
+								  })
+								  .catch(error => {
+									  console.log("uploadEquipe : Pb incrementation : "+error);
+								  });
+								})
+								.catch(error => console.log("equipe : mounted : ERROR : "+error));
+						
+							  */
+							});
+						})
+						.catch(error => {
+							console.log("updatete KO : "+error);
+							alert({
+							  title: "Problème de sauvegarde",
+							  message: "La sauvegarde n'est pas possible actuellement. Mais vous pouvez continuer à utiliser cette équipe pour saisir les participants et les scores. Vous pourrez faire la sauvegarde plus tard",
+							  okButtonText: "OK"
+							}).then(() => {
+							  console.log("Alert dialog closed");
+							  this.$navigateTo(mesDefis);
+							});
+						})
+					
+					}
+				});
+			},
 			recupereDefis() {
 				console.log("Récupération des défis de la commune");
 				let titre = "Les défis de votre commune ont été chargés dans vos défis";
@@ -94,10 +165,12 @@
             affichageCat() {
 				console.log("liste des challenges");
 				this.$store.state.selectedCommune = null;
+				this.$store.state.affichageDefiType = "equipe";
                 this.$navigateTo(listeChallengesCat);
             },
 			affichageCatCommune() {
 				console.log("liste des challenges");
+				this.$store.state.affichageDefiType = "commune";
 				this.$store.state.selectedCommune = this.$store.state.selectedEquipe.commune;
                 this.$navigateTo(listeChallengesCat);
 			},

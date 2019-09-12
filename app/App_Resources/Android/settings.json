@@ -1,1 +1,5 @@
-{"appId":"org.nativescript.Telethon","minSdkVersion":null,"targetSdkVersion":null}
+{
+  "appId": "org.nativescript.Telethon",
+  "minSdkVersion": 18,
+  "targetSdkVersion": 28
+}

@@ -5,25 +5,22 @@
 			<ScrollView row="1" col="0" >
 				<StackLayout class="m-20"> 
 					<GridLayout rows="auto" columns="*,50,50" >
-							<Label row="0" col="0" class="m-b-20 label" text="Participant :" textWrap="true" />
+							<Label row="0" col="0" class="m-b-20 sousTitre" text="Edition participant" textWrap="true" />
 							<Image row="0" col="1" class="actionButton" src="~/assets/icons/delete.png" @tap="deleteProfil"/>
 							<Image row="0" col="2" class="actionButton" src="~/assets/icons/save.png" @tap="save"/>
 						</GridLayout>
 					<FloatLabel placeholder="Pseudo" label="Pseudo" :valeur="myFirstname" @updateValeur="updateNom"/>
-					<!--<FloatLabel placeholder="Prénom" label="prenom" :valeur="myLastname" @updateValeur="updatePrenom"/>-->
 					<GridLayout rows="30, auto" marginBottom="5">
-						<Label ref="labelVille" row="1" text="Ville d'habitation" opacity="0.4" fontSize="14" class="input" />
-						<TextField ref="textFieldVille" row="1" borderBottomColor="#fff" padding="0" @focus="onFocus"
-					@blur="onBlur" borderBottomWidth="3" @textChange="onTextChange" />
+						<Label ref="labelVille" row="0" text="Ville d'habitation" class="label" />
+						<TextField ref="textFieldVille" row="1" borderBottomColor="#fff" marginLeft="10" borderBottomWidth="3" @textChange="onTextChange" />
 					</GridLayout>
 					<ScrollView v-if="affichageVilles" >
-						<StackLayout backgroundColor="#3c495e" >
+						<StackLayout backgroundColor="#ffffff" >
 							<GridLayout v-for="ville in villes" rows="40" columns="*"  >
 								<Label :text="ville.nom" @tap="selectVille(ville.nom,ville.code)" class="labelVille"/>
 							</GridLayout>
 						</StackLayout>
 					</ScrollView>
-					<label ref="villeCode" />
 					<FloatLabel placeholder="Téléphone" label="telephone" :valeur="myTelephone" @updateValeur="updateTelephone"/>
 					
 					
@@ -137,9 +134,7 @@
 				console.log("Sélection de la ville");
 				console.log(nom);
 				let textField = this.$refs.textFieldVille.nativeView;
-                let villeCode = this.$refs.villeCode.nativeView;
                 textField.text = nom;
-				villeCode.text = code;
 				this.affichageVilles = false;
 
 				
@@ -161,44 +156,6 @@
                 //ApplicationSettings.setString(textField.name, textField.text);
                 //this.firstTx = textField.text;
             },
-            onFocus: function() {
-                // get our elments to maninpulate.
-                const label = this.$refs.labelVille.nativeView;
-                const textField = this.$refs.textFieldVille.nativeView;
-
-                // animate the label sliding up and less transparent.
-                label
-                    .animate({
-                        translate: {
-                            x: 0,
-                            y: -25
-                        },
-                        opacity: 1
-                    })
-                    .then(() => {}, () => {});
-
-                // set the border bottom color to green to indicate focus
-                //textField.borderBottomColor = new Color("#00b47e");
-            },
-            onBlur: function() {
-                const label = this.$refs.labelVille.nativeView;
-                const textField = this.$refs.textFieldVille.nativeView;
-
-                // if there is text in our input then don't move the label back to it's initial position.
-                if (!textField.text) {
-                    label
-                        .animate({
-                            translate: {
-                                x: 0,
-                                y: 0
-                            },
-                            opacity: 0.4
-                        })
-                        .then(() => {}, () => {});
-                }
-                // reset border bottom color.
-                //textField.borderBottomColor = new Color("#c ec8c8");
-            }
         }
     };
 </script>

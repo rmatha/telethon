@@ -10,8 +10,9 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
+		affichageDefiType : null,
 		connexion : null,
-		debug : true,
+		debug : false,
         database: null,
         data: [],
 		versionCategorie : "0",
@@ -166,10 +167,13 @@ const store = new Vuex.Store({
 					description_longue : data.data[i][3],
 					reglementation : data.data[i][4],
 					bareme : data.data[i][5],
-					categorie : data.data[i][6]
+					categorie : data.data[i][6],
+					updated : data.data[i][7],
+					deleted : data.data[i][8]
 				});
-				console.log("mutation load defis : "+JSON.stringify(state.defis));
+				
 			}
+			console.log("mutation load defis : "+JSON.stringify(state.defis));
 			
 		},
 		loadScoresEquipe(state, data) {
@@ -204,7 +208,7 @@ const store = new Vuex.Store({
 				}, error => {
 					console.log("CREATE TABLE ERROR", error);
 				});
-				db.execSQL("CREATE TABLE IF NOT EXISTS defi (id INTEGER PRIMARY KEY AUTOINCREMENT, nom TEXT, description_courte TEXT, description_longue TEXT,reglementation TEXT,bareme TEXT,categorie INTEGER)").then(id => {
+				db.execSQL("CREATE TABLE IF NOT EXISTS defi (id INTEGER PRIMARY KEY AUTOINCREMENT, nom TEXT, description_courte TEXT, description_longue TEXT,reglementation TEXT,bareme TEXT,categorie INTEGER,updated tinyint(1), deleted tinyint(1))").then(id => {
 					context.commit("init", { database: db });
 					console.log("Table defi cree");
 				}, error => {
@@ -252,6 +256,8 @@ const store = new Vuex.Store({
 				context.state.database.execSQL("INSERT INTO participant (firstname, lastname,telephone,commune) VALUES (?,?,?,?)", [data.firstname, data.lastname, data.telephone,data.commune]).then(id => {
 					console.log("insertParticipant add participant");
 					context.dispatch("queryParticipants");
+					// mise ne place du flag de MAJ de l'equipe 
+					this.state.updateEquipe = true;
 				}, error => {
 					console.log("insertParticipant INSERT ERROR", error);
 				});
@@ -298,10 +304,11 @@ const store = new Vuex.Store({
 			});
 			
 		},
-		insertDefi(context, data) {
+		insertOrUpdateDefi(context, data) {
+			console.log("telestore : insertOrUpdateDefi : data : "+JSON.stringify(data));
 			if (data.id == 0) {
-				console.log("insertDefi : insert");
-				context.state.database.execSQL("INSERT INTO defi (nom,description_courte,description_longue,reglementation,bareme,categorie) VALUES (?,?,?,?,?,?)", [data.nom,data.description_courte,data.description_longue,data.reglementation,data.bareme,this.state.selectedCategorie.id]).then(id => {
+				console.log("insertOrUpdateDefi : insert");
+				context.state.database.execSQL("INSERT INTO defi (nom,description_courte,description_longue,reglementation,bareme,categorie,updated,deleted) VALUES (?,?,?,?,?,?,1,0)", [data.nom,data.description_courte,data.description_longue,data.reglementation,data.bareme,this.state.selectedCategorie.id]).then(id => {
 					//context.commit("saveDefi", { data: data });
 					//queryDefis(context, data : [id : data.categorie]);
 					context.dispatch("queryDefis", data.categorie);
@@ -310,8 +317,8 @@ const store = new Vuex.Store({
 				});
 			}
 			else {
-				console.log("insertDefi : update");
-				context.state.database.execSQL("UPDATE defi set nom = ?, description_courte = ?, description_longue = ?, reglementation = ?, bareme = ? where id = ?", [data.nom,data.description_courte,data.description_longue,data.reglementation,data.bareme, data.id]).then(id => {
+				console.log("insertOrUpdateDefi : update");
+				context.state.database.execSQL("UPDATE defi set nom = ?, description_courte = ?, description_longue = ?, reglementation = ?, bareme = ?, updated = 1 where id = ?", [data.nom,data.description_courte,data.description_longue,data.reglementation,data.bareme, data.id]).then(id => {
 					//context.commit("saveDefi", { data: data });
 					context.dispatch("queryDefis", data.categorie);
 				}, error => {
@@ -488,7 +495,7 @@ const store = new Vuex.Store({
 		},
 		queryDefis(context) {
 			console.log("queryDefis");
-			context.state.database.all("SELECT * FROM defi", []).then(result => {
+			context.state.database.all("SELECT * FROM defi where deleted = 0", []).then(result => {
 				context.commit("loadDefis", { data: result });
 				console.log("queryDefis : NB : "+result.length);
 			}, error => {
@@ -556,7 +563,7 @@ const store = new Vuex.Store({
 			});
 			for (var j = 0 ; j < tab.data.length ; j++) {
 				console.log("intégration du défis : "+tab.data[j].nom);
-				context.state.database.execSQL("INSERT INTO defi (id,nom,description_courte,description_longue,reglementation,bareme,categorie) VALUES (?,?,?,?,?,?,?)", [tab.data[j].id,tab.data[j].nom,tab.data[j].description,tab.data[j].description_longue,tab.data[j].reglementation,tab.data[j].bareme,tab.data[j].categorie.id]).then(id => {
+				context.state.database.execSQL("INSERT INTO defi (id,nom,description_courte,description_longue,reglementation,bareme,categorie,updated,deleted) VALUES (?,?,?,?,?,?,?,0,0)", [tab.data[j].id,tab.data[j].nom,tab.data[j].description,tab.data[j].description_longue,tab.data[j].reglementation,tab.data[j].bareme,tab.data[j].categorie.id]).then(id => {
 					//context.commit("saveProfil", { data: data });
 					
 				}, error => {
@@ -590,9 +597,10 @@ const store = new Vuex.Store({
 			context.dispatch("queryEquipes");
 		},
 		deleteDefi(context, data) {
-			context.state.database.execSQL("DELETE FROM defi where id = ?", [data.id]).then(id => {
+			console.log("telestore : deleteDefi : data : "+JSON.stringify(data));
+			console.log("telestore : deleteDefi : data.id : "+data.id);
+			context.state.database.execSQL("UPDATE defi set deleted =1 where id = ?", [data.id]).then(id => {
 				//context.commit("savedefi", { data: data });
-				context.dispatch("queryDefisCat", data.categorie);
 				context.dispatch("queryDefis");
 			}, error => {
 				console.log("DELETE ERROR defi", error);
@@ -601,6 +609,7 @@ const store = new Vuex.Store({
 		deleteParticipant(context, data) {
 			context.state.database.execSQL("DELETE FROM participant where id = ?", [data.id]).then(id => {
 				context.dispatch("queryParticipants");
+				state.updateEquipe = true;
 			}, error => {
 				console.log("DELETE ERROR defi", error);
 			});
