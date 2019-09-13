@@ -1,20 +1,17 @@
 <template>
-    <page>
+    <page class="page" actionBarHidden="true">
 		<DockLayout stretchLastChild="true">
-			<Header dock="top" />
-			<Footer dock="bottom" />
+        <Header dock="top" />
+        <Footer dock="bottom" />
 			<StackLayout dock="center" class="root" >
-			<StackLayout row="1" col="0" colSpan="3">
-					<Label row="0" col="0" text="Edition Catégorie " class="catTitle"/>
-					
-					
+				<Label text="Edition Catégorie " class="catTitle"/>
 				<Label :text="categorie.id" />
 				<FloatLabel placeholder="Nom de la catégorie" label="Nom" :valeur="categorie.nom" @updateValeur="updateCatNom"/>
 						
 					
 				<Button text="Enregistrer" @tap="saveCategorie" />
 			</StackLayout>
-			</StackLayout>
+			
 		</DockLayout>
 	</page>
 	
@@ -27,12 +24,9 @@
 	export default {
 		computed: {
 			
-			myCategorieName() {
-                return "Tennis";
-            },
+			
         },
-        props: ['cat'],
-		data() {
+        data() {
             return {
 				categorie: {
 					id : 0,
@@ -42,9 +36,9 @@
         },
 		mounted() {
 			console.log("Edition de la categorie");
-			if (this.cat) {
+			if (this.$store.state.selectedCategorie) {
 				console.log("Chargement de cat");
-				this.categorie = this.cat;
+				this.categorie = this.$store.state.selectedCategorie;
 			}
 			else {
 				console.log("on conserve la catégorie vide");

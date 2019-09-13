@@ -5,23 +5,20 @@
 			<Footer dock="bottom" />
 			<StackLayout dock="center" class="root" >
 				<StackLayout width="100%" height="100%">
-					<GridLayout rows="auto" columns="*,50">
+					<GridLayout rows="auto" columns="*,50,50">
 						<Label row="0" col="0" text="Liste des catégories" class="label"/>
-						<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="addCat()"/>
+						<Image v-if="$store.state.updateCategorie" row="0" col="1" class="actionButton" src="~/assets/icons/upload.png" @tap=""/>
+						<Image row="0" col="2" src="~/assets/icons/add-256.gif" @tap="addCat()"/>
 						
 					</GridLayout>
 					<ListView for="item in $store.state.categories" height="100%" > 
 					  <v-template>
 						<GridLayout rows="*" columns="*" margin="0"  >
-							<Image :src="lienCat(item.nom)" height="25%" @tap="selectCategorie(item)"/>
-							<GridLayout verticalAlignment="top" rows="auto,auto" columns="auto,*,auto">
+							<Image :src="lienCat(item.nom)" height="25%" />
+							<GridLayout verticalAlignment="top" rows="auto,auto" columns="auto,*,auto" @tap="selectCategorie(item)">
 								<Label row="0" col="0" colspan="2" :text="item.nom" class="catTitle" />
 								<Label row="1" col="0" colspan="2" :text="nbDefis(item)" class="catNBDefis" />
-								<Image row="0" col="2" class="imageActions" src="~/assets/icons/actions.png" v-if="$store.state.selectedEquipe.admin" @tap="showActions(item)"/>
-								<StackLayout :key="selectedCategorie" row="0" col="1" colspan="2" rowSpan="2">
-									<Button text="modifier" @tap="addCat(item)" />
-									<Button text="Supprimer" @tap="deleteCat(item)" />
-								</StackLayout>
+								
 							</GridLayout>
 						</GridLayout>
 					  </v-template>
@@ -88,41 +85,12 @@
 				});
 				return "Nombre de défis : "+nbDefisCat.length;
 			},
-			addCat(categorie = null) {
-				if (categorie) {
-					console.log("Modification de la catégorie :",categorie.nom);
-					this.$store.state.selectedCategorie = categorie;
-					this.$navigateTo(addCategorie);
-				}
-				else {
-					console.log("Ajout d'une catégorie");
-					this.$store.state.selectedCategorie = null;
-					this.$navigateTo(addCategorie);
-				}
-				/*if (item.defis.length > 0) {
-					console.log("Affichage des défis");
-					
-            	}*/
+			addCat() {
+				console.log("Ajout d'une catégorie");
+				this.$store.state.selectedCategorie = null;
+				this.$navigateTo(addCategorie);
 			},
-			deleteCat(categorie) {
-				// affichage du modal de confirmation
-				confirm({
-				  title: "Confirmation",
-				  message: "Voulez-vous supprimer la catégorie "+categorie.nom+" ?",
-				  okButtonText: "oui",
-				  cancelButtonText: "non"
-				}).then(result => {	console.log(result);
-					if (result) {
-						console.log("on supprime !");
-						this.$store.dispatch("deleteCategorie", categorie);
-						this.$store.dispatch("queryCategorie");
-						this.$store.state.updateCategorie = true;
-					}
-					else {
-						console.log("pas touche !");
-					}
-				});
-			},
+			
             selectCategorie(categorie) {
 				console.log("listCategorie : ouverture des defis pour la categorie : "+categorie.nom);
 				this.$store.state.selectedCategorie = categorie;

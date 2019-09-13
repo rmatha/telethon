@@ -5,7 +5,11 @@
         <Footer dock="bottom" />
 			<StackLayout dock="center" class="root" >
 			<StackLayout>
-				<Label row="0" col="0" class="titre mb50" :text="$store.state.selectedCategorie.nom" textAlignment="center" />
+				<GridLayout  rows="auto" columns="*,50,50">
+					<Label row="0" col="0" class="titre mb50" :text="$store.state.selectedCategorie.nom" textAlignment="center" />
+					<Image row="0" col="1" class="actionButton" src="~/assets/icons/delete.png" @tap="deleteCategorie"/>
+					<Image row="0" col="2" class="actionButton" src="~/assets/icons/modify.png" @tap="editCat"/>
+				</GridLayout>
 				<GridLayout  rows="auto" columns="*,50">
 					<Label row="0" col="0" text="Liste des défis" textAlignment="center" fontSize="24"/>
 					<Image row="0" col="1" v-if="$store.state.isAdmin" src="~/assets/icons/add-256.gif" @tap="addDefi"/>
@@ -38,6 +42,7 @@
 	import affichageDefi from "./affichageDefi";
 	import editDefi from "./editDefi";
 	import store from "../store/teleStore.js";
+	import editCategorie from "../categorie/addCategorie";
 	
 	export default {
 		computed: {
@@ -68,6 +73,29 @@
 				this.$store.state.selectedDefi = null;
 				this.$navigateTo(editDefi);
 			}, 
+			editCat() {
+				this.$navigateTo(editCategorie);
+				
+			},
+			deleteCategorie() {
+				// affichage du modal de confirmation
+				confirm({
+				  title: "Confirmation",
+				  message: "Voulez-vous supprimer la catégorie "+this.$store.state.selectedCategorie.nom+" ?",
+				  okButtonText: "oui",
+				  cancelButtonText: "non"
+				}).then(result => {	console.log(result);
+					if (result) {
+						console.log("on supprime !");
+						this.$store.dispatch("deleteCategorie", this.$store.state.selectedCategorie);
+						this.$store.dispatch("queryCategorie");
+						this.$store.state.updateCategorie = true;
+					}
+					else {
+						console.log("pas touche !");
+					}
+				});
+			},
 		},
     };
 </script>

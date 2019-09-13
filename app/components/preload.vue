@@ -46,20 +46,22 @@
 			this.messages.push("Vérification de l'accès à internet");
 			const connectionType = connectivity.getConnectionType();
 			if (connectionType !== connectivity.connectionType.none) {
+				
 				this.reloadCategories();
 				this.reloadDefis();
 				this.reloadEquipes();
 				
 				this.messages.push("Chargement de l'équipe en cours");
 				this.$store.dispatch("queryCurrentEquipe").then(() => {
-					console.log("équipe en cours second: "+JSON.stringify(this.$store.state.selectedEquipe));
+					console.log("équipe en cours : "+JSON.stringify(this.$store.state.selectedEquipe));
 					this.messages.push("équipe en cours : "+this.$store.state.selectedEquipe.nom);
-					// chargement des participants 
-					this.$store.dispatch("queryParticipants").then(() => {
-						console.log("preload : chargement Participants OK");
-						// chargement des defis de la commune
-						this.$store.dispatch("queryDefis").then(() => {
-							console.log("preload : chargement  defis commune OK");
+					// si pas d'équipe, on ne charge pas la suite !
+					if (this.$store.state.selectedEquipe.length > 0) {
+						// chargement des participants 
+						this.$store.dispatch("queryParticipants").then(() => {
+							console.log("preload : chargement Participants OK");
+							// chargement des defis de la commune
+							
 							// chargement des defis de l'équipe
 							this.$store.dispatch("queryNosDefis").then(() => {
 								console.log("preload : chargement mes defis OK");
@@ -69,10 +71,9 @@
 									
 									
 								});
-							});
+							});						
 						});
-						
-					});
+					};
 				});
 				console.log("fin de chargement de l'equipe en cours !");
 			}
@@ -126,8 +127,10 @@
 					axios
 					.get('https://telethon.citeyen.com/public/api/defis/version')
 					.then(response => {
-						console.log("Version defi serveur :"+response.data.version); 
-						if (response.data.version > this.$store.state.versionDefi) {
+						var versionServeur = response.data.version
+						console.log("Version defi serveur :"+versionServeur); 
+						//if (response.data.version > this.$store.state.versionDefi) {
+						if (true) {
 							// mise a jour de la table de categories
 							console.log("MAJ des défis à partir du serveur");
 							this.messages.push("MAJ des défis à partir du serveur");
@@ -135,7 +138,7 @@
 							  .get('https://telethon.citeyen.com/public/api/defis/list')
 							  .then(responseList => {
 								console.log("Chargement des  defis en base : "+JSON.stringify(responseList.data));
-								this.$store.dispatch("reloadDefis",{data : responseList.data,version : response.data.version});
+								this.$store.dispatch("reloadDefis",{data : responseList.data,version : versionServeur});
 							  });
 						}else {
 							this.messages.push("Defis à jour");

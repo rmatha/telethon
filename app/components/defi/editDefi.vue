@@ -45,7 +45,8 @@
 					description_courte: "" , 
 					description_longue : "",
 					reglementation : "",
-					bareme : ""
+					bareme : "",
+					deleted : 0,
 				},
 				categories : null,
             }
@@ -58,6 +59,7 @@
 				this.defi.nom = this.$store.state.selectedDefi.nom;
 				this.defi.description_courte = this.$store.state.selectedDefi.description_courte;
 				this.defi.description_longue = this.$store.state.selectedDefi.description_longue;
+				this.defi.deleted = this.$store.state.selectedDefi.deleted;
 				// recuperation du nom de la categorie pour le defi sélectionné
 				var $categories = this.$store.state.categories.filter(item => {
 					console.log("editDefi : mounted : filter : "+ item.id +" ---"+this.$store.state.selectedDefi.categorie);

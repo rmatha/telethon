@@ -31,6 +31,7 @@ const store = new Vuex.Store({
 		participants: [],
 		categories: [],
 		defis: [],
+		defisAll: [],
 		defisCommune: [],
 		nosDefis: [],
 		nosScores: [],
@@ -159,8 +160,10 @@ const store = new Vuex.Store({
 		},
 		loadDefis(state, data) {
 			state.defis = [];
+			state.defisAll = [];
+			console.log("telestore : loadDefis : defi deleted : ");
 			for(var i = 0; i < data.data.length; i++) {
-				state.defis.push({
+				state.defisAll.push({
 					id : data.data[i][0],
 					nom : data.data[i][1],
 					description_courte: data.data[i][2] , 
@@ -169,11 +172,28 @@ const store = new Vuex.Store({
 					bareme : data.data[i][5],
 					categorie : data.data[i][6],
 					updated : data.data[i][7],
-					deleted : data.data[i][8]
+					deleted : data.data[i][8],
+					added : data.data[i][9]
 				});
+				// dans cette liste on ne rajoute que les defis non deleted
+				if (data.data[i][8] == "0") {
+					state.defis.push({
+						id : data.data[i][0],
+						nom : data.data[i][1],
+						description_courte: data.data[i][2] , 
+						description_longue : data.data[i][3],
+						reglementation : data.data[i][4],
+						bareme : data.data[i][5],
+						categorie : data.data[i][6],
+						updated : data.data[i][7],
+						deleted : data.data[i][8],
+						added : data.data[i][9]
+					});
+				};
 				
-			}
+			};
 			console.log("mutation load defis : "+JSON.stringify(state.defis));
+			console.log("mutation load defisAll : "+JSON.stringify(state.defisAll));
 			
 		},
 		loadScoresEquipe(state, data) {
@@ -208,7 +228,7 @@ const store = new Vuex.Store({
 				}, error => {
 					console.log("CREATE TABLE ERROR", error);
 				});
-				db.execSQL("CREATE TABLE IF NOT EXISTS defi (id INTEGER PRIMARY KEY AUTOINCREMENT, nom TEXT, description_courte TEXT, description_longue TEXT,reglementation TEXT,bareme TEXT,categorie INTEGER,updated tinyint(1), deleted tinyint(1))").then(id => {
+				db.execSQL("CREATE TABLE IF NOT EXISTS defi (id INTEGER PRIMARY KEY AUTOINCREMENT, nom TEXT, description_courte TEXT, description_longue TEXT,reglementation TEXT,bareme TEXT,categorie INTEGER,updated tinyint(1), deleted tinyint(1), added tinyint(1))").then(id => {
 					context.commit("init", { database: db });
 					console.log("Table defi cree");
 				}, error => {
@@ -308,7 +328,7 @@ const store = new Vuex.Store({
 			console.log("telestore : insertOrUpdateDefi : data : "+JSON.stringify(data));
 			if (data.id == 0) {
 				console.log("insertOrUpdateDefi : insert");
-				context.state.database.execSQL("INSERT INTO defi (nom,description_courte,description_longue,reglementation,bareme,categorie,updated,deleted) VALUES (?,?,?,?,?,?,1,0)", [data.nom,data.description_courte,data.description_longue,data.reglementation,data.bareme,this.state.selectedCategorie.id]).then(id => {
+				context.state.database.execSQL("INSERT INTO defi (nom,description_courte,description_longue,reglementation,bareme,categorie,updated,deleted,added) VALUES (?,?,?,?,?,?,1,?,1)", [data.nom,data.description_courte,data.description_longue,data.reglementation,data.bareme,this.state.selectedCategorie.id,data.deleted]).then(id => {
 					//context.commit("saveDefi", { data: data });
 					//queryDefis(context, data : [id : data.categorie]);
 					context.dispatch("queryDefis", data.categorie);
@@ -318,7 +338,7 @@ const store = new Vuex.Store({
 			}
 			else {
 				console.log("insertOrUpdateDefi : update");
-				context.state.database.execSQL("UPDATE defi set nom = ?, description_courte = ?, description_longue = ?, reglementation = ?, bareme = ?, updated = 1 where id = ?", [data.nom,data.description_courte,data.description_longue,data.reglementation,data.bareme, data.id]).then(id => {
+				context.state.database.execSQL("UPDATE defi set nom = ?, description_courte = ?, description_longue = ?, reglementation = ?, bareme = ?, updated = 1, deleted = ? where id = ?", [data.nom,data.description_courte,data.description_longue,data.reglementation,data.bareme, data.deleted, data.id]).then(id => {
 					//context.commit("saveDefi", { data: data });
 					context.dispatch("queryDefis", data.categorie);
 				}, error => {
@@ -495,9 +515,10 @@ const store = new Vuex.Store({
 		},
 		queryDefis(context) {
 			console.log("queryDefis");
-			context.state.database.all("SELECT * FROM defi where deleted = 0", []).then(result => {
-				context.commit("loadDefis", { data: result });
+			context.state.database.all("SELECT * FROM defi", []).then(result => {
 				console.log("queryDefis : NB : "+result.length);
+				context.commit("loadDefis", { data: result });
+				console.log("queryDefis : NB end : "+result.length);
 			}, error => {
 				console.log("SELECT ERROR defis", error);
 			});
@@ -515,7 +536,7 @@ const store = new Vuex.Store({
 		},*/
 		queryNosDefis(context) {
 			console.log("queryNosDefis ");
-			context.state.database.all("SELECT * FROM nosDefis where idEquipe = ?", [this.state.selectedEquipe.id]).then(result => {
+			context.state.database.all("SELECT * FROM nosDefis", []).then(result => {
 				context.commit("loadNosDefis", { data: result });
 				console.log("queryNosDefis : NB : "+result.length);
 			}, error => {
@@ -558,26 +579,29 @@ const store = new Vuex.Store({
 		reloadDefis(context, tab) {
 			context.state.database.execSQL("DELETE FROM defi").then(id => {
 				console.log("Table defi vidée");
+				for (var j = 0 ; j < tab.data.length ; j++) {
+					console.log("intégration du défis : "+tab.data[j].nom+" : deleted : "+tab.data[j].deleted);
+					var deleted = (tab.data[j].deleted) ? "1" : "0";
+					context.state.database.execSQL("INSERT INTO defi (id,nom,description_courte,description_longue,reglementation,bareme,categorie,updated,deleted,added) VALUES (?,?,?,?,?,?,?,0,?,0)", [tab.data[j].id,tab.data[j].nom,tab.data[j].description,tab.data[j].description_longue,tab.data[j].reglementation,tab.data[j].bareme,tab.data[j].categorie.id,deleted]).then(id => {
+						context.dispatch("queryDefis");
+						
+					}, error => {
+						console.log("defi  INSERT ERROR", error);
+					});
+				}
 			}, error => {
-				console.log("DELETE ERROR defi", error);
+				console.log("DELETE ERROR  defi", error);
 			});
-			for (var j = 0 ; j < tab.data.length ; j++) {
-				console.log("intégration du défis : "+tab.data[j].nom);
-				context.state.database.execSQL("INSERT INTO defi (id,nom,description_courte,description_longue,reglementation,bareme,categorie,updated,deleted) VALUES (?,?,?,?,?,?,?,0,0)", [tab.data[j].id,tab.data[j].nom,tab.data[j].description,tab.data[j].description_longue,tab.data[j].reglementation,tab.data[j].bareme,tab.data[j].categorie.id]).then(id => {
-					//context.commit("saveProfil", { data: data });
-					
-				}, error => {
-					console.log("defi INSERT ERROR", error);
-				});
-			}
+			
 			console.log("MAJ de la version des défis : "+tab.version);
 			context.state.database.execSQL("REPLACE INTO configVersion (libelle,valeur) VALUES ('defi',?)",tab.version).then(id => {
 				console.log("Table configVersion MAJ");
+				context.commit("loadDefiVersion", { data: tab.version });
 			}, error => {
 				console.log("UPDATE configVersion ", error);
 			});
-			context.commit("loadDefiVersion", { data: tab.version });
-			context.dispatch("queryDefis");
+			
+			
 		},
 		reloadEquipes(context, tab) {
 			for (var j = 0 ; j < tab.data.length ; j++) {
@@ -599,7 +623,7 @@ const store = new Vuex.Store({
 		deleteDefi(context, data) {
 			console.log("telestore : deleteDefi : data : "+JSON.stringify(data));
 			console.log("telestore : deleteDefi : data.id : "+data.id);
-			context.state.database.execSQL("UPDATE defi set deleted =1 where id = ?", [data.id]).then(id => {
+			context.state.database.execSQL("UPDATE defi set deleted =1, updated = 1 where id = ?", [data.id]).then(id => {
 				//context.commit("savedefi", { data: data });
 				context.dispatch("queryDefis");
 			}, error => {
@@ -707,6 +731,17 @@ const store = new Vuex.Store({
 			let versionEquipe = data.version;
 			context.state.database.execSQL("UPDATE equipe set version = ? where current = 1",data.version).then(id => {
 				state.selectedEquipe.version = versionEquipe;
+				context.commit("loadEquipeVersion", { data: data.version });
+			});
+
+		},
+		incrementeVersionDefi(context,data) {
+			console.log("MAJ de la version des défis : "+data.version);
+			context.state.database.execSQL("REPLACE INTO configVersion (libelle,valeur) VALUES ('defi',?)",data.version).then(id => {
+				console.log("Table configVersion MAJ");
+				context.commit("loadDefiVersion", { data: data.version });
+			}, error => {
+				console.log("UPDATE configVersion ", error);
 			});
 
 		}
