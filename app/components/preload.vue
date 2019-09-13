@@ -129,8 +129,7 @@
 					.then(response => {
 						var versionServeur = response.data.version
 						console.log("Version defi serveur :"+versionServeur); 
-						//if (response.data.version > this.$store.state.versionDefi) {
-						if (true) {
+						if (response.data.version > this.$store.state.versionDefi) {
 							// mise a jour de la table de categories
 							console.log("MAJ des défis à partir du serveur");
 							this.messages.push("MAJ des défis à partir du serveur");

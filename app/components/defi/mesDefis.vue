@@ -22,9 +22,10 @@
 						</ListView>
 						
 						<button class="boutonAction recup" text="Récupérer les défis de ma ville" @tap="recupereDefis" />
-						<GridLayout rows="auto" columns="*,50">
+						<GridLayout rows="auto" columns="*,50,50">
 							<Label row="0" col="0" class="m-b-20 titreTelethon" :text="sousTitreCommune" textWrap="true" />
-							<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="affichageCatCommune"/> 
+							<Image row="0" col="1" class="actionButton" src="~/assets/icons/upload.png" @tap="uploadDefisCommune"/>
+							<Image row="0" col="2" src="~/assets/icons/add-256.gif" @tap="affichageCatCommune"/> 
 						</GridLayout>
 									
 						<ListView for="item in $store.state.defisCommune" >
@@ -73,6 +74,29 @@
 
 		},
 		methods: {
+			uploadDefisCommune() {
+				confirm({
+				  title: "Sauvegarde des défis pour la commune",
+				  message: "Confirmez-vous la sauvegarde des défis pour la commune ?",
+				  okButtonText: "OK",
+				  cancelButtonText: "NON"
+				}).then(result => {
+					// on poste les defi pour la commune sur le serveur 
+					axios
+						  .post('https://www.telethon.citeyen.com/public/api/defiCommune/upload', {
+							defis : this.$store.state.defisCommune,
+							commune : this.$store.state.selectedCommune,
+						  })
+						  .then(response => {
+							alert({
+							  title: "Sauvegarde des défis",
+							  message: "Sauvegarde des défis pour la commune OK",
+							  okButtonText: "OK"
+							}).then(() => {
+							});
+						  });
+				});
+			},
 			uploadDefis() {
 				confirm({
 				  title: "Sauvegarde des défis ",
