@@ -8,11 +8,11 @@
 				<Label class="sousTitre" :text="defiNom" textWrap="true"/>
 				<GridLayout rows="auto,auto,auto" columns="*,*" > 
 					<Label row="0" col="0" class="label" text="Participant" verticalAlignment="center"/>
-					<ListPicker row="1" col="0" v-if="isNouveauScore" ref="profilEnCours" :items="$store.state.participants" textField="firstname" />
-					<Label row="1" col="0" v-else :text="participant" verticalAlignment="center" horizontalAlignment="center"/>
-					<Label row="0" col="1" text="Score"  verticalAlignment="center"/>
-					<ListPicker row="1" col="1" ref="scoreEnCours" :items="scoresRef" :selectedIndex="selectedIndexScore" />
-					<Button row="2" col="0" class="boutonAction" text="Annuler" @tap="annuler" />
+					<ListPicker row="1" col="0" v-if="!$store.state.selectedScore" ref="profilEnCours" :items="$store.state.participants" textField="nom" />
+					<Label row="1" col="0" v-else :text="participantNom" verticalAlignment="center" horizontalAlignment="center"/>
+					<Label row="0" col="1" class="label" text="Score"  verticalAlignment="center"/>
+					<ListPicker row="1" col="1" ref="scoreEnCours" :items="scoresRef" :selectedIndex="score.note" />
+					<Button row="2" col="0" v-if="$store.state.selectedScore" class="boutonAction" text="Supprimer" @tap="supprimerScore" />
 					<Button row="2" col="1" class="boutonAction" text="Enregistrer" @tap="saveScore" />
 				</GridLayout>
 			</StackLayout>
@@ -27,22 +27,8 @@
 	import affichageDefi from "../defi/affichageDefi";
 	export default {
 		computed: {
-			selectedIndexScore() {
-				if(this.$store.state.selectedScore) {
-					return this.$store.state.selectedScore.score;
-				}
-				return 10;
-			},
-			participant() {
-				if (this.$store.state.selectedScore) {
-					let profilEnCours = this.$store.state.participants.find(e => e.id == this.$store.state.selectedScore.idProfil);
-					return profilEnCours.firstname+ " "+profilEnCours.lastname;
-
-				}
-				return ""
-			},
-			isNouveauScore() {
-				return this.$store.state.selectedScore == null;
+			participantNom() {
+				return this.score.participant ? this.score.participant.nom : "Non défini";
 			},
 			defiNom() {
 				return "Defi : "+this.$store.state.selectedDefi.nom;
@@ -52,41 +38,61 @@
         data() {
             return {
 				scoresRef: ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],
+				score : {
+					note : 10,
+					participant : null,
+					defi : null,
+					date : null,
+				},
             }
         },
 		mounted() {
+			if(this.$store.state.selectedScore) {
+					this.score =  this.$store.state.selectedScore;
+			} 
+			else {
+				this.score.note = 10;
+				this.score.participant = null;
+				this.score.defi = this.$store.state.selectedDefi;
+				this.score.date = Date.now();
+			}
+			
         },
 		methods: {
 			saveScore() {
-				// récupération de l'ID du profil
-				let idProfil = -1;
-				if (this.$store.state.selectedScore) {
-					console.log("SaveScore update :");
-					idProfil = this.$store.state.selectedScore.idProfil;
-				}
-				else {
-					let indexProfil = this.$refs.profilEnCours.nativeView;
-					idProfil = this.$store.state.participants[indexProfil.selectedIndex].id;
-					console.log("Récupération de l'index : "+indexProfil+" : ayant pour id : "+idProfil);
-				}
+				// recuperation du score 
 				let indexScore = this.$refs.scoreEnCours.nativeView;
 				// récupération de l'ID du profil
-				let score = this.scoresRef[indexScore.selectedIndex];
-				console.log("Récupération de l'index : "+indexScore+" : ayant pour valeur : "+score);
+				this.score.note = parseInt(this.scoresRef[indexScore.selectedIndex]);
+				
+				
+				//recuperation du participant si necessaire
+				if (!this.score.participant) {
+					let indexProfil = this.$refs.profilEnCours.nativeView;
+					this.score.participant = this.$store.state.participants[indexProfil.selectedIndex];
+				}
 				if (this.$store.state.selectedScore) {
-					console.log("sauvegarde des valeurs 1 : "+this.$store.state.selectedScore.id+"-"+this.$store.state.selectedDefi.id+"-"+idProfil+"-"+score);
-					this.$store.dispatch("insertScore", {id : this.$store.state.selectedScore.id ,idDefi : this.$store.state.selectedDefi.id,idProfil : idProfil, score : score});
+					console.log("ADDSCORE : SaveScore update :");
+					this.$store.dispatch("updateScore", {"score" : this.score});
 				}
 				else {
-					console.log("sauvegarde des valeurs 2 : "+this.$store.state.selectedDefi.id+"-"+idProfil+"-"+score);
-					this.$store.dispatch("insertScore", {idDefi : this.$store.state.selectedDefi.id,idParticipant : idProfil, score : score});
+					console.log("ADDSCORE : SaveScore insert :");
+					this.$store.dispatch("insertScore", {"score" : this.score});
 				}
 				this.$store.state.selectedScore = null;
 				this.$navigateTo(affichageDefi);
             },
-			annuler() {
-				this.$store.state.selectedScore = null;
-				this.$navigateTo(affichageDefi);
+			supprimerScore() {
+				this.$store.dispatch("deleteScore", {"score" : this.$store.state.selectedScore});
+				alert({
+				  title: "Suppression du score",
+				  message: "Le score a été supprimé",
+				  okButtonText: "OK"
+				}).then(() => {
+				  console.log("Alert dialog closed");
+				  this.$navigateTo(affichageDefi);
+				});
+				
 			}
 			
 		},

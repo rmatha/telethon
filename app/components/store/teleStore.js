@@ -1,5 +1,6 @@
 import Vue from 'nativescript-vue';
 import axios from 'axios'
+import * as ApplicationSettings from "application-settings";
 	
 const Vuex = require("vuex");
 
@@ -10,10 +11,12 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
+		debug : false,
+        
+		
 		affichageDefiType : null,
 		connexion : null,
-		debug : false,
-        database: null,
+		database: null,
         data: [],
 		versionCategorie : "0",
 		versionDefi : "0",
@@ -21,6 +24,7 @@ const store = new Vuex.Store({
 		updateCategorie : false,
 		updateDefi : false,
 		updateEquipe : false,
+		selectedParticipant : null,
 		selectedCommune : null,
 		selectedCategorie : {},
 		selectedDefi : null,
@@ -31,726 +35,260 @@ const store = new Vuex.Store({
 		participants: [],
 		categories: [],
 		defis: [],
-		defisAll: [],
 		defisCommune: [],
-		nosDefis: [],
-		nosScores: [],
+		defisEquipe: [],
+		scoresEquipe: [],
 		equipes : [],
-		scoresEquipe : []
+		scores : []
     },
-    mutations: {
-		init(state, data) {
-			state.database = data.database;
+	actions : {
+		init(state) {
+			console.log("TELESTORE : INIT : state : "+JSON.stringify(state));
+			console.log("TELESTORE : INIT : state : "+JSON.stringify(this.state));
+            if(ApplicationSettings.getString("store")) {
+                this.replaceState(
+                    Object.assign(this.state, JSON.parse(ApplicationSettings.getString("store")))
+                );
+            }
+			console.log("chargement du store terminé : "+JSON.stringify(this.state)); 
+			return true;
+        },
+        
+        setSelectedEquipe(context,data) {
+			console.log("TELESTORE : setSelectedEquipe : data : "+JSON.stringify(data));
+			console.log("TELESTORE : setSelectedEquipe : state : "+JSON.stringify(this.state));
+			this.state.selectedEquipe = data.equipe;
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+			
 		},
 		
-		loadCategorieVersion(state, data) {
-			console.log("loadCategorieVersion : -----"+data.data);
-			state.versionCategorie = data.data ? data.data : 0;
-		},
-		loadDefiVersion(state, data) {
-			console.log("loadCategorieDefi : -----"+data.data);
-			state.versionDefi = data.data ? data.data : 0;
-		},
-		loadEquipeVersion(state, data) {
-			console.log("loadCategorieEquipe : -----"+data.data);
-			state.versionEquipe = data.data ? data.data : 0;
-		},
-		loadCurrentEquipe(state, data) {
-			console.log("loadCurrentEquipe : "+JSON.stringify(data));
-			state.selectedEquipe = {};
-			for(var i = 0; i < data.data.length; i++) {
-				state.selectedEquipe.id = data.data[i][0];
-				state.selectedEquipe.nom = data.data[i][1];
-				state.selectedEquipe.commune = data.data[i][2];
-				state.selectedEquipe.code = data.data[i][3];
-				state.selectedEquipe.admin = data.data[i][4];
-				state.selectedEquipe.organisateur = data.data[i][5];
-				state.selectedEquipe.version = data.data[i][6];
-			}
-			console.log("mutation load currentEquipe: "+JSON.stringify(state.selectedEquipe));
+		
+		resetVersion(state) {
+			this.state.versionCategorie = 0;
+			this.state.versionDefi = 0;
+			this.state.versionEquipe = 0;
+			console.log("telestore : resetConfig : "+JSON.stringify(this.state));
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
 		
-		loadEquipes(state, data) {
-			console.log("loadEquipes");
-			state.equipes = [];
-			for(var i = 0; i < data.data.length; i++) {
-				state.equipes.push({
-					id : data.data[i][0],
-					nom : data.data[i][1],
-					commune : data.data[i][2],
-					code : data.data[i][3],
-					admin : data.data[i][4],
-					organisateur : data.data[i][5],
-					current : data.data[i][6],
-					version : data.data[i][7],
-				});
-			}
-			console.log("mutation load loadEquipes: "+JSON.stringify(state.equipes));
+		setVersionEquipe(state,data) {
+			this.state.versionEquipe = data.version;
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
-		loadParticipants(state, data) {
-			console.log("loadParticipants");
-			state.participants = [];
-			for(var i = 0; i < data.data.length; i++) {
-				state.participants.push({
-					id : data.data[i][0],
-					firstname : data.data[i][1],
-					lastname : data.data[i][2],
-					telephone :	data.data[i][3],
-					commune :	data.data[i][4],
-				});
-			}
-			console.log("mutation load loadParticipants: "+JSON.stringify(state.participants));
-		},
-		loadCategorie(state, data) {
-			state.categories = [];
-			for(var i = 0; i < data.data.length; i++) {
-				state.categories.push({
-					id : data.data[i][0],
-					nom : data.data[i][1]
-				});
-				console.log("mutation load categorie : "+JSON.stringify(state.categories));
-			}
-			
-		},
-		loadNosDefis(state, data) {
-			console.log("loadNosDefis");
-			state.nosDefis = [];
-			
-			for (var i = 0 ; i < this.state.defis.length; i++) {
-				for (var j = 0 ; j < data.data.length ; j++) {
-					console.log(i+" : "+ this.state.defis[i].id + " : "+j+" : "+data.data[j][1]);
-					if (this.state.defis[i].id == data.data[j][1]) {
-						state.nosDefis.push({
-							id : this.state.defis[i].id,
-							nom : this.state.defis[i].nom,
-							description_courte: this.state.defis[i].description_courte , 
-							description_longue : this.state.defis[i].description_longue,
-							reglementation : this.state.defis[i].reglementation,
-							bareme : this.state.defis[i].bareme,
-							categorie : this.state.defis[i].categorie
-						});
-					}
-				}
-			};
-			console.log("loadNosDefis : "+JSON.stringify(state.nosDefis));
-			
-		},
-		loadDefisCurrentCommune(state, data) {
-			state.defisCommune = [];
-			console.log("telestore : loadDefisCurrentCommune data: "+JSON.stringify(data));
-			console.log("telestore : loadDefisCurrentCommune defis: "+JSON.stringify(this.state.defis));
-			for (var i = 0 ; i < this.state.defis.length; i++) {
-				for (var j = 0 ; j < data.data.length ; j++) {
-					console.log(i+" : "+ this.state.defis[i].id + " : "+j+" : "+data.data[j][1]);
-					if (this.state.defis[i].id == data.data[j][1]) {
-						state.defisCommune.push({
-							id : this.state.defis[i].id,
-							nom : this.state.defis[i].nom,
-							description_courte: this.state.defis[i].description_courte , 
-							description_longue : this.state.defis[i].description_longue,
-							reglementation : this.state.defis[i].reglementation,
-							bareme : this.state.defis[i].bareme,
-							categorie : this.state.defis[i].categorie
-						});
-					}
-				}
-			};
-			console.log("loadDefisCurrentCommune : "+JSON.stringify(state.defisCommune));
-			
-		},
-		loadDefis(state, data) {
-			state.defis = [];
-			state.defisAll = [];
-			console.log("telestore : loadDefis : defi deleted : ");
-			for(var i = 0; i < data.data.length; i++) {
-				state.defisAll.push({
-					id : data.data[i][0],
-					nom : data.data[i][1],
-					description_courte: data.data[i][2] , 
-					description_longue : data.data[i][3],
-					reglementation : data.data[i][4],
-					bareme : data.data[i][5],
-					categorie : data.data[i][6],
-					updated : data.data[i][7],
-					deleted : data.data[i][8],
-					added : data.data[i][9]
-				});
-				// dans cette liste on ne rajoute que les defis non deleted
-				if (data.data[i][8] == "0") {
-					state.defis.push({
-						id : data.data[i][0],
-						nom : data.data[i][1],
-						description_courte: data.data[i][2] , 
-						description_longue : data.data[i][3],
-						reglementation : data.data[i][4],
-						bareme : data.data[i][5],
-						categorie : data.data[i][6],
-						updated : data.data[i][7],
-						deleted : data.data[i][8],
-						added : data.data[i][9]
-					});
-				};
-				
-			};
-			console.log("mutation load defis : "+JSON.stringify(state.defis));
-			console.log("mutation load defisAll : "+JSON.stringify(state.defisAll));
-			
-		},
-		loadScoresEquipe(state, data) {
-			console.log("loadScoresEquipe ");
-			state.scoresEquipe = [];
-			for(var i = 0; i < data.data.length; i++) {
-				state.scoresEquipe.push({
-					id : data.data[i][0],
-					idDefi : data.data[i][1],
-					idParticipant : data.data[i][2] , 
-					score : data.data[i][3],
-					nomDefi : data.data[i][4],
-					nomProfil : data.data[i][5]+" "+data.data[i][6],
-				}); 
-				console.log("mutation load scoresEquipe : "+JSON.stringify(state.scoresEquipe));
-			}
-			
-		},
-	},
-    actions: {
-		init(context) {
-			(new Sqlite("my.db")).then(db => {
-				db.execSQL("CREATE TABLE IF NOT EXISTS participant (id INTEGER PRIMARY KEY AUTOINCREMENT, firstname TEXT, lastname TEXT, telephone TEXT,commune TEXT)").then(id => {
-					context.commit("init", { database: db });
-					console.log("Table participant cree ");
-				}, error => {
-					console.log("CREATE TABLE ERROR", error);
-				});
-				db.execSQL("CREATE TABLE IF NOT EXISTS configVersion (id INTEGER PRIMARY KEY AUTOINCREMENT, libelle type UNIQUE, valeur INTEGER)").then(id => {
-					context.commit("init", { database: db });
-					console.log("Table configVersion cree");
-				}, error => {
-					console.log("CREATE TABLE ERROR", error);
-				});
-				db.execSQL("CREATE TABLE IF NOT EXISTS defi (id INTEGER PRIMARY KEY AUTOINCREMENT, nom TEXT, description_courte TEXT, description_longue TEXT,reglementation TEXT,bareme TEXT,categorie INTEGER,updated tinyint(1), deleted tinyint(1), added tinyint(1))").then(id => {
-					context.commit("init", { database: db });
-					console.log("Table defi cree");
-				}, error => {
-					console.log("CREATE TABLE ERROR defi", error);
-				});
-				db.execSQL("CREATE TABLE IF NOT EXISTS categorie (id INTEGER PRIMARY KEY AUTOINCREMENT, nom TEXT)").then(id => {
-					context.commit("init", { database: db });
-					console.log("Table categorie cree");
-				}, error => {
-					console.log("CREATE TABLE ERROR categorie", error);
-				});
-				db.execSQL("CREATE TABLE IF NOT EXISTS equipe (id INTEGER PRIMARY KEY AUTOINCREMENT, nom TEXT, commune TEXT, current tinyint(1), code varchar(256), admin tinyint(1), organisateur tinyint(1),version INTEGER, UNIQUE(nom,commune))").then(id => {
-					context.commit("init", { database: db });
-					console.log("Table equipe cree");
-				}, error => {
-					console.log("CREATE TABLE ERROR equipe", error); 
-				});
-				db.execSQL("CREATE TABLE IF NOT EXISTS nosDefis (id INTEGER PRIMARY KEY AUTOINCREMENT, idDefi INTEGER, idEquipe INTEGER)").then(id => {
-					context.commit("init", { database: db });
-					console.log("Table nosDefis cree");
-				}, error => { 
-					console.log("CREATE TABLE ERROR nosDefis", error); 
-				});
-				db.execSQL("CREATE TABLE IF NOT EXISTS score (id INTEGER PRIMARY KEY AUTOINCREMENT, idDefi INTEGER, idParticipant INTEGER, score INTEGER)").then(id => {
-					context.commit("init", { database: db });
-					console.log("Table score cree");
-				}, error => { 
-					console.log("CREATE TABLE ERROR score", error); 
-				});
-				db.execSQL("CREATE TABLE IF NOT EXISTS defisCommune (id INTEGER PRIMARY KEY AUTOINCREMENT, idDefi INTEGER, commune varchar(256))").then(id => {
-					context.commit("init", { database: db });
-					console.log("Table defisCommune cree");
-				}, error => { 
-					console.log("CREATE TABLE ERROR defisCommune", error); 
-				});
-				
-			}, error => {
-				console.log("OPEN DB ERROR", error);
-			});
-		},
-		insertParticipant(context, data) {
-			console.log("id du participant : "+data.id+" : del'équipe : "+this.state.selectedEquipe.id);
-			if (data.id < 0) {
-				console.log("insert d'un nouveau participant");
-				context.state.database.execSQL("INSERT INTO participant (firstname, lastname,telephone,commune) VALUES (?,?,?,?)", [data.firstname, data.lastname, data.telephone,data.commune]).then(id => {
-					console.log("insertParticipant add participant");
-					context.dispatch("queryParticipants");
-					// mise ne place du flag de MAJ de l'equipe 
-					this.state.updateEquipe = true;
-				}, error => {
-					console.log("insertParticipant INSERT ERROR", error);
-				});
-			}
-			else {
-				console.log("update d'un nouveau participant");
-				context.state.database.execSQL("UPDATE participant set firstname = ?, lastname = ?,telephone =?, commune = ? where id = ?", [data.firstname, data.lastname, data.telephone,data.commune,data.id]).then(id => {
-					context.dispatch("queryParticipants");
-				}, error => {
-					console.log("insertParticipant UPDATE ERROR", error);
-				});
-			}
-		},
-		insertCategorie(context, data) {
-			if (data.id == 0) {
-				context.state.database.execSQL("INSERT INTO categorie (nom) VALUES (?)", [data.nom]).then(id => {
-					//context.commit("saveCategorie", { data: data });
-				}, error => {
-					console.log("INSERT ERROR categorie", error);
-				});
-			}
-			else {
-				context.state.database.execSQL("UPDATE categorie set nom = ? where id = ?", [data.nom,data.id]).then(id => {
-					//context.commit("saveCategorie", { data: data });
-				}, error => {
-					console.log("update ERROR categorie", error);
-				});
-			}
-		},
-		insertCurrentEquipe(context, data) {
-			console.log("insertCurrentEquipe reset current");
-			// on annule l'équipe qui était sélectionnée 
-			context.state.database.execSQL("UPDATE equipe set current = 0", []).then(id => {
-				console("reset current equipe OK");
-			}, error => {
-				console.log("INSERT ERROR", error);
-			});
-			console.log("insertCurrentEquipe insert equipe");
-			context.state.database.execSQL("INSERT INTO equipe (nom,commune,current,code,admin,organisateur) VALUES (?,?,1,?,?,?)", [data.nom,data.commune,data.code,data.admin,data.organisateur]).then(id => {
-				//context.commit("saveCategorie", { data: data });
-				context.dispatch("queryCurrentEquipe");
-			}, error => {
-				console.log("INSERT ERROR categorie", error);
-			});
-			
-		},
-		insertOrUpdateDefi(context, data) {
-			console.log("telestore : insertOrUpdateDefi : data : "+JSON.stringify(data));
-			if (data.id == 0) {
-				console.log("insertOrUpdateDefi : insert");
-				context.state.database.execSQL("INSERT INTO defi (nom,description_courte,description_longue,reglementation,bareme,categorie,updated,deleted,added) VALUES (?,?,?,?,?,?,1,?,1)", [data.nom,data.description_courte,data.description_longue,data.reglementation,data.bareme,this.state.selectedCategorie.id,data.deleted]).then(id => {
-					//context.commit("saveDefi", { data: data });
-					//queryDefis(context, data : [id : data.categorie]);
-					context.dispatch("queryDefis", data.categorie);
-				}, error => {
-					console.log("INSERT ERROR defi", error);
-				});
-			}
-			else {
-				console.log("insertOrUpdateDefi : update");
-				context.state.database.execSQL("UPDATE defi set nom = ?, description_courte = ?, description_longue = ?, reglementation = ?, bareme = ?, updated = 1, deleted = ? where id = ?", [data.nom,data.description_courte,data.description_longue,data.reglementation,data.bareme, data.deleted, data.id]).then(id => {
-					//context.commit("saveDefi", { data: data });
-					context.dispatch("queryDefis", data.categorie);
-				}, error => {
-					console.log("update ERROR defi", error);
-				});
-			}
-		},
-		insertNosDefis (context,data) {
-			console.log("insertNosDefis defi : "+JSON.stringify(this.state.selectedDefi));
-			context.state.database.execSQL("INSERT INTO nosDefis (idDefi,idEquipe) VALUES (?,?)", [this.state.selectedDefi.id,this.state.selectedEquipe.id]).then(id => {
-				context.dispatch("queryNosDefis");
-			}, error => {
-				console.log("INSERT ERROR defi", error);
-			});
 		
+		reloadDefis(state,data) {
+			this.state.defis = data.defis;
+			this.state.versionDefi = data.version;
+			console.log("Nombre de defis en local : "+this.state.defis.length); 
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
-		insertDefisCurrentCommune (context,data) {
-			console.log("insertDefisCurrentCommune defi : "+JSON.stringify(data));
-			context.state.database.execSQL("INSERT INTO defisCommune (idDefi,commune) VALUES (?,?)", [data.defi.id,this.state.selectedEquipe.commune]).then(id => {
-				context.dispatch("queryDefisCurrentCommune");
-			}, error => {
-				console.log("INSERT ERROR defi", error);
-			});
 		
-		},
-		insertScore(context, data) {
-			if (data.id) {
-  				console.log("insertScore : update");
-				context.state.database.execSQL("UPDATE score set idDefi = ?, idParticipant = ?, score = ? where id = ?", [data.idDefi,data.idParticipant,data.score,data.id]).then(id => {
-					//context.commit("saveDefi", { data: data });
-					context.dispatch("queryScoresEquipe");
-				}, error => {
-					console.log("update ERROR score", error);
-				});
-			}
-			else {
-				console.log("insertScore : insert : data "+JSON.stringify(data));
-				context.state.database.execSQL("INSERT INTO score (idDefi,idParticipant,score) VALUES (?,?,?)", [data.idDefi,data.idParticipant,data.score]).then(id => {
-					context.dispatch("queryScoresEquipe");
-				}, error => {
-					console.log("INSERT ERROR score", error);
-				});
-			}
-		},
-		updateCurrentEquipe(context,data) {
-			// on annule l'équipe qui était sélectionnée 
-			context.state.database.execSQL("UPDATE equipe set current = 0", []).then(id => {
-				console.log("updateCurrentEquipe : current = 0 OK");
-				// on place la nouvelle equipe en current
-				context.state.database.execSQL("UPDATE equipe set current = 1 where nom = ? and commune = ?", [data["nom"],data["commune"]]).then(id => {
-					context.dispatch("queryCurrentEquipe");
-					// maintenant il faut récupérer les particpants du serveur 
-						
-					
-				}, error => {
-					console.log("INSERT ERROR", error);
-				});
-			}, error => {
-				console.log("updateCurrentEquipe : update 0 ERROR", error);
-			});
-			
-			//console.log("action query : "+JSON.stringify(data));
-		},
-		downloadParticipants(context,data) {
-			console.log("downloadParticipants : data :"+JSON.stringify(data));
-			// on annule l'équipe qui était sélectionnée 
-			context.state.database.execSQL("DELETE FROM participant").then(id => {
-				//context.commit("saveProfil", { data: data });
-				//context.dispatch("queryParticipants",data);
-			}, error => {
-				console.log("downloadParticipants :PARTICPANT DELETE ERROR", error);
-			});
-			if (data) {
-				for(var i = 0; i < data.length; i++) {
-					context.state.database.execSQL("INSERT INTO  participant (firstname,commune) VALUES (?,?)", [data[i].nom,data[i].commune]).then(id => {
-						console.log("downloadParticipants : participant inséré :"+data[i].nom);
-					}, error => {
-						console.log("downloadParticipants :INSERT ERROR", error);
-					});
-				}
-				context.dispatch("queryParticipants");
-			}
-		},
-		queryCurrentEquipe(context) {
-			console.log("queryCurrentEquipe");
-			context.state.database.all("SELECT id,nom,commune,code, admin,organisateur,version FROM equipe where current = 1").then(result => {
-				console.log("queryCurrentEquipe : récupération : "+ JSON.stringify(result));
-				context.commit("loadCurrentEquipe", { data: result });
-			}, error => {
-				console.log("queryCurrentEquipe : SELECT ERROR", error);
-			});
-		},
-		queryDonnees(context,data) {
-			console.log("queryDonnees : data :"+data);
-			context.dispatch("queryDefis");
-			context.dispatch("queryEquipes");
-			context.dispatch("queryCurentEquipe");
-			if (data) {
-				console.log("queryDonnees : selectedEquipes");
-				context.dispatch("queryNosDefis");
-				context.dispatch("queryParticipants");
-				context.dispatch("queryDefisCurrentCommune");
-				context.dispatch("queryScoresEquipe")
-			}
-		},
-		queryCategorieVersion(context) {
-			context.state.database.all("SELECT valeur FROM configVersion where libelle = 'categorie'").then(result => {
-				context.commit("loadCategorieVersion", { data: result[0]});
-			}, error => {
-				console.log("SELECT ERROR versionCategorie", error);
-			});
-		},
-		queryDefiVersion(context) {
-			context.state.database.all("SELECT valeur FROM configVersion where libelle = 'defi'").then(result => {
-				context.commit("loadDefiVersion", { data: result[0]});
-			}, error => {
-				console.log("SELECT ERROR versionDefi", error);
-			});
-		},
-		queryEquipeVersion(context) {
-			context.state.database.all("SELECT valeur FROM configVersion where libelle = 'equipe'").then(result => {
-				context.commit("loadEquipeVersion", { data: result[0]});
-			}, error => {
-				console.log("SELECT ERROR versionEquipe", error);
-			});
-		},
-		queryEquipes(context) {
-			console.log("queryEquipes");
-			context.state.database.all("SELECT id,nom,commune,code, admin, organisateur ,version FROM equipe ", []).then(result => {
-				context.commit("loadEquipes", { data: result });
-				console.log("Liste des équipes : "+JSON.stringify(result));
-			}, error => {
-				console.log("SELECT ERROR", error);
-			});
-			//console.log("action query : "+JSON.stringify(data));
-		},
-		queryParticipants(context) {
-			console.log("queryParticipants : chargement des participants ");
-			context.state.database.all("SELECT id,firstname, lastname, telephone, commune FROM participant").then(result => {
-				console.log("Liste des participants : "+JSON.stringify(result));
-				context.commit("loadParticipants", { data: result });
-			}, error => {
-				console.log("SELECT ERROR", error);
-			});
-			//console.log("action query : "+JSON.stringify(data));
-		},
-		queryScoresEquipe(context) {
-			console.log("queryScoresEquipe : chargement des score pour equipe "+this.state.selectedEquipe.id);
-			context.state.database.all("SELECT score.id,idDefi, idParticipant, score, defi.nom, firstname, lastname from score, participant, defi where score.idDefi = defi.id and score.idParticipant = participant.id ").then(result => {
-				console.log("Nombre de réponses : "+JSON.stringify(result));
-				context.commit("loadScoresEquipe", { data: result });
-			}, error => {
-				console.log("SELECT ERROR", error);
-			});
-			//console.log("action query : "+JSON.stringify(data));
-		},
-		queryDefisCurrentCommune(context) {
-			console.log("querydefisCurrentCommune : chargement des defis pour la commune "+this.state.selectedEquipe.commune);
-			context.state.database.all("SELECT id, idDefi, commune from defisCommune where commune = ?",[this.state.selectedEquipe.commune]).then(result => {
-				console.log("Nombre de réponses : "+JSON.stringify(result));
-				context.commit("loadDefisCurrentCommune", { data: result });
-			}, error => {
-				console.log("SELECT ERROR", error);
-			});
-			//console.log("action query : "+JSON.stringify(data));
-		},
-		queryCategorie(context) {
-			context.state.database.all("SELECT id, nom FROM categorie", []).then(result => {
-				context.commit("loadCategorie", { data: result });
-			}, error => {
-				console.log("SELECT ERROR categorie", error);
-			});
-			//console.log("action query : "+JSON.stringify(data));
-		},
-		queryDefis(context) {
-			console.log("queryDefis");
-			context.state.database.all("SELECT * FROM defi", []).then(result => {
-				console.log("queryDefis : NB : "+result.length);
-				context.commit("loadDefis", { data: result });
-				console.log("queryDefis : NB end : "+result.length);
-			}, error => {
-				console.log("SELECT ERROR defis", error);
-			});
-			//console.log("action query : "+JSON.stringify(data));
-		},/*
-		queryDefisCat(context,data) {
-			console.log("queryDefisCat : ID cat : "+data.id);
-			context.state.database.all("SELECT * FROM defi where categorie = ?", [data.id]).then(result => {
-				context.commit("loadDefisCat", { data: result });
-				console.log("queryDefis : NB : "+result.length);
-			}, error => {
-				console.log("SELECT ERROR defis CAT", error);
-			});
-			//console.log("action query : "+JSON.stringify(data));
-		},*/
-		queryNosDefis(context) {
-			console.log("queryNosDefis ");
-			context.state.database.all("SELECT * FROM nosDefis", []).then(result => {
-				context.commit("loadNosDefis", { data: result });
-				console.log("queryNosDefis : NB : "+result.length);
-			}, error => {
-				console.log("SELECT ERROR defis NOS", error);
-			});
-			//console.log("action query : "+JSON.stringify(data));
-		},
-		deleteCategorie(context, data) {
-			context.state.database.execSQL("DELETE FROM categorie where id = ?", [data.id]).then(id => {
-				context.dispatch("queryCategorie");
-				//context.commit("saveCategorie", { data: data });
-			}, error => {
-				console.log("DELETE ERROR categorie", error);
-			});
-		},
-		reloadCategories(context, tab) {
-			context.state.database.execSQL("DELETE FROM categorie").then(id => {
-				console.log("Table Catégories vidée");
-			}, error => {
-				console.log("DELETE ERROR categorie", error);
-			});
-			for (var j = 0 ; j < tab.data.length ; j++) {
-				console.log("reloadCategories : intégration de la catégorie : "+tab.data[j].nom);
-				context.state.database.execSQL("INSERT INTO categorie (id,nom) VALUES (?,?)", [tab.data[j].id,tab.data[j].nom]).then(id => {
-					
-					
-				}, error => {
-					console.log("reloadCategories INSERT ERROR", error);
-				});
-			}
-			console.log("reloadCategories :MAJ de la version des catégories : "+tab.version);
-			context.state.database.execSQL("REPLACE INTO configVersion (libelle,valeur) VALUES ('categorie',?)",tab.version).then(id => {
-				console.log("reloadCategories : Table configVersion MAJ");
-			}, error => {
-				console.log("reloadCategories :UPDATE configVersion ", error);
-			});
-			context.commit("loadCategorieVersion", { data: tab.version });
-			context.dispatch("queryCategorie");
-		},
-		reloadDefis(context, tab) {
-			context.state.database.execSQL("DELETE FROM defi").then(id => {
-				console.log("Table defi vidée");
-				for (var j = 0 ; j < tab.data.length ; j++) {
-					console.log("intégration du défis : "+tab.data[j].nom+" : deleted : "+tab.data[j].deleted);
-					var deleted = (tab.data[j].deleted) ? "1" : "0";
-					context.state.database.execSQL("INSERT INTO defi (id,nom,description_courte,description_longue,reglementation,bareme,categorie,updated,deleted,added) VALUES (?,?,?,?,?,?,?,0,?,0)", [tab.data[j].id,tab.data[j].nom,tab.data[j].description,tab.data[j].description_longue,tab.data[j].reglementation,tab.data[j].bareme,tab.data[j].categorie.id,deleted]).then(id => {
-						context.dispatch("queryDefis");
-						
-					}, error => {
-						console.log("defi  INSERT ERROR", error);
-					});
-				}
-			}, error => {
-				console.log("DELETE ERROR  defi", error);
-			});
-			
-			console.log("MAJ de la version des défis : "+tab.version);
-			context.state.database.execSQL("REPLACE INTO configVersion (libelle,valeur) VALUES ('defi',?)",tab.version).then(id => {
-				console.log("Table configVersion MAJ");
-				context.commit("loadDefiVersion", { data: tab.version });
-			}, error => {
-				console.log("UPDATE configVersion ", error);
-			});
-			
-			
-		},
-		reloadEquipes(context, tab) {
-			for (var j = 0 ; j < tab.data.length ; j++) {
-				context.state.database.execSQL("REPLACE INTO equipe (nom,commune,code,admin,organisateur,version) VALUES (?,?,?,?,?,?)", [tab.data[j].nom,tab.data[j].commune,tab.data[j].code,tab.data[j].admin,tab.data[j].organisateur,tab.data[j].version]).then(id => {
-					console.log ("reloadEquipes : replace : "+tab.data["nom"]);
-				}, error => {
-					console.log("DELETE ERROR equipe", error);
-				});
-			}
-			console.log("MAJ de la version des équipes : "+tab.version);
-			context.state.database.execSQL("REPLACE INTO configVersion (libelle,valeur) VALUES ('equipe',?)",tab.version).then(id => {
-				console.log("Table configVersion MAJ");
-			}, error => {
-				console.log("UPDATE configVersion ", error);
-			});
-			context.commit("loadEquipeVersion", { data: tab.version });
-			context.dispatch("queryEquipes");
-		},
-		deleteDefi(context, data) {
-			console.log("telestore : deleteDefi : data : "+JSON.stringify(data));
-			console.log("telestore : deleteDefi : data.id : "+data.id);
-			context.state.database.execSQL("UPDATE defi set deleted =1, updated = 1 where id = ?", [data.id]).then(id => {
-				//context.commit("savedefi", { data: data });
-				context.dispatch("queryDefis");
-			}, error => {
-				console.log("DELETE ERROR defi", error);
-			});
-		},
-		deleteParticipant(context, data) {
-			context.state.database.execSQL("DELETE FROM participant where id = ?", [data.id]).then(id => {
-				context.dispatch("queryParticipants");
-				state.updateEquipe = true;
-			}, error => {
-				console.log("DELETE ERROR defi", error);
-			});
-		},
-		deleteNosDefis(context, data) {
-			context.state.database.execSQL("DELETE FROM nosDefis where idDefi = ? and idEquipe = ?", [data.defi.id, this.state.selectedEquipe.id]).then(id => {
-				//context.commit("savedefi", { data: data });
-				context.dispatch("queryNosDefis");
-			}, error => {
-				console.log("DELETE ERROR nosDefis", error);
-			});
-		},
-		deleteDefisCurrentCommune(context, data) {
-			context.state.database.execSQL("DELETE FROM defisCommune where idDefi = ? and commune = ?", [data.defi.id, this.state.selectedEquipe.commune]).then(id => {
-				//context.commit("savedefi", { data: data });
-				context.dispatch("queryDefisCurrentCommune");
-			}, error => {
-				console.log("DELETE ERROR nosDefis", error);
-			});
-		},
-		deleteBase(context) {
-			context.state.database.execSQL("DROP TABLE participant").then(id => {
-				console.log("Suppression de la table challenge");
-			}, error => {
-				console.log("drop ERROR conf", error);
-			});
-			context.state.database.execSQL("DROP TABLE equipe").then(id => {
-				console.log("Suppression de la table equipe");
-			}, error => {
-				console.log("DELETE ERROR score", error);
-			});
-			context.state.database.execSQL("DROP TABLE defi").then(id => {
-				console.log("Suppression de toutes les tables");
-			}, error => {
-				console.log("DELETE ERROR conf", error);
-			});
-			context.state.database.execSQL("DROP TABLE configVersion").then(id => {
-				console.log("Suppression de la table configVersion");
-			}, error => {
-				console.log("DELETE ERROR config", error);
-			});
-		},
-		listEquipeBase(context) {
-			context.state.database.all("SELECT id,nom,commune,code, admin,organisateur,version,current  FROM equipe").then(result => {
-				console.log("equipes :"+JSON.stringify(result));
-			}, error => {
-				console.log("SELECT EQUIPE error", error);
-			});
-			context.state.database.all("SELECT id,firstname FROM participant").then(result => {
-				console.log("participants :"+JSON.stringify(result));
-			}, error => {
-				console.log("SELECT EQUIPE error", error);
-			});
-		},
-		incrementeConfigVersion(context,data) {
-			console.log("incrementeConfigVersion : data :"+JSON.stringify(data));
-			let valeur = 0;
-			let valide = true;
-			switch (data.type) {
-				case 'categorie':
-					console.log('incrementeConfigVersion : On récupérere la version de catégorie');
-					valeur = state.versionCategorie;
-				case 'equipe':
-					console.log('incrementeConfigVersion : On récupérere la version de equipe');
-					valeur = state.versionEquipe;
-				case 'defi':
-					console.log('incrementeConfigVersion : On récupérere la version de defi');
-					valeur = state.versionDefi;
-				break;
-				
-				default:
-					console.log('incrementeConfigVersion : Sorry, we are out of ' + data.type + '.');
-					valide = false;
-				break;
-			if (valide) {
-				console.log("incrementeConfigVersion : on peut incrementer !");
-				valeur++;
-				context.state.database.execSQL("REPLACE INTO configVersion (libelle,valeur) VALUES ('?',?)",data,valeur).then(id => {
-					console.log("incrementeConfigVersion : increment OK !");
-				});
-			}
-			else {
-				console.log("incrementeConfigVersion : pas moyen d'increnter configVersion");
-			}
-}
-
-			context.state.database.execSQL("REPLACE INTO configVersion (libelle,valeur) VALUES ('categorie',?)",tab.version).then(id => {
-				console.log("reloadCategories : Table configVersion MAJ");
-			}, error => {
-				console.log("reloadCategories :UPDATE configVersion ", error);
-			});
-		},
-		incrementeVersionEquipe(context,data) {
-			console.log("incrementeVersionEquipe : "+data.version);
-			let versionEquipe = data.version;
-			context.state.database.execSQL("UPDATE equipe set version = ? where current = 1",data.version).then(id => {
-				state.selectedEquipe.version = versionEquipe;
-				context.commit("loadEquipeVersion", { data: data.version });
-			});
-
-		},
-		incrementeVersionDefi(context,data) {
-			console.log("MAJ de la version des défis : "+data.version);
-			context.state.database.execSQL("REPLACE INTO configVersion (libelle,valeur) VALUES ('defi',?)",data.version).then(id => {
-				console.log("Table configVersion MAJ");
-				context.commit("loadDefiVersion", { data: data.version });
-			}, error => {
-				console.log("UPDATE configVersion ", error);
-			});
-
-		}
+		reloadEquipes(state, data) {
+            this.state.equipes = data.equipes;
+			this.state.versionEquipe = data.version;
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+			console.log("TELESTORE : reloadEquipes : Nombre d'équipe en base : "+this.state.equipes.length); 
+        },
 		
 		
-	}
+		
+		
+		setVersionEquipe(state,data) {
+		    this.state.selectedEquipe.version = data.version;
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+			console.log("TELESTORE : setParticipants : Version de l'équipe : "+this.state.selectedEquipe.version); 
+		
+		},
+		
+		newEquipe(state,data) {
+			this.state.selectedEquipe = data.equipe;
+			this.state.equipes.push(data.equipe);
+			this.state.participants = [];
+			this.state.defisEquipe = [];
+			this.state.scoresEquipe = [];
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+		},
+		
+		
+		
+		/**
+		categorie
+		**/
+		
+		reloadCategories(state,data) {
+            this.state.categories = data.categories;
+			this.state.versionCategorie = data.version;
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+			console.log("TELESTORE : reloadCategories : Nombre de catégories en base : "+this.state.categories.length); 
+	
+		},
+		
+		
+		addCategorie(state,data) {
+			this.state.categories.push(data.categorie);
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+		},
+		
+		updateCategorie(state,data) {
+			console.log("TESTORE : UPDATECATEGORIE : categorie sélectionnée "+JSON.stringify(this.state.selectedCategorie));
+			var indexCategorie = this.state.categories.findIndex(item => {
+					return item.nom == this.state.selectedCategorie.nom;
+				});
+			// mise a jour des informations
+			console.log("TESTORE : UPDATECATEGORIE : index récupéré : "+indexCategorie);
+			this.state.categories[indexCategorie].nom = data.categorie.nom;
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+			console.log("Nombre de categories après update : "+JSON.stringify(this.state.categories));
+		},
+		deleteCategorie(state) {
+			console.log("Nombre de categorie avant suppression : "+JSON.stringify(this.state.categories));
+			this.state.categories = this.state.categories.filter(item => {
+					return item.nom !== this.state.selectedCategorie.nom;
+				});
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+			console.log("Nombre de categories après suppression : "+JSON.stringify(this.state.categories));
+		},
+		
+		
+		/**
+		participants
+		**/
+		
+		addParticipant(state,data) {
+			this.state.participants.push(data.participant);
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+		},
+		
+		deleteParticipant(state,data) {
+			console.log("Nombre de particpants avant suppression : "+JSON.stringify(this.state.participants));
+			this.state.participants = this.state.participants.filter(item => {
+					return item.nom !== data.participant.nom;
+				});
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+			console.log("Nombre de particpants après suppression : "+JSON.stringify(this.state.participants));
+		},
+		
+		setParticipants(state,data) {
+		    console.log("TELESTORE : setParticipants : Liste des particpants : "+JSON.stringify(data));
+			this.state.participants = data.participants;
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+			console.log("TELESTORE : setParticipants : Nombre de participants en base : "+this.state.participants.length); 
+		},
+	
+		updateParticipant(state,data) {
+			var indexParticipant = this.state.participants.findIndex(item => {
+					return item == this.state.selectedParticipant;
+				});
+			// mise a jour des informations
+			this.state.participants[indexParticipant].nom = data.participant.nom;
+			this.state.participants[indexParticipant].commune = data.participant.commune;
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+			console.log("Nombre de particpants après suppression : "+JSON.stringify(this.state.participants));
+		},
+		
+		setSelectedParticipant(state,data) {
+			this.state.selectedParticipant = data.participant;
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+		},
+		
+		insertScore(state,data) {
+			console.log("TELESTORE : insertScore : score en cours : "+JSON.stringify(data));
+			this.state.scoresEquipe.push(data.score);
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+			console.log("TELESTORE : insertScore : liste des scores : "+this.state.scoresEquipe.length); 
+		},
+		
+		updateScore(state,data) {
+			var indexScore = this.state.scoresEquipe.findIndex(item => {
+					return item == this.state.selectedScore;
+				});
+			// mise a jour des informations
+			this.state.scoresEquipe[indexScore] = data.score;
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+			console.log("Nombre de particpants après suppression : "+JSON.stringify(this.state.participants));
+		},
+		deleteScore(state,data) {
+			this.state.scoresEquipe = this.state.scoresEquipe.filter(score => {
+				return score !== data.score;
+			});
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+		},
+		
+		
+		
+		deleteDefi(state,data) {
+			console.log("Nombre de défis avant suppression : "+this.state.defis.length);
+			this.state.defis = this.state.defis.filter(defi => {
+				return defi !== data.defi;
+			});
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+			console.log("Nombre de défis après suppression : "+this.state.defis.length);
+		},
+		
+		deleteDefisCurrentCommune(state,data) {
+			console.log("Nombre de défis commune avant suppression : "+this.state.defisCommune.length);
+			this.state.defisCommune = this.state.defisCommune.filter(item => {
+				return item !== data.defi;
+			});
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+			console.log("Nombre de défis commune après suppression : "+this.state.defisCommune.length);
+		},
+		
+		deleteDefisEquipe(state,data) {
+			console.log("Nombre de défis equipe avant suppression : "+this.state.defisEquipe.length);
+			this.state.defisEquipe = this.state.defisEquipe.filter(item => {
+				return item !== data.defi;
+			});
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+			console.log("Nombre de défis equipe après suppression : "+this.state.defisEquipe.length);
+		},
+		
+		insertDefisCurrentCommune(state,data) {
+			this.state.defisCommune.push(data.defi);
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+		},
+		
+		insertDefisEquipe(state,data) {
+			this.state.defisEquipe.push(data.defi);
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+		},
+		
+		insertDefi(state,data) {
+			this.state.defis.push(data.defi);
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+		},
+		
+		updateDefi(state,data) {
+			var indexDefi = this.state.defis.findIndex(defi => {
+					return (defi.nom == this.state.selectedDefi.nom) & (defi.categorie.nom == this.state.selectedCategorie.nom);
+				});
+			// mise a jour des informations
+			this.state.defis[indexDefi].nom = data.defi.nom;
+			this.state.defis[indexDefi].description_courte = data.defi.description_courte;
+			this.state.defis[indexDefi].description_longue = data.defi.description_longue;
+			this.state.defis[indexDefi].reglementation = data.defi.reglementation;
+			this.state.defis[indexDefi].bareme = data.defi.bareme;
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+			console.log("Liste des defis après update : "+JSON.stringify(this.state.defis));
+		},
+		
+		resetAll (state) {
+			ApplicationSettings.setString("store", "");
+		},
+		
+		resetScoreEquipe(state) {
+			console.log("TELESTORE : resetScoreEquipe ");
+			this.state.scoresEquipe = [];
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+		},
+		
+		setDebug(state) {
+			this.state.debug = !this.state.debug;
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+		},
+		
+    }
 });
-
-
 
 Vue.prototype.$store = store;
 

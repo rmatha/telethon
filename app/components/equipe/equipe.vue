@@ -76,7 +76,7 @@
         mounted() {
 			console.log("Equipe en cours est à :"+JSON.stringify(this.$store.state.selectedEquipe));
 			console.log("Liste des participants : "+JSON.stringify(this.$store.state.participants));
-			console.log("nombre des participants : "+this.$store.state.participants.lenght);
+			console.log("nombre des participants : "+this.$store.state.participants.length);
 			// vérification des version de la version de l'équipe sur le serveur 
 			const connectionType = connectivity.getConnectionType();
 			console.log("etat de la connexion : "+connectionType);
@@ -108,7 +108,7 @@
 											.get('https://telethon.citeyen.com/public/api/participants/list', {params : params})
 											.then(response => {
 												console.log("equipe mounted : Liste des participants serveur :"+JSON.stringify(response.data.participants));//.data.participants); 
-												this.$store.dispatch("downloadParticipants", response.data.participants);
+												this.$store.dispatch("setParticipants",{"participants" : response.data.participants});
 												console.log("equipe mounted  : Validation du chargement des participants");
 												alert({
 												  title: "Sélection d'équipe",
@@ -117,7 +117,7 @@
 												}).then(() => {
 												  console.log("equipe mounted  :Chargement de l'équipe");
 												  
-												  this.$store.dispatch("incrementeVersionEquipe", {"version" : versionEquipeServeur} );
+												  this.$store.dispatch("setVersionEquipe", {"version" : versionEquipeServeur} );
 												  this.$navigateTo(equipe);
 												  
 												});
@@ -186,15 +186,17 @@
 				});
 			},
 			libelleProfil(participantTemp) {
-				return participantTemp.firstname;
+				return participantTemp.nom;
 			},
 			addParticipant(participantTemp) {
-				console.log("Ajout d'un aprticipant :"+participantTemp);
-				this.$navigateTo(profil, { props: {participant : null}});
+				console.log("Ajout d'un participant");
+				this.$store.dispatch("setSelectedParticipant",{"participant" : null});
+				this.$navigateTo(profil);
 			},
 			editParticipant(participantTemp) {
-				console.log("Ajout d'un aprticipant :"+participantTemp);
-				this.$navigateTo(profil, { props: {participant : participantTemp}});
+				console.log("edition du aprticipant :"+participantTemp);
+				this.$store.dispatch("setSelectedParticipant",{"participant" : participantTemp});
+				this.$navigateTo(profil);
 			},
 			
 			changeEquipe() {
@@ -237,7 +239,7 @@
 								.then(response => {
 									console.log("Version de l'équipe sur le serveur : "+response.data.version);
 									let versionEquipeServeur = response.data.version;
-									this.$store.dispatch("incrementeVersionEquipe", {"version" : versionEquipeServeur} ).then(() => {
+									this.$store.dispatch("setVersionEquipe", {"version" : versionEquipeServeur} ).then(() => {
 									console.log("uploadEquipe : incrementation configVersion OK");
 								  })
 								  .catch(error => {

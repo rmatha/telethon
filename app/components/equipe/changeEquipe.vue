@@ -13,12 +13,10 @@
 					</GridLayout>
 					<StackLayout v-if="isNouvelleEquipe" >
 						<Label text="Création de la nouvelle équipe" class="entetePage"/>
-						<FloatLabel placeholder="Nom de l'équipe" label="nom de l'équipe" :valeur="input.nom" @updateValeur="updateNomEquipe"/>
-						<GridLayout rows="30, auto" marginBottom="5">
-							<Label ref="labelVille" row="1" text="Ville du challenge Téléthon" opacity="0.4" fontSize="14" class="input" />
-							<TextField ref="textFieldVille" row="1" borderBottomColor="#fff" padding="0" @focus="onFocus"
-						@blur="onBlur" borderBottomWidth="3" @textChange="onTextChange" v-model="input.commune"/>
-						</GridLayout>
+						<Label class="label" text="Nom de l'équipe" />
+						<TextField class="textfield" hint="Ex : the killers..." v-model="input.nom"/>
+						<Label ref="labelVille" class="label" text="Ville du challenge Téléthon"  />
+						<TextField class="textfield" ref="textFieldVille" @textChange="onTextChange" v-model="input.commune"/>
 						<ScrollView v-if="affichageVilles" >
 							<StackLayout backgroundColor="#3c495e" >
 								<GridLayout v-for="ville in villes" rows="40" columns="*"  >
@@ -26,7 +24,8 @@
 								</GridLayout>
 							</StackLayout>
 						</ScrollView>
-						<FloatLabel placeholder="Mot de passe" label="code de confidentialité" :valeur="input.code" @updateValeur="updateCodeEquipe" />
+						<Label class="label"  text="Mot de passe" />
+						<TextField class="textfield" v-model="input.code"/>
 						<GridLayout rows="auto,auto" columns="*,50" marginBottom="5">
 							<Image row="0" col="1" v-if="input.organisateur" class="imageCheck" src="~/assets/icons/checkTrue.png" @tap="updateOrganisateur"/>
 							<Image row="0" col="1" v-else  class="imageCheck"src="~/assets/icons/checkFalse.png" @tap="updateOrganisateur"/>
@@ -97,9 +96,6 @@
 			if (this.type == "search") {
 				this.isExistanteEquipe = true;
 			};
-			console.log("rechargement de la table des equipes au cas où");
-			this.$store.dispatch("queryEquipes");
-			
         },
 		computed: {	
 			getClassButtonNouvelleEquipe () {
@@ -130,6 +126,7 @@
 					code : "",
 					admin : false,
 					organisateur : false,
+					version : 0,
 				},
 				villesRef: [],
                 villes: [],
@@ -194,6 +191,7 @@
 				let indexEquipe = this.$refs.equipeEnCours.nativeView;
 				this.input.nom = this.equipesVille[indexEquipe.selectedIndex].nom;
 				this.input.code = this.equipesVille[indexEquipe.selectedIndex].code;
+				this.input.version = this.equipesVille[indexEquipe.selectedIndex].version;
 				console.log("selectEquipeExistante : sélectionde l'équipe :"+this.input.nom+" : sur la commune : "+this.input.commune+ " est le code : "+ this.input.code);
 				prompt({
 				  title: "Code de l'équipe",
@@ -203,8 +201,8 @@
 				  defaultText: "",
 				}).then(result => {
 					if (result.result & (result.text == this.input.code)) {
-						console.log("slection ok");
-						this.$store.dispatch("updateCurrentEquipe",this.input).then(() => {
+						console.log("selection ok");
+						this.$store.dispatch("setSelectedEquipe",{"equipe" : this.input}).then(() => {
 							console.log("updateCurrentEquipe : Equipe chargée");
 							console.log("updateCurrentEquipe : Recherche axios pour les partcipants");
 							let params = {};
@@ -214,7 +212,7 @@
 								.get('https://telethon.citeyen.com/public/api/participants/list', {params : params})
 								.then(response => {
 									console.log("updateCurrentEquipe : Liste des participants serveur :"+JSON.stringify(response.data.participants));//.data.participants); 
-									this.$store.dispatch("downloadParticipants", response.data.participants);
+									this.$store.dispatch("setParticipants", {"participants" : response.data.participants});
 									console.log("updateCurrentEquipe : Validation du chargement des participants");
 									alert({
 									  title: "Sélection d'équipe",
@@ -262,7 +260,7 @@
 				}
 				else {
 					console.log("on peut créer la nouvelle équipe : "+JSON.stringify(this.input));
-					this.$store.dispatch("insertCurrentEquipe", this.input).then(() => {
+					this.$store.dispatch("newEquipe", {"equipe" :  this.input}).then(() => {
 						alert({
 						  title: "Création d'équipe confirmée",
 						  message: "Vous allez être redirigé pour intégrer les membres à votre équipe",
@@ -272,6 +270,8 @@
 						});
 					});
 				};
+				
+				
 			},
 			nouvelleEquipe() {
 				this.isNouvelleEquipe = true;
@@ -280,12 +280,6 @@
 			equipeExistante() {
 				this.isNouvelleEquipe = false;
 				this.isExistanteEquipe = true;
-			},
-			updateNomEquipe(nomEquipe) {
-				this.input.nom = nomEquipe;
-			},
-			updateCodeEquipe(codeEquipe) {
-				this.input.code = codeEquipe;
 			},
 			selectVille(nom,code) {
 				console.log("Sélection de la ville"+nom);
@@ -320,45 +314,6 @@
                 //ApplicationSettings.setString(textField.name, textField.text);
                 //this.firstTx = textField.text;
             },
-            onFocus: function() {
-                // get our elments to maninpulate.
-                const label = this.$refs.labelVille.nativeView;
-                const textField = this.$refs.textFieldVille.nativeView;
-
-                // animate the label sliding up and less transparent.
-                label
-                    .animate({
-                        translate: {
-                            x: 0,
-                            y: -25
-                        },
-                        opacity: 1
-                    })
-                    .then(() => {}, () => {});
-
-                // set the border bottom color to green to indicate focus
-                //textField.borderBottomColor = new Color("#00b47e");
-				this.affichageEquipes = false;
-            },
-            onBlur: function() {
-                const label = this.$refs.labelVille.nativeView;
-                const textField = this.$refs.textFieldVille.nativeView;
-
-                // if there is text in our input then don't move the label back to it's initial position.
-                if (!textField.text) {
-                    label
-                        .animate({
-                            translate: {
-                                x: 0,
-                                y: 0
-                            },
-                            opacity: 0.4
-                        })
-                        .then(() => {}, () => {});
-                }
-                // reset border bottom color.
-                //textField.borderBottomColor = new Color("#c ec8c8"); 
-            }
         }
     };
 </script>

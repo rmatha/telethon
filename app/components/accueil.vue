@@ -6,10 +6,6 @@
 			
 			<StackLayout  dock="center" class="root" >
 				<label class="titre mb50" text="Bonjour !"  horizontalAlignment="center"/>
-				<Button v-if="$store.state.debug" text="Lister les equipes" @tap="showEquipe" />
-				<Button v-if="$store.state.debug" text="effacer tablesss" @tap="reinit" />
-				<Button v-if="$store.state.debug" text="Recharger l'équipe enn cours" @tap="reinitEquipe" />
-				<Button v-if="$store.state.debug" text="Recharger les scores" @tap="reinitScore" />
 				
 				
 				<StackLayout  v-if="isEquipeSelected">
@@ -18,7 +14,6 @@
 							<label class="label" text="Equipe :"  />
 							<label class="valeur" :text="nomEquipe"  />
 							<label class="valeur" :text="nbParticipantsEquipe"  />
-							<label class="valeur" :text="synchroEquipe"  />
 						</StackLayout>
 						<Image  src="~/assets/icons/modify.png" col="1" row="0" @tap="navEquipe" stretch="none" />
 						<StackLayout row="1" col="0">	
@@ -28,7 +23,7 @@
 						<Image  src="~/assets/icons/modify.png" col="1" row="1" @tap="navMesDefis" stretch="none" />
 						<StackLayout row="2" col="0">	
 							<label class="label" text="Score : "/>
-							<label class="valeur" text="coming soon !!!"  /><Label :text="networkStatus" />
+							<label class="valeur" :text="moyenneEquipe"  /><Label :text="networkStatus" />
 						</StackLayout>
 						<Image  src="~/assets/icons/modify.png" col="1" row="2" @tap="navScore" stretch="none" class="modify"/>
 						
@@ -68,8 +63,8 @@
             };
         },
 		computed: {
-			synchroEquipe() {
-				
+			moyenneEquipe() {
+				return "Moyenne de l'équipe : "+(this.$store.state.scoresEquipe.length > 0 ?	_.meanBy(this.$store.state.scoresEquipe, 'note') : "Pas de score enregistré"); 
 			},
 			nomEquipe() {
 				return "Nom de l'équipe: "+this.$store.state.selectedEquipe? this.$store.state.selectedEquipe.nom : "Pas d'équipe sélectionnée";
@@ -79,8 +74,8 @@
 			},
 			nbDefisEquipe() {
 				var messageDefi = "Pas de défis enregistrés pour l'équipe... Utilisez le bouton à droite pour gérer vos défis !";
-				if (this.$store.state.nosDefis.length > 0) {
-					messageDefi ="Nombre de défis pour l'équipe : "+this.$store.state.nosDefis.length;
+				if (this.$store.state.defisEquipe) {
+					messageDefi ="Nombre de défis pour l'équipe : "+this.$store.state.defisEquipe.length;
 				}
 				return messageDefi;
 			},
@@ -97,6 +92,10 @@
         },
         mounted() {
 			console.log("home ");
+			console.log("ACCUEIL : STATE : "+JSON.stringify(this.$store.state));
+			console.log("ACCUEIL : STATE : equipe "+JSON.stringify(this.$store.state.equipes));
+			console.log("ACCUEIL : STATE : equipeVersion "+JSON.stringify(this.$store.state.versionEquipe));
+			console.log("ACCUEIL : STATE : scoresEquipe "+JSON.stringify(this.$store.state.scoresEquipe));
 			// chargement des données en fonction de l'équipe en cours
 			//this.$store.dispatch("queryDonnees", isEquipeSelected);
 			// vérification si une connexion est disponible
@@ -110,15 +109,13 @@
 				console.log("Pas de réseau !!!");
 			}
 			console.log("HOME : chargement de l'équipe en cours !!");
-			this.$store.dispatch("queryCurrentEquipe").then(() => {
-				if (this.$store.state.selectedEquipe) {
-					console.log("HOME : on a bien récupéré l'équipe :"+this.$store.state.selectedEquipe.nom);
-					//on peut mettre a jour les tables mesDefis et participants
-				}
-				else {
-					console.log("PAs d'équipe en cours !!!");
-				}
-			});
+			if (this.$store.state.selectedEquipe) {
+				console.log("HOME : on a bien récupéré l'équipe :"+this.$store.state.selectedEquipe.nom);
+				//on peut mettre a jour les tables mesDefis et participants
+			}
+			else {
+				console.log("Pas d'équipe en cours !!!");
+			}
 			
 			
 		},
@@ -143,21 +140,6 @@
 				return "Pas d'équipe en courss";
 			},
 			
-			reinit() {
-				this.$store.dispatch("deleteBase");
-			},
-			reinitEquipe() {
-				console.log("En recharge l'équipe !!");
-				this.$store.dispatch("queryCurrentEquipe");
-			},
-			reinitScore() {
-				console.log("On recharge les scores !!");
-				this.$store.dispatch("queryScoresEquipe");
-			},
-			showEquipe() {
-				console.log("HOME : On affiche les équipes en base !!");
-				this.$store.dispatch("listEquipeBase");
-			}
 
 		}
     };

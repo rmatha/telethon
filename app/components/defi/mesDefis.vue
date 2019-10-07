@@ -8,13 +8,13 @@
 					<StackLayout width="100%" height="100%">
 						<GridLayout rows="auto" columns="*,50,50">
 							<Label row="0" col="0" class="m-b-20 titreTelethon" text="Mes Défis" textWrap="true" />
-							<Image row="0" col="1" class="actionButton" src="~/assets/icons/upload.png" @tap="uploadDefis"/>
+							<Image row="0" col="1" class="actionButton" src="~/assets/icons/upload.png"/>
 							<Image row="0" col="2" src="~/assets/icons/add-256.gif" @tap="affichageCat"/>
 						</GridLayout>
-						<ListView for="item in $store.state.nosDefis" >
+						<ListView for="item in $store.state.defisEquipe" >
 						  <v-template>
 							<GridLayout rows="auto,*" columns="*,50"  margin="0" @tap="getDefi(item)">
-								<Label col="0" raw="0" :text="item.nom" class="defiTitle" />
+								<Label col="0" raw="0" :text="item.categorie.nom +' : '+item.nom" class="defiTitle" />
 								<Label col="0" row="1" :text="item.description_courte" class="defiDescription" />
 								<Image col="1" row="0" rowSpan="2" src="~/assets/icons/right.png" height="30px"/>
 							</GridLayout>
@@ -33,7 +33,7 @@
 							<GridLayout rows="*" columns="*,50"  margin="0" @tap="getDefiCommune(item)">
 								<GridLayout col="0" verticalAlignment="bottom">
 									<StackLayout paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16">
-										<Label :text="item.nom" class="defiTitle" />
+										<Label :text="item.categorie.nom+' : '+item.nom" class="defiTitle" />
 										<Label :text="item.description_courte" class="defiDescription" />
 									</StackLayout>
 								</GridLayout>
@@ -59,7 +59,7 @@
 	export default {
 		
 		mounted() {
-			console.log("mesDefis : mounted : mesDefis "+JSON.stringify(this.$store.state.nosDefis));
+			console.log("mesDefis : mounted : mesDefis "+JSON.stringify(this.$store.state.defisEquipe));
 			console.log("mesDefis : mounted : defisCommune "+JSON.stringify(this.$store.state.defisCommune));
 		},
 		data() {
@@ -92,68 +92,11 @@
 							  title: "Sauvegarde des défis",
 							  message: "Sauvegarde des défis pour la commune OK",
 							  okButtonText: "OK"
-							}).then(() => {
 							});
 						  });
 				});
 			},
-			uploadDefis() {
-				confirm({
-				  title: "Sauvegarde des défis ",
-				  message: "Confirmez-vous la sauvegarde des modifications faites sur les défis (suppressions, modifications et ajouts)?",
-				  okButtonText: "OK",
-				  cancelButtonText: "NON"
-				}).then(result => {
-				  console.log(result);
-				  if (result) {
-					console.log("On sauvegarde sur le serveur");
-					console.log("defis ALL:"+JSON.stringify(this.$store.state.defisAll));
-					this.defisUpdated = this.$store.state.defisAll.filter(item => {
-						console.log("defi a upload :"+item.nom+" : "+item.updated); 
-						return item.updated == "1";
-					});
-					console.log("mesDefis : uploadDefi : nombre de défis à MAJ : "+this.defisUpdated.length);
-					console.log("mesDefis : uploadDefi : "+JSON.stringify(this.defisUpdated));
-					
-					axios
-						  .post('https://www.telethon.citeyen.com/public/api/defis/upload', {
-							defis : this.defisUpdated,
-						  })
-						  .then(response => {
-							console.log("update OK");
-							alert({
-							  title: "Récupération des défis",
-							  message: "Mise à jour des défis à partir du serveur",
-							  okButtonText: "OK"
-							}).then(() => {
-								axios
-									.get('https://telethon.citeyen.com/public/api/defis/version')
-									.then(response => {
-										var versionServeur = response.data.version
-										axios
-										  .get('https://telethon.citeyen.com/public/api/defis/list')
-										  .then(responseList => {
-											console.log("Chargement des  defis en base : "+JSON.stringify(responseList.data));
-											this.$store.dispatch("reloadDefis",{data : responseList.data,version : versionServeur});
-										  });
-									})
-							});
-						})
-						.catch(error => {
-							console.log("updatete KO : "+error.response);
-							alert({
-							  title: "Problème de sauvegarde",
-							  message: "La sauvegarde n'est pas possible actuellement. Mais vous pouvez continuer à utiliser cette équipe pour saisir les participants et les scores. Vous pourrez faire la sauvegarde plus tard",
-							  okButtonText: "OK"
-							}).then(() => {
-							  console.log("Alert dialog closed");
-							  this.$navigateTo(mesDefis);
-							});
-						})
-					
-					}
-				});
-			},
+			
 			recupereDefis() {
 				console.log("Récupération des défis de la commune");
 				let titre = "Les défis de votre commune ont été chargés dans vos défis";
@@ -161,7 +104,7 @@
 					console.log("defis de la commune : "+this.$store.state.defisCommune);
 					if (this.$store.state.defisCommune.length > 0) {
 						console.log("R2cupération des défis OK");
-						this.$store.state.nosDefis = this.$store.state.defisCommune;
+						this.$store.state.defisEquipe = this.$store.state.defisCommune;
 					}
 					else {
 						console.log("pas de défis pour la commune en cours");
@@ -181,7 +124,7 @@
 					});
 			},
             affichageCat() {
-				console.log("liste des challenges");
+				console.log("liste des defi");
 				this.$store.state.selectedCommune = null;
 				this.$store.state.affichageDefiType = "equipe";
                 this.$navigateTo(listeChallengesCat);
@@ -193,16 +136,29 @@
                 this.$navigateTo(listeChallengesCat);
 			},
 			getDefi(item) {
-				console.log("affichage du defi : "+item.nom + ": "+item.id);
-				this.$store.state.selectedCategorie = this.categorie;
-                this.$store.state.selectedDefi = item;
+				console.log("MESDEFIS : GETDEFI : affichage du defi : "+JSON.stringify(item));
+				var currentCategorie = this.$store.state.categories.filter(function(categorie) {
+					return categorie.nom == item.categorie.nom;
+				});
+				console.log("MESDEFIS  : getDefi : categorie récupérée : "+JSON.stringify(currentCategorie));	
+				if (currentCategorie.length > 0) {
+					this.$store.state.selectedCategorie = currentCategorie[0];
+                }
+				this.$store.state.selectedDefi = item;
 				this.$store.state.selectedCommune = null;
                 this.$navigateTo(affichageDefi);
 			},
 			getDefiCommune(item) {
 				console.log("affichage du defi : "+item.nom + ": "+item.id);
-				this.$store.state.selectedCategorie = this.categorie;
-                this.$store.state.selectedDefi = item;
+				console.log("MESDEFIS : GETDEFICOMMUNE : affichage du defi : "+JSON.stringify(item));
+				var currentCategorie = this.$store.state.categories.filter(function(categorie) {
+					return categorie.nom == item.categorie.nom;
+				});
+				console.log("MESDEFIS  : getDefiCommune : categorie récupérée : "+JSON.stringify(currentCategorie));	
+				if (currentCategorie.length > 0) {
+					this.$store.state.selectedCategorie = currentCategorie[0];
+                }
+				this.$store.state.selectedDefi = item;
 				this.$store.state.selectedCommune = this.$store.state.selectedEquipe.commune;
                 this.$navigateTo(affichageDefi);
 			},

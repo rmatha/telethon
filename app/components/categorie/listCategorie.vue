@@ -4,26 +4,28 @@
 			<Header dock="top" />
 			<Footer dock="bottom" />
 			<StackLayout dock="center" class="root" >
-				<StackLayout width="100%" height="100%">
-					<GridLayout rows="auto" columns="*,50,50">
-						<Label row="0" col="0" text="Liste des catégories" class="label"/>
-						<Image v-if="$store.state.updateCategorie" row="0" col="1" class="actionButton" src="~/assets/icons/upload.png" @tap=""/>
-						<Image row="0" col="2" src="~/assets/icons/add-256.gif" @tap="addCat()"/>
-						
-					</GridLayout>
-					<ListView for="item in $store.state.categories" height="100%" > 
-					  <v-template>
-						<GridLayout rows="*" columns="*" margin="0"  >
-							<Image :src="lienCat(item.nom)" height="25%" />
-							<GridLayout verticalAlignment="top" rows="auto,auto" columns="auto,*,auto" @tap="selectCategorie(item)">
-								<Label row="0" col="0" colspan="2" :text="item.nom" class="catTitle" />
-								<Label row="1" col="0" colspan="2" :text="nbDefis(item)" class="catNBDefis" />
-								
-							</GridLayout>
+				<ScrollView orientation="horizontal">
+					<StackLayout width="100%" height="100%">
+						<GridLayout rows="auto" columns="*,50,50">
+							<Label row="0" col="0" text="Liste des catégories" class="label"/>
+							<Image v-if="$store.state.updateCategorie" row="0" col="1" class="actionButton" src="~/assets/icons/upload.png" @tap=""/>
+							<Image row="0" col="2" src="~/assets/icons/add-256.gif" @tap="addCat()"/>
+							
 						</GridLayout>
-					  </v-template>
-					</ListView>
-				</StackLayout>
+						<ListView for="item in $store.state.categories" height="100%" > 
+						  <v-template>
+							<GridLayout rows="*" columns="*" margin="0"  @tap="selectCategorie(item)">
+								<Image :src="lienCat(item.nom)" height="25%" />
+								<GridLayout verticalAlignment="top" rows="auto,auto" columns="auto,*,auto" >
+									<Label row="0" col="0" colspan="2" :text="item.nom" class="catTitle" />
+									<Label row="1" col="0" colspan="2" :text="nbDefis(item)" class="catNBDefis" />
+									
+								</GridLayout>
+							</GridLayout>
+						  </v-template>
+						</ListView>
+					</StackLayout>
+				</ScrollView>
 			</StackLayout>
 		</DockLayout>
 	</page>
@@ -58,9 +60,7 @@
             }
         },
 		mounted() {
-			console.log("chargment de la base Categorie");
-			this.$store.dispatch("queryCategorie");
-            console.log("chargement dans la variable");
+			
         },
 		methods: {
 			showActions(itemRef) {
@@ -80,8 +80,8 @@
 				console.log("listCategorie itemRef:"+JSON.stringify(itemRef));
 				
 				var nbDefisCat = this.$store.state.defis.filter(item => {
-					console.log("listCategorie : "+item.categorie +" : "+itemRef.id); 
-					return item.categorie == itemRef.id;
+					console.log("listCategorie : "+item.categorie.nom +" : "+itemRef.nom); 
+					return item.categorie.nom == itemRef.nom;
 				});
 				return "Nombre de défis : "+nbDefisCat.length;
 			},

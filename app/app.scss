@@ -8,6 +8,20 @@
 // Import common styles
 @import 'app-common';
 
+.textfield {
+	background-color: #ffffff;
+	height: 50;
+	text-decoration: none;
+	border-radius: 18px;
+}
+
+.textView {
+	background-color: #ffffff;
+	height: 200;
+	text-decoration: none;
+	border-radius: 18px;
+}
+
 .mb50 {
 	margin-bottom : 50px;
 }
@@ -157,6 +171,8 @@
 	color : black;
 	text-decoration: underline;
 	margin-left : 20px;
+	margin-bottom : 10px;
+	margin-top : 30px;
 }
 
 .valeur {

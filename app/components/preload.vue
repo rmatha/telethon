@@ -9,6 +9,10 @@
 				<Button v-if="$store.state.debug" text="reload equipes" @tap="reloadEquipes" />
 				<Button v-if="$store.state.debug" text="reload catégories" @tap="reloadCategories" />
 				<Button v-if="$store.state.debug" text="reload defis" @tap="reloadDefis" />
+				<Button v-if="$store.state.debug" text="resetAll" @tap="resetAll" />
+				<Button v-if="$store.state.debug" text="resetScoreEquipe" @tap="resetScoreEquipe" />
+				<Button text="mode debug" @tap="setDebug" />
+				
 			</StackLayout>
 			<StackLayout dock="center" class="preload" >
 				<GridLayout rows="40" columns="*">
@@ -31,6 +35,8 @@
 	const connectivity = require("connectivity");
 	import axios from 'axios';
 	import accueil from './accueil';
+	import * as ApplicationSettings from "application-settings";
+
 	
     export default {
 		data() {
@@ -39,46 +45,42 @@
 				messages : [],
 				connexion : false,
 				go : false,
+				equipesAll : [],
             };
         },
 		mounted() {
 			// vérification de la connectivité
-			this.messages.push("Vérification de l'accès à internet");
+			this.messages.push("Vérification de l'accès à  internet");
 			const connectionType = connectivity.getConnectionType();
 			if (connectionType !== connectivity.connectionType.none) {
+					this.messages.push("Accès internet validé");
+					this.reloadEquipes();
+					this.reloadCategories();	
+					this.reloadDefis();
+					
+					
+					let message = this.$store.state.selectedEquipe ? this.$store.state.selectedEquipe.nom : "Pas d'équipe sélectionnée";
+					
+					console.log("équipe en cours : "+message);
+					this.messages.push("équipe en cours : "+message);
+
 				
-				this.reloadCategories();
-				this.reloadDefis();
-				this.reloadEquipes();
 				
-				this.messages.push("Chargement de l'équipe en cours");
-				this.$store.dispatch("queryCurrentEquipe").then(() => {
-					console.log("équipe en cours : "+JSON.stringify(this.$store.state.selectedEquipe));
-					this.messages.push("équipe en cours : "+this.$store.state.selectedEquipe.nom);
-					// si pas d'équipe, on ne charge pas la suite !
-					if (this.$store.state.selectedEquipe.length > 0) {
-						// chargement des participants 
-						this.$store.dispatch("queryParticipants").then(() => {
-							console.log("preload : chargement Participants OK");
-							// chargement des defis de la commune
-							
-							// chargement des defis de l'équipe
-							this.$store.dispatch("queryNosDefis").then(() => {
-								console.log("preload : chargement mes defis OK");
-								// chargement des defis de l'équipe
-								this.$store.dispatch("queryDefisCurrentCommune").then(() => {
-									console.log("preload : chargement des defis OK");
-									
-									
-								});
-							});						
-						});
-					};
+				
+			}
+			else {
+				this.messages.push("Pas de connexion internet !");
+				this.$store.commit("load").then ( () => {
+					this.messages.push("Chargement de l'équipe en cours sans réseau");
+					let message = this.$store.state.selectedEquipe ? this.$store.state.selectedEquipe.nom : "Pas d'équipe sélectionnée";
+					console.log("équipe en cours : "+message);
+					this.messages.push("équipe en cours : "+message);
 				});
-				console.log("fin de chargement de l'equipe en cours !");
+				
 			}
 			this.chargement = false;
 			console.log("équipe en cours root: "+JSON.stringify(this.$store.state.selectedEquipe));
+
 		},
         computed: {
 			currentEquipe() {
@@ -100,78 +102,87 @@
 			reloadCategories() {
 				this.messages.push("Vérification des catégories");
 				//récuperation du numero de version locale pour les categories
-				this.$store.dispatch("queryCategorieVersion").then(() => {
-					// révupération de la version des catégories sur le serveur 
-					axios
-					.get('https://telethon.citeyen.com/public/api/categories/version')
-					.then(response => {
-						if (response.data.version > this.$store.state.versionCategorie) {
-							// mise a jour de la table de categories
-							this.messages.push("MAJ des catégories à partir du serveur");
-							axios
-							  .get('https://telethon.citeyen.com/public/api/categories/list')
-							  .then(responseList => {
-								this.$store.dispatch("reloadCategories",{data : responseList.data,version : response.data.version});
-							  });
-						}else {
-							this.messages.push("Catégories à jour");
-						}
-					})
-				});
+				// révupération de la version des catégories sur le serveur 
+				axios
+				.get('https://telethon.citeyen.com/public/api/categories/version')
+				.then(response => {
+					if (response.data.version > this.$store.state.versionCategorie) {
+						// mise a jour de la table de categories
+						this.messages.push("MAJ des catégories à partir du serveur");
+						axios
+						  .get('https://telethon.citeyen.com/public/api/categories/list')
+						  .then(responseList => {
+							this.$store.dispatch("reloadCategories",{"categories" : responseList.data,"version" : response.data.version});
+						  });
+					}else {
+						this.messages.push("Catégories à jour");
+					}
+				})
 			},
 			reloadDefis() {
 				this.messages.push("Vérification des Défis");
-				this.$store.dispatch("queryDefiVersion").then(() => {
-					console.log("Version defi locale : "+this.$store.state.versionDefi);
-					// révupération de la version des catégories sur le serveur 
-					axios
-					.get('https://telethon.citeyen.com/public/api/defis/version')
-					.then(response => {
-						var versionServeur = response.data.version
-						console.log("Version defi serveur :"+versionServeur); 
-						if (response.data.version > this.$store.state.versionDefi) {
-							// mise a jour de la table de categories
-							console.log("MAJ des défis à partir du serveur");
-							this.messages.push("MAJ des défis à partir du serveur");
-							axios
-							  .get('https://telethon.citeyen.com/public/api/defis/list')
-							  .then(responseList => {
-								console.log("Chargement des  defis en base : "+JSON.stringify(responseList.data));
-								this.$store.dispatch("reloadDefis",{data : responseList.data,version : versionServeur});
-							  });
-						}else {
-							this.messages.push("Defis à jour");
-						}
-					})
-				});
+				// on commence par charger les defis dans le store pour voir s'ils n'ont pas été effacé
+				console.log("Nombre de défis récupérés de la base : "+this.$store.state.defis.length);
+				console.log("Version defi locale : "+this.$store.state.versionDefi);
+				// révupération de la version des catégories sur le serveur 
+				axios
+				.get('https://telethon.citeyen.com/public/api/defis/version')
+				.then(response => {
+					var versionServeur = response.data.version
+					console.log("Version defi serveur :"+versionServeur); 
+					if ((response.data.version > this.$store.state.versionDefi) || (this.$store.state.defis.length == 0)) {
+						// mise a jour de la table de categories
+						console.log("MAJ des défis à partir du serveur");
+						this.messages.push("MAJ des défis à partir du serveur :");
+						axios
+						  .get('https://telethon.citeyen.com/public/api/defis/list')
+						  .then(responseList => {
+							console.log("Chargement des  defis en base : "+JSON.stringify(responseList.data));
+							this.$store.dispatch("reloadDefis",{"defis" : responseList.data,"version" : versionServeur});
+						  });
+					}else {
+						this.messages.push("Defis à jour");
+					}
+				})
 			},
 			reloadEquipes() {
 				this.messages.push("Vérification des équipes");
-				this.$store.dispatch("queryEquipeVersion").then(() => {
-					console.log("Version equipe locale : "+this.$store.state.versionEquipe);
-					// révupération de la version des catégories sur le serveur 
-					axios
-					.get('https://telethon.citeyen.com/public/api/equipes/version')
-					.then(response => {
-						console.log("Version equipe serveur :"+response.data.version); 
-						if (response.data.version > this.$store.state.versionEquipe) {
-							// mise a jour de la table de categories
-							console.log("MAJ des equipes à partir du serveur");
-							this.messages.push("MAJ des équipes à partir du serveur");
-							axios
-							  .get('https://telethon.citeyen.com/public/api/equipes/list')
-							  .then(responseList => {
-								console.log("Chargement des equipes en base : "+JSON.stringify(responseList.data));
-								this.$store.dispatch("reloadEquipes",{data : responseList.data,version : response.data.version});
-							  });
-						}else {
-							this.messages.push("Equipes à jour ");
-						}
-						this.go = true;
-					})
+				console.log("Version equipe locale : "+this.$store.state.versionEquipe);
+				// révupération de la version des catégories sur le serveur 
+				axios
+				.get('https://telethon.citeyen.com/public/api/equipes/version')
+				.then(response => {
+					console.log("Version equipe serveur :"+response.data.version); 
+					if (response.data.version > this.$store.state.versionEquipe) {
+						// mise a jour de la table de categories
+						console.log("MAJ des equipes à partir du serveur");
+						this.messages.push("MAJ des équipes à partir du serveur");
+						axios
+						  .get('https://telethon.citeyen.com/public/api/equipes/list')
+						  .then(responseList => {
+							console.log("Chargement des equipes en base : "+JSON.stringify(responseList.data));
+							this.$store.dispatch("reloadEquipes",{equipes : responseList.data,version : response.data.version});
+						  });
+					}else {
+						this.messages.push("Equipes  à jour ");
+					}
+					this.go = true;
 				});
+				if (this.$store.state.equipes) {
+					this.messages.push("Nombre d'équipe en base "+this.$store.state.equipes.length);
+				};
+			},
+			resetAll() {
+				this.$store.dispatch("resetAll");
+			},
+			resetScoreEquipe() {
+				this.$store.dispatch("resetScoreEquipe");
+			},
+			setDebug() {
+				this.$store.dispatch("setDebug");
 			},
 		}
+		
     };
 </script>
 <style>

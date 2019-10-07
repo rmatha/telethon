@@ -9,11 +9,12 @@
 							<Image row="0" col="1" class="actionButton" src="~/assets/icons/delete.png" @tap="deleteProfil"/>
 							<Image row="0" col="2" class="actionButton" src="~/assets/icons/save.png" @tap="save"/>
 						</GridLayout>
-					<FloatLabel placeholder="Pseudo" label="Pseudo" :valeur="myFirstname" @updateValeur="updateNom"/>
-					<GridLayout rows="30, auto" marginBottom="5">
-						<Label ref="labelVille" row="0" text="Ville d'habitation" class="label" />
-						<TextField ref="textFieldVille" row="1" borderBottomColor="#fff" marginLeft="10" borderBottomWidth="3" @textChange="onTextChange" />
-					</GridLayout>
+					<StackLayout>
+						<Label class="label" ref="label" text="Pseudo" />
+						<TextField class="textfield" hint="Pseudo" v-model="input.nom"/>
+						<Label ref="labelVille" text="Ville d'habitation" class="label" />
+						<TextField class="textfield" ref="textFieldVille" v-model="input.commune" @textChange="onTextChange" />
+					</StackLayout>
 					<ScrollView v-if="affichageVilles" >
 						<StackLayout backgroundColor="#ffffff" >
 							<GridLayout v-for="ville in villes" rows="40" columns="*"  >
@@ -21,7 +22,6 @@
 							</GridLayout>
 						</StackLayout>
 					</ScrollView>
-					<FloatLabel placeholder="Téléphone" label="telephone" :valeur="myTelephone" @updateValeur="updateTelephone"/>
 					
 					
 				</StackLayout>
@@ -52,10 +52,22 @@
                 .then(data => {
                     this.villesRef = data;
                     console.log("nom de la premiere ville : " + data[0].nom);
-                    console.log("Nombre de villes : " + this.villes.length);
+                    //console.log("Nombre de villes : " + this.villes.length);
                 }
 			);
-			this.load();
+			console.log("Participant en cours : "+JSON.stringify(this.$store.state.selectedParticipant));
+			if (this.$store.state.selectedParticipant != null) {
+				this.input.nom = this.$store.state.selectedParticipant.nom;
+				this.input.ville = this.$store.state.selectedParticipant.commune;
+				let textField = this.$refs.textFieldVille.nativeView;
+                textField.text = this.input.ville;
+				
+				console.log("R2cupération des informations du participant");
+			}
+			else {
+				console.log("nouveau participant");
+			}
+			console.log("Equipe en cours : "+this.$store.state.selectedEquipe.nom);
 			
 			
         },
@@ -77,11 +89,8 @@
 		data() {
             return {
                 input: {
-					id : -1,
-                    firstname: "",
-                    lastname: "",
-					telephone: "",
-					equipe: "",
+					nom: "",
+					commune : "",
 				},
 				villesRef: [],
                 villes: [],
@@ -90,51 +99,91 @@
         },
 		
         methods: {
-			updateTelephone(telephone) {
-				this.input.telephone = telephone;
-			},
-			updateNom(nom) {
-				this.input.firstname = nom;
-			},
-			updatePrenom(prenom) {
-				this.input.lastname = prenom;
-			},
 			save() {
-				console.log("sauvegarde des informations : "+this.input.id+" : "+this.input.firstname);
-			    console.log("sauvegarde des informations : "+this.input.lastname+" : "+this.input.equipe);
-			    this.$store.dispatch("insertParticipant", this.input);
-				this.updateEquipe = true;
-				this.$navigateTo(equipe);
-            },
-            load() {
-				if (this.participant != null) {
-					this.input = this.participant;
-					console.log("R2cupération des informations du participant");
+				var doublon = false;
+				if (this.input.nom.length > 0) {
+					// on verifie si on a un selectedParticipant
+					if (this.$store.state.selectedParticipant) {
+						// si le nom a changé, on vérifie si le nom n'existe pas déjà dans l'équipe
+						if (this.$store.state.selectedParticipant.nom != this.input.nom) {
+							var doublon = this.$store.state.participants.filter(item => {
+								return item.nom == this.input.nom;
+							});
+							console.log("PROFIL :SAVE: doublon size : "+doublon.length);
+							if (doublon.length > 0) {
+								// le nom existe dajà donc on refuse 
+								alert({
+								  title: "Saisie incorrecte",
+								  message: "Cette personne existe déjà dans l'équipe",
+								  okButtonText: "OK"
+								});
+							}
+							else {
+								// on applique les modifs sur la paersonne selectionnée
+								this.$store.dispatch("updateParticipant", {"participant" : this.input});
+								this.$store.state.updateEquipe = true;
+								this.$navigateTo(equipe);
+							}
+						}
+						else {
+							// on update le participant
+							this.$store.dispatch("updateParticipant", {"participant" : this.input});
+							this.$store.state.updateEquipe = true;
+							this.$navigateTo(equipe);
+						}
+					}
+					else {
+						// on ajoute un nouveau participant si n'existe pas déjà dans la liste des participants
+						console.log("PROFIL : SAVE : on fait une MAJ du participant");
+						this.$store.state.participants.forEach (participant => {
+							if (participant.nom == this.input.nom) {
+								doublon = true;
+							}						
+						});
+						if (!doublon) {
+							console.log("PROFIL : SAVE : on ajoute le participant:  : "+JSON.stringify(this.input));
+							this.$store.dispatch("addParticipant", {"participant" : this.input});
+							this.$store.state.updateEquipe = true;
+							this.$navigateTo(equipe);
+						}
+						else {
+							alert({
+							  title: "Saisie incorrecte",
+							  message: "Cette personne existe déjà dans l'équipe",
+							  okButtonText: "OK"
+							})
+						}
+					}
 				}
-				
-				console.log("Equipe en cours : "+this.$store.state.selectedEquipe.nom);
-				
+				else {
+					alert({
+						  title: "Saisie incorrecte",
+						  message: "Le nom de la personne est obligatoire",
+						  okButtonText: "OK"
+					})
+				}
             },
 			deleteProfil() {
 				// affichage du modal de confirmation
-				this.$showModal(modal, { fullscreen: true, props: { textModal: "Voulez-vous supprimer le participant "+this.input.firstname+" ?" }}).then( data => {
-					console.log(data);
-					if (data) {
-						console.log("on supprime !");
-						this.$store.dispatch("deleteParticipant", this.input);
-						this.updateEquipe = true;
-						this.$navigateTo(equipe);
-					}
-					else {
-						console.log("pas touche !");
-					}
+				confirm({
+				  title: "Confirmation de suppression",
+				  message: "Voulez-vous supprimer le participant : "+this.$store.state.selectedParticipant.nom,
+				  okButtonText: "oui",
+				  cancelButtonText: "non"
+				}).then(() => {
+					console.log("on supprime !");
+					this.$store.dispatch("deleteParticipant", {"participant" : this.input});
+					this.updateEquipe = true;
+					this.$navigateTo(equipe);
 				});
+					
 			},
 			selectVille(nom,code) {
 				console.log("Sélection de la ville");
 				console.log(nom);
 				let textField = this.$refs.textFieldVille.nativeView;
                 textField.text = nom;
+				this.input.commune = nom;
 				this.affichageVilles = false;
 
 				
@@ -147,7 +196,7 @@
 				this.villes = this.villesRef.filter(ville => {
 					return ville.nom.toLowerCase().indexOf(textField.text.toLowerCase()) > -1
 				})
-				if (textField.text.length > 2) {
+				if (textField.text) {
 					this.affichageVilles = true;
 				}
 				else {
