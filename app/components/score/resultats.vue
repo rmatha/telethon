@@ -69,37 +69,37 @@
 				this.moyenneProfil = [];
 				this.moyenneDefi = [];
 				// récupération des scores de l'équipe 
-				console.log("Contenu des scores : "+JSON.stringify(this.$store.state.scoresEquipe));
-				console.log("Contenu des scores : "+this.$store.state.scoresEquipe.length);
-				if (this.$store.state.scoresEquipe.length == 0) {
+				console.log("Contenu des scores : "+JSON.stringify(this.$store.state.selectedEquipe.scores));
+				console.log("Contenu des scores : "+this.$store.state.selectedEquipe.scores.length);
+				if (this.$store.state.selectedEquipe.scores.length == 0) {
 					console.log("pas de score");
 					this.moyenne = "Pas de score !";
 				}
 				else {
-					console.log("Calcul de la moyenne : "+JSON.stringify(this.$store.state.scoresEquipe));
-					this.moyenne = _.meanBy(this.$store.state.scoresEquipe, 'note');
+					console.log("Calcul de la moyenne : "+JSON.stringify(this.$store.state.selectedEquipe.scores));
+					this.moyenne = _.round(_.meanBy(this.$store.state.selectedEquipe.scores, 'score'),2);
 				}
 				// calcul des moyennes par défi
-				var scoreByDefi = _.groupBy(this.$store.state.scoresEquipe,"defi.nom");
+				var scoreByDefi = _.groupBy(this.$store.state.selectedEquipe.scores,"defi.nom");
 				console.log(JSON.stringify(scoreByDefi));
 				console.log("--------------------------");
 				_.forEach(scoreByDefi, function(scoreTemp,nomDefi) {
 					console.log("RESULTAT : scoreByDefi : "+JSON.stringify(scoreTemp));
 					console.log("RESULTAT : nomDefi : "+nomDefi);
-					var scores = _.map(scoreTemp,"note");
-					var moyenneTemp = _.meanBy(scoreTemp, 'note');
+					var scores = _.round(_.map(scoreTemp,"score"),2);
+					var moyenneTemp = _.round(_.meanBy(scoreTemp, 'score'),2);
 					// récupération du nom du défi 
 					this.moyenneDefi.push({ nomDefi: nomDefi, moyenne : moyenneTemp});
 				}.bind(this));
 				// calcul des moyennes par participant
-				var scoreByPart = _.groupBy(this.$store.state.scoresEquipe,"participant.nom");
+				var scoreByPart = _.groupBy(this.$store.state.selectedEquipe.scores,"participant.nom");
 				console.log(JSON.stringify(scoreByPart));
 				console.log("--------------------------");
 				_.forEach(scoreByPart, function(scoreTemp,participant) {
 					console.log("participant : "+participant.nom+" enregistrements : "+JSON.stringify(scoreTemp));
-					var scores = _.map(scoreTemp,"note");
+					var scores = _.round(_.map(scoreTemp,"score"),2);
 					console.log("scores : "+JSON.stringify(scores));
-					var moyenneTemp = _.meanBy(scoreTemp, 'note');
+					var moyenneTemp = _.round(_.meanBy(scoreTemp, 'score'),2);
 					console.log("moyenne : "+moyenneTemp);
 					this.moyenneProfil.push({ nomProfil:participant, moyenne : moyenneTemp});
 				}.bind(this));

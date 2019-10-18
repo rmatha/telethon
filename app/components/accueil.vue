@@ -64,18 +64,18 @@
         },
 		computed: {
 			moyenneEquipe() {
-				return "Moyenne de l'équipe : "+(this.$store.state.scoresEquipe.length > 0 ?	_.meanBy(this.$store.state.scoresEquipe, 'note') : "Pas de score enregistré"); 
+				return "Moyenne de l'équipe : "+(this.$store.state.selectedEquipe.scores.length > 0 ?	_.round(_.meanBy(this.$store.state.selectedEquipe.scores, 'score'),2) : "Pas de score enregistré"); 
 			},
 			nomEquipe() {
-				return "Nom de l'équipe: "+this.$store.state.selectedEquipe? this.$store.state.selectedEquipe.nom : "Pas d'équipe sélectionnée";
+				return "Nom de l'équipe: "+this.$store.state.selectedEquipe? "Equipe : "+this.$store.state.selectedEquipe.nom : "Pas d'équipe sélectionnée";
 			},
 			nbParticipantsEquipe() {
-				return "Nombre de particpants : "+this.$store.state.participants.length;
+				return "Nombre de particpants : "+this.$store.state.selectedEquipe ? this.$store.state.selectedEquipe.participants.length+" participants": "Pas de participants";
 			},
 			nbDefisEquipe() {
 				var messageDefi = "Pas de défis enregistrés pour l'équipe... Utilisez le bouton à droite pour gérer vos défis !";
-				if (this.$store.state.defisEquipe) {
-					messageDefi ="Nombre de défis pour l'équipe : "+this.$store.state.defisEquipe.length;
+				if (this.$store.state.selectedEquipe.defis_equipes) {
+					messageDefi ="Nombre de défis pour l'équipe : "+this.$store.state.selectedEquipe.defis_equipes.length;
 				}
 				return messageDefi;
 			},
@@ -95,7 +95,7 @@
 			console.log("ACCUEIL : STATE : "+JSON.stringify(this.$store.state));
 			console.log("ACCUEIL : STATE : equipe "+JSON.stringify(this.$store.state.equipes));
 			console.log("ACCUEIL : STATE : equipeVersion "+JSON.stringify(this.$store.state.versionEquipe));
-			console.log("ACCUEIL : STATE : scoresEquipe "+JSON.stringify(this.$store.state.scoresEquipe));
+			console.log("ACCUEIL : STATE : scoresEquipe "+JSON.stringify(this.$store.state.selectedEquipe.scores));
 			// chargement des données en fonction de l'équipe en cours
 			//this.$store.dispatch("queryDonnees", isEquipeSelected);
 			// vérification si une connexion est disponible

@@ -21,44 +21,52 @@ const store = new Vuex.Store({
 		versionCategorie : "0",
 		versionDefi : "0",
 		versionEquipe : "0",
+		versionDefisCommune : "0",
 		updateCategorie : false,
 		updateDefi : false,
 		updateEquipe : false,
 		selectedParticipant : null,
 		selectedCommune : null,
-		selectedCategorie : {},
+		selectedCategorie : null,
 		selectedDefi : null,
 		selectedScore : null,
 		selectedEquipe : null,
 		isAdmin : true,
 		isOrganisateur : true,
-		participants: [],
 		categories: [],
 		defis: [],
 		defisCommune: [],
 		defisEquipe: [],
-		scoresEquipe: [],
 		equipes : [],
-		scores : []
+		scores : [],
+		villes : []
     },
 	actions : {
 		init(state) {
-			console.log("TELESTORE : INIT : state : "+JSON.stringify(state));
-			console.log("TELESTORE : INIT : state : "+JSON.stringify(this.state));
-            if(ApplicationSettings.getString("store")) {
-                this.replaceState(
-                    Object.assign(this.state, JSON.parse(ApplicationSettings.getString("store")))
-                );
-            }
-			console.log("chargement du store terminé : "+JSON.stringify(this.state)); 
-			return true;
+			return new Promise((resolve, reject) => {
+				console.log("TELESTORE : INIT : state : "+JSON.stringify(state));
+				console.log("TELESTORE : INIT : state : "+JSON.stringify(this.state));
+				if(ApplicationSettings.getString("store")) {
+					this.replaceState(
+						Object.assign(this.state, JSON.parse(ApplicationSettings.getString("store")))
+					);
+					console.log("chargement du store terminé : "+JSON.stringify(this.state)); 
+					resolve()
+				}
+				else {
+					console.log("Pas de store dans les settigns");
+					reject();
+				
+				};
+			});
         },
         
         setSelectedEquipe(context,data) {
 			console.log("TELESTORE : setSelectedEquipe : data : "+JSON.stringify(data));
-			console.log("TELESTORE : setSelectedEquipe : state : "+JSON.stringify(this.state));
 			this.state.selectedEquipe = data.equipe;
+			this.state.updateEquipe;
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
+			console.log("TELESTORE : setSelectedEquipe : this.selectedEquipe : "+JSON.stringify(this.state.selectedEquipe));
 			
 		},
 		
@@ -96,16 +104,13 @@ const store = new Vuex.Store({
 		setVersionEquipe(state,data) {
 		    this.state.selectedEquipe.version = data.version;
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
-			console.log("TELESTORE : setParticipants : Version de l'équipe : "+this.state.selectedEquipe.version); 
+			console.log("TELESTORE : setVersionEquipe : Version de l'équipe : "+this.state.selectedEquipe.version); 
 		
 		},
 		
 		newEquipe(state,data) {
 			this.state.selectedEquipe = data.equipe;
 			this.state.equipes.push(data.equipe);
-			this.state.participants = [];
-			this.state.defisEquipe = [];
-			this.state.scoresEquipe = [];
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
 		
@@ -155,35 +160,35 @@ const store = new Vuex.Store({
 		**/
 		
 		addParticipant(state,data) {
-			this.state.participants.push(data.participant);
+			this.state.selectedEquipe.participants.push(data.participant);
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
 		
 		deleteParticipant(state,data) {
-			console.log("Nombre de particpants avant suppression : "+JSON.stringify(this.state.participants));
-			this.state.participants = this.state.participants.filter(item => {
+			console.log("Nombre de particpants avant suppression : "+JSON.stringify(this.state.selectedEquipe.participants));
+			this.state.selectedEquipe.participants = this.state.selectedEquipe.participants.filter(item => {
 					return item.nom !== data.participant.nom;
 				});
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
-			console.log("Nombre de particpants après suppression : "+JSON.stringify(this.state.participants));
+			console.log("Nombre de particpants après suppression : "+JSON.stringify(this.state.selectedEquipe.participants));
 		},
 		
 		setParticipants(state,data) {
 		    console.log("TELESTORE : setParticipants : Liste des particpants : "+JSON.stringify(data));
-			this.state.participants = data.participants;
+			this.state.selectedEquipe.participants = data.participants;
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
-			console.log("TELESTORE : setParticipants : Nombre de participants en base : "+this.state.participants.length); 
+			console.log("TELESTORE : setParticipants : Nombre de participants en base : "+this.state.selectedEquipe.participants.length); 
 		},
 	
 		updateParticipant(state,data) {
-			var indexParticipant = this.state.participants.findIndex(item => {
+			var indexParticipant = this.state.selectedEquipe.participants.findIndex(item => {
 					return item == this.state.selectedParticipant;
 				});
 			// mise a jour des informations
-			this.state.participants[indexParticipant].nom = data.participant.nom;
-			this.state.participants[indexParticipant].commune = data.participant.commune;
+			this.state.selectedEquipe.participants[indexParticipant].nom = data.participant.nom;
+			this.state.selectedEquipe.participants[indexParticipant].commune = data.participant.commune;
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
-			console.log("Nombre de particpants après suppression : "+JSON.stringify(this.state.participants));
+			console.log("Nombre de particpants après suppression : "+JSON.stringify(this.state.selectedEquipe.participants));
 		},
 		
 		setSelectedParticipant(state,data) {
@@ -193,28 +198,31 @@ const store = new Vuex.Store({
 		
 		insertScore(state,data) {
 			console.log("TELESTORE : insertScore : score en cours : "+JSON.stringify(data));
-			this.state.scoresEquipe.push(data.score);
+			this.state.selectedEquipe.scores.push(data.score);
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 			console.log("TELESTORE : insertScore : liste des scores : "+this.state.scoresEquipe.length); 
 		},
 		
 		updateScore(state,data) {
-			var indexScore = this.state.scoresEquipe.findIndex(item => {
+			var indexScore = this.state.selectedEquipe.scores.findIndex(item => {
 					return item == this.state.selectedScore;
 				});
 			// mise a jour des informations
-			this.state.scoresEquipe[indexScore] = data.score;
+			this.state.selectedEquipe.scores[indexScore] = data.score;
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
-			console.log("Nombre de particpants après suppression : "+JSON.stringify(this.state.participants));
+			console.log("TELESTORE : updateScore : Liste des scores après suppression : "+JSON.stringify(this.state.selectedEquipe.scores));
 		},
 		deleteScore(state,data) {
-			this.state.scoresEquipe = this.state.scoresEquipe.filter(score => {
+			this.state.selectedEquipe.scores = this.state.selectedEquipe.scores.filter(score => {
 				return score !== data.score;
 			});
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
 		
-		
+		recupereDefis(state) {
+			this.state.defisEquipe = this.state.defisCommune;
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+		},
 		
 		deleteDefi(state,data) {
 			console.log("Nombre de défis avant suppression : "+this.state.defis.length);
@@ -234,6 +242,22 @@ const store = new Vuex.Store({
 			console.log("Nombre de défis commune après suppression : "+this.state.defisCommune.length);
 		},
 		
+		reloadDefisCommune(state,data) {
+			console.log("TELESTORE : RELOADDEFISCOMMUNE : Chargement des defis pour la commune "+this.state.selectedEquipe.commune);
+			this.state.defisCommune = [];
+			console.log("TELESTORE : RELOADDEFISCOMMUNE : Liste des defis à charger : "+JSON.stringify(data.defis));
+			data.defis.forEach (idDefi => {
+				console.log("TELESTORE : RELOADDEFISCOMMUNE : traitement du defis : "+idDefi.id);
+				this.state.defisCommune.push(this.state.defis.filter( defi => {
+					return defi.id == idDefi.id;
+				})[0]);
+				
+			});
+			console.log("TELESTORE : RELOADDEFISCOMMUNE :  Defis de la commune  : "+JSON.stringify(this.state.defisCommune));
+			ApplicationSettings.setString("store", JSON.stringify(this.state));
+			
+			
+		},
 		deleteDefisEquipe(state,data) {
 			console.log("Nombre de défis equipe avant suppression : "+this.state.defisEquipe.length);
 			this.state.defisEquipe = this.state.defisEquipe.filter(item => {
@@ -278,7 +302,7 @@ const store = new Vuex.Store({
 		
 		resetScoreEquipe(state) {
 			console.log("TELESTORE : resetScoreEquipe ");
-			this.state.scoresEquipe = [];
+			this.state.selectedEquipe.scores = [];
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
 		

@@ -33,7 +33,7 @@
 										
 									</StackLayout>
 								</GridLayout>
-								<Label col="1" :text="score.note" class="defiTitle" />
+								<Label col="1" :text="score.score" class="defiTitle" />
 							</GridLayout>
 									
 						  </v-template>
@@ -81,11 +81,12 @@
         },
 		mounted() {
 			// chargement des scores pour le defi en cours
-			this.scoresCurrentDefi = this.$store.state.scoresEquipe.filter(score => {
-					console.log("AFFICHAGEDEFI : MOUNTED : score.defi : "+score.defi.nom+" : "+this.$store.state.selectedDefi.nom);
-					return score.defi.nom == this.$store.state.selectedDefi.nom;
-				});
-			console.log("AFFICHAGEDEFI : MOUNTED : Liste des scores pour le DEFI : "+JSON.stringify(this.scoresCurrentDefi));
+			this.scoresCurrentDefi = this.$store.state.selectedEquipe.scores.filter(scoreItem => {
+				console.log("AFFICHAGEDEFI : MOUNTED : "+JSON.stringify(scoreItem.defi.id)+" : "+JSON.stringify(this.$store.state.selectedDefi.id));
+				return scoreItem.defi.id == this.$store.state.selectedDefi.id;
+			});
+
+			console.log("AFFICHAGEDEFI : MOUNTED : Liste des scores pour le DEFI  : "+JSON.stringify(this.scoresCurrentDefi));
 			
         },
 		methods: {

@@ -8,11 +8,11 @@
 				<Label class="sousTitre" :text="defiNom" textWrap="true"/>
 				<GridLayout rows="auto,auto,auto" columns="*,*" > 
 					<Label row="0" col="0" class="label" text="Participant" verticalAlignment="center"/>
-					<ListPicker row="1" col="0" v-if="!$store.state.selectedScore" ref="profilEnCours" :items="$store.state.participants" textField="nom" />
+					<ListPicker row="1" col="0" v-if="!$store.state.selectedScore" ref="profilEnCours" :items="$store.state.selectedEquipe.participants" textField="nom" />
 					<Label row="1" col="0" v-else :text="participantNom" verticalAlignment="center" horizontalAlignment="center"/>
 					<Label row="0" col="1" class="label" text="Score"  verticalAlignment="center"/>
-					<ListPicker row="1" col="1" ref="scoreEnCours" :items="scoresRef" :selectedIndex="score.note" />
-					<Button row="2" col="0" v-if="$store.state.selectedScore" class="boutonAction" text="Supprimer" @tap="supprimerScore" />
+					<ListPicker row="1" col="1" ref="scoreEnCours" :items="scoresRef" :selectedIndex="score.score" />
+					<Button row="2" col="0" v-if="$store.state.selectedEquipe.scores" class="boutonAction" text="Supprimer" @tap="supprimerScore" />
 					<Button row="2" col="1" class="boutonAction" text="Enregistrer" @tap="saveScore" />
 				</GridLayout>
 			</StackLayout>
@@ -39,10 +39,9 @@
             return {
 				scoresRef: ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],
 				score : {
-					note : 10,
+					score : 10,
 					participant : null,
-					defi : null,
-					date : null,
+					defi : this.$store.state.selectedDefi,
 				},
             }
         },
@@ -50,12 +49,6 @@
 			if(this.$store.state.selectedScore) {
 					this.score =  this.$store.state.selectedScore;
 			} 
-			else {
-				this.score.note = 10;
-				this.score.participant = null;
-				this.score.defi = this.$store.state.selectedDefi;
-				this.score.date = Date.now();
-			}
 			
         },
 		methods: {
@@ -63,13 +56,13 @@
 				// recuperation du score 
 				let indexScore = this.$refs.scoreEnCours.nativeView;
 				// récupération de l'ID du profil
-				this.score.note = parseInt(this.scoresRef[indexScore.selectedIndex]);
+				this.score.score = parseInt(this.scoresRef[indexScore.selectedIndex]);
 				
 				
 				//recuperation du participant si necessaire
 				if (!this.score.participant) {
 					let indexProfil = this.$refs.profilEnCours.nativeView;
-					this.score.participant = this.$store.state.participants[indexProfil.selectedIndex];
+					this.score.participant = this.$store.state.selectedEquipe.participants[indexProfil.selectedIndex];
 				}
 				if (this.$store.state.selectedScore) {
 					console.log("ADDSCORE : SaveScore update :");

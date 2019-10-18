@@ -39,22 +39,12 @@
 
 	import equipe from "./equipe";
 	import modal from "../include/modal";
+	import villesRef from "@/assets/villes.json"
 
 
     export default {
         mounted() {
-			console.log("chargment de la base");
-            console.log("mounted Chargement des villes de Charente"); 
-            fetch(
-                    "https://geo.api.gouv.fr/departements/16/communes?fields=nom,code&format=json&geometry=centre"
-                )
-                .then(response => response.json())
-                .then(data => {
-                    this.villesRef = data;
-                    console.log("nom de la premiere ville : " + data[0].nom);
-                    //console.log("Nombre de villes : " + this.villes.length);
-                }
-			);
+			
 			console.log("Participant en cours : "+JSON.stringify(this.$store.state.selectedParticipant));
 			if (this.$store.state.selectedParticipant != null) {
 				this.input.nom = this.$store.state.selectedParticipant.nom;
@@ -92,7 +82,6 @@
 					nom: "",
 					commune : "",
 				},
-				villesRef: [],
                 villes: [],
                 affichageVilles: false
             };
@@ -106,7 +95,7 @@
 					if (this.$store.state.selectedParticipant) {
 						// si le nom a changé, on vérifie si le nom n'existe pas déjà dans l'équipe
 						if (this.$store.state.selectedParticipant.nom != this.input.nom) {
-							var doublon = this.$store.state.participants.filter(item => {
+							var doublon = this.$store.state.selectedEquipe.participants.filter(item => {
 								return item.nom == this.input.nom;
 							});
 							console.log("PROFIL :SAVE: doublon size : "+doublon.length);
@@ -134,12 +123,14 @@
 					}
 					else {
 						// on ajoute un nouveau participant si n'existe pas déjà dans la liste des participants
-						console.log("PROFIL : SAVE : on fait une MAJ du participant");
-						this.$store.state.participants.forEach (participant => {
-							if (participant.nom == this.input.nom) {
-								doublon = true;
-							}						
-						});
+						console.log("PROFIL : SAVE : on créé un participant");
+						if (this.$store.state.selectedEquipe.participants) {
+							this.$store.state.selectedEquipe.participants.forEach (participant => {
+								if (participant.nom == this.input.nom) {
+									doublon = true;
+								}						
+							});
+						};
 						if (!doublon) {
 							console.log("PROFIL : SAVE : on ajoute le participant:  : "+JSON.stringify(this.input));
 							this.$store.dispatch("addParticipant", {"participant" : this.input});
@@ -167,7 +158,7 @@
 				// affichage du modal de confirmation
 				confirm({
 				  title: "Confirmation de suppression",
-				  message: "Voulez-vous supprimer le participant : "+this.$store.state.selectedParticipant.nom,
+				  message: "Voulez-vous supprimer le participant : "+this.$store.state.selectedEquipe.selectedParticipant.nom,
 				  okButtonText: "oui",
 				  cancelButtonText: "non"
 				}).then(() => {
@@ -193,18 +184,16 @@
                 console.log("onTextChange saisie " + textField.text);
                 console.log("onTextChange label " + textField.name);
 				// filtre de la liste villes 
-				this.villes = this.villesRef.filter(ville => {
+				this.villes = villesRef.filter(ville => {
 					return ville.nom.toLowerCase().indexOf(textField.text.toLowerCase()) > -1
 				})
-				if (textField.text) {
+				if (textField.text.length > 2) {
 					this.affichageVilles = true;
 				}
 				else {
 					this.affichageVilles = false;
 				};
-                //ApplicationSettings.setString(textField.name, textField.text);
-                //this.firstTx = textField.text;
-            },
+			},
         }
     };
 </script>

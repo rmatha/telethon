@@ -11,11 +11,11 @@
 							<Image row="0" col="1" class="actionButton" src="~/assets/icons/upload.png"/>
 							<Image row="0" col="2" src="~/assets/icons/add-256.gif" @tap="affichageCat"/>
 						</GridLayout>
-						<ListView for="item in $store.state.defisEquipe" >
+						<ListView for="defiEquipe in $store.state.selectedEquipe.defis_equipes" >
 						  <v-template>
-							<GridLayout rows="auto,*" columns="*,50"  margin="0" @tap="getDefi(item)">
-								<Label col="0" raw="0" :text="item.categorie.nom +' : '+item.nom" class="defiTitle" />
-								<Label col="0" row="1" :text="item.description_courte" class="defiDescription" />
+							<GridLayout rows="auto,*" columns="*,50"  margin="0" @tap="getDefi(defiEquipe.defi)">
+								<Label col="0" raw="0" :text="defiEquipe.defi.categorie.nom +' : '+defiEquipe.defi.nom" class="defiTitle" />
+								<Label col="0" row="1" :text="defiEquipe.defi.description" class="defiDescription" />
 								<Image col="1" row="0" rowSpan="2" src="~/assets/icons/right.png" height="30px"/>
 							</GridLayout>
 						  </v-template>
@@ -34,7 +34,7 @@
 								<GridLayout col="0" verticalAlignment="bottom">
 									<StackLayout paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16">
 										<Label :text="item.categorie.nom+' : '+item.nom" class="defiTitle" />
-										<Label :text="item.description_courte" class="defiDescription" />
+										<Label :text="item.description" class="defiDescription" />
 									</StackLayout>
 								</GridLayout>
 								<Image col="1" src="~/assets/icons/right.png" height="30px"/>
@@ -83,7 +83,7 @@
 				}).then(result => {
 					// on poste les defi pour la commune sur le serveur 
 					axios
-						  .post('https://www.telethon.citeyen.com/public/api/defiCommune/upload', {
+						  .post('https://www.telethon.citeyen.com/public/api/defisCommune/upload', {
 							defis : this.$store.state.defisCommune,
 							commune : this.$store.state.selectedCommune,
 						  })
@@ -104,7 +104,7 @@
 					console.log("defis de la commune : "+this.$store.state.defisCommune);
 					if (this.$store.state.defisCommune.length > 0) {
 						console.log("R2cupération des défis OK");
-						this.$store.state.defisEquipe = this.$store.state.defisCommune;
+						this.$store.dispatch("recupereDefis");
 					}
 					else {
 						console.log("pas de défis pour la commune en cours");
@@ -130,7 +130,7 @@
                 this.$navigateTo(listeChallengesCat);
             },
 			affichageCatCommune() {
-				console.log("liste des challenges");
+				console.log("liste des defis commune");
 				this.$store.state.affichageDefiType = "commune";
 				this.$store.state.selectedCommune = this.$store.state.selectedEquipe.commune;
                 this.$navigateTo(listeChallengesCat);
@@ -149,7 +149,6 @@
                 this.$navigateTo(affichageDefi);
 			},
 			getDefiCommune(item) {
-				console.log("affichage du defi : "+item.nom + ": "+item.id);
 				console.log("MESDEFIS : GETDEFICOMMUNE : affichage du defi : "+JSON.stringify(item));
 				var currentCategorie = this.$store.state.categories.filter(function(categorie) {
 					return categorie.nom == item.categorie.nom;
@@ -164,9 +163,9 @@
 			},
 			
 			getDefiNom(idDefi) {
-				var currentDefi = this.$store.state.defis.filter(function(elem) {
-					console.log(idDefi+ "---" + elem.id); 
-					if (idDefi == elem.id) return elem.nom;
+				var currentDefi = this.$store.state.defis.filter(defi => {
+					console.log(idDefi+ "---" + defi.id); 
+					if (idDefi == defi.id) return defi.nom;
 				});
 				if(currentDefi.length > 0) {
 					return currentDefi[0].Value;

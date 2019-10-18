@@ -64,13 +64,7 @@
 			// recueration du defi s"il existe 
 			if (this.$store.state.selectedDefi) {
 				console.log("editDefi : mounted : on récupère le defi en cours :"+this.$store.state.selectedDefi.categorie);
-				this.defi.id = this.$store.state.selectedDefi.id;
-				this.defi.nom = this.$store.state.selectedDefi.nom;
-				this.defi.description_courte = this.$store.state.selectedDefi.description_courte;
-				this.defi.description_longue = this.$store.state.selectedDefi.description_longue;
-				this.defi.reglementation = this.$store.state.selectedDefi.reglementation;
-				this.defi.bareme = this.$store.state.selectedDefi.bareme;
-				this.defi.deleted = this.$store.state.selectedDefi.deleted;
+				this.defi = this.$store.state.selectedDefi;
 				
 				// recuperation du nom de la categorie pour le defi sélectionné
 				if (!this.$store.state.selectedCategorie) {
