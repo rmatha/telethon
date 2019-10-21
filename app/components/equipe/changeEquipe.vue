@@ -17,7 +17,7 @@
 						<TextField class="textfield" hint="Ex : the killers..." v-model="input.nom"/>
 						<Label ref="labelVille" class="label" text="Ville du challenge Téléthon"  />
 						<TextField class="textfield" ref="textFieldVille" @textChange="onTextChange" v-model="input.commune"/>
-						<ScrollView v-if="affichageVilles" >
+						<ScrollView v-if="affichageVilles" height="500">
 							<StackLayout backgroundColor="#3c495e" >
 								<GridLayout v-for="ville in villes" rows="40" columns="*"  >
 									<Label :text="ville.nom" @tap="selectVille(ville.nom,ville.code)" class="labelVille"/>
@@ -44,7 +44,7 @@
 							<TextField ref="textFieldVille" row="1" borderBottomColor="#fff" padding="0"
 						borderBottomWidth="3" @textChange="onTextChange" v-model="input.commune"/>
 						</GridLayout>
-						<ScrollView v-if="affichageVilles" >
+						<ScrollView v-if="affichageVilles" height="500">
 							<StackLayout >
 								<GridLayout v-for="ville in villes" rows="40" columns="*"  >
 									<Label :text="ville.nom" @tap="selectVille(ville.nom,ville.code)" class="labelVille"/>

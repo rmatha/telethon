@@ -36,7 +36,7 @@ const store = new Vuex.Store({
 		categories: [],
 		defis: [],
 		defisCommune: [],
-		defisEquipe: [],
+		defis_equipes: [],
 		equipes : [],
 		scores : [],
 		villes : []
@@ -44,7 +44,6 @@ const store = new Vuex.Store({
 	actions : {
 		init(state) {
 			return new Promise((resolve, reject) => {
-				console.log("TELESTORE : INIT : state : "+JSON.stringify(state));
 				console.log("TELESTORE : INIT : state : "+JSON.stringify(this.state));
 				if(ApplicationSettings.getString("store")) {
 					this.replaceState(
@@ -160,6 +159,9 @@ const store = new Vuex.Store({
 		**/
 		
 		addParticipant(state,data) {
+			if (!this.state.selectedEquipe.participants) {
+				this.state.selectedEquipe.participants = [];
+			}
 			this.state.selectedEquipe.participants.push(data.participant);
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
@@ -220,7 +222,7 @@ const store = new Vuex.Store({
 		},
 		
 		recupereDefis(state) {
-			this.state.defisEquipe = this.state.defisCommune;
+			this.state.selectedEquipe.defis_equipes = this.state.defisCommune;
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
 		
@@ -253,18 +255,17 @@ const store = new Vuex.Store({
 				})[0]);
 				
 			});
-			console.log("TELESTORE : RELOADDEFISCOMMUNE :  Defis de la commune  : "+JSON.stringify(this.state.defisCommune));
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 			
 			
 		},
 		deleteDefisEquipe(state,data) {
-			console.log("Nombre de défis equipe avant suppression : "+this.state.defisEquipe.length);
-			this.state.defisEquipe = this.state.defisEquipe.filter(item => {
+			console.log("Nombre de défis equipe avant suppression : "+this.state.selectedEquipe.defis_equipes.length);
+			this.state.selectedEquipe.defis_equipes = this.state.selectedEquipe.defis_equipes.filter(item => {
 				return item !== data.defi;
 			});
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
-			console.log("Nombre de défis equipe après suppression : "+this.state.defisEquipe.length);
+			console.log("Nombre de défis equipe après suppression : "+this.state.selectedEquipe.defis_equipes.length);
 		},
 		
 		insertDefisCurrentCommune(state,data) {
@@ -273,7 +274,7 @@ const store = new Vuex.Store({
 		},
 		
 		insertDefisEquipe(state,data) {
-			this.state.defisEquipe.push(data.defi);
+			this.state.selectedEquipe.defis_equipes.push(data.defi);
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
 		

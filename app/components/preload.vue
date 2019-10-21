@@ -253,7 +253,7 @@
 				.get('https://telethon.citeyen.com/public/api/equipes/info', {params : params})
 				.then(response => {
 					// si la version du serveur plus récente, on récupère 
-					console.log("version de l'équipe en cours local : "+this.$store.state.selectedEquipe.version);
+					console.log("version de l'équipe  en cours local : "+this.$store.state.selectedEquipe.version);
 					console.log("version de l'équipe en cours serveur  : "+JSON.stringify(response.data.version));
 					//if (response.data.version > this.$store.state.selectedEquipe.version) {
 					if (response.data) {

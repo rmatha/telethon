@@ -11,15 +11,18 @@
 							<Image row="0" col="1" class="actionButton" src="~/assets/icons/delete.png" @tap="deleteDefi"/>
 							<Image row="0" col="2" class="actionButton" src="~/assets/icons/modify.png" @tap="modifyDefi"/>
 						</GridLayout>
-						
-						<Label class="label" text="Description Courte :"  />
-						<Label :text="$store.state.selectedDefi ? $store.state.selectedDefi.description_courte : 'Non renseigné'" class="defiDesc"/>
-						<Label class="label" text="Description Longue :"  />
-						<Label :text="$store.state.selectedDefi ? $store.state.selectedDefi.description_longue : 'Non renseigné'" class="defiDesc"/>
-						<Label class="label" text="Règlement :"  />
-						<Label :text="$store.state.selectedDefi ? $store.state.selectedDefi.reglementation : 'Non renseigné'" class="defiDesc"/>
-						<Label class="label" text="Barême :"  />
-						<Label :text="$store.state.selectedDefi ? $store.state.selectedDefi.bareme : 'Non renseigné'" class="defiDesc"/>
+						<Button class="boutonAction" v-if="detail" text="Afficher les détails du défi" @tap="changeDetailState"/>
+						<Button class="boutonAction" v-else text="Cacher les détails du défi" @tap="changeDetailState"/>
+						<StackLayout v-if="detail">
+							<Label class="label" text="Description Courte :"  />
+							<Label :text="$store.state.selectedDefi ? $store.state.selectedDefi.description_courte : 'Non renseigné'" class="defiDesc"/>
+							<Label class="label" text="Description Longue :"  />
+							<Label :text="$store.state.selectedDefi ? $store.state.selectedDefi.description_longue : 'Non renseigné'" class="defiDesc"/>
+							<Label class="label" text="Règlement :"  />
+							<Label :text="$store.state.selectedDefi ? $store.state.selectedDefi.reglementation : 'Non renseigné'" class="defiDesc"/>
+							<Label class="label" text="Barême :"  />
+							<Label :text="$store.state.selectedDefi ? $store.state.selectedDefi.bareme : 'Non renseigné'" class="defiDesc"/>
+						</StackLayout>
 						<GridLayout v-if="$store.state.selectedEquipe" rows="auto" columns="*,50" >
 							<Label row="0" col="0" class="label m-b-20" text="Liste des scores :" textWrap="true" />
 							<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="addScore"/>
@@ -77,6 +80,7 @@
         data() {
             return {
 				scoresCurrentDefi : [],
+				detail : false,
 			}
         },
 		mounted() {
@@ -90,6 +94,9 @@
 			
         },
 		methods: {
+			changeDetailState() {
+				this.detail = !this.detail;
+			},
 			getProfilNom(item) {
 				let profilEnCours = this.$store.state.participants.find(e => e.nom == item.participantNom);
 				return profilEnCours.nom;
@@ -120,15 +127,12 @@
 					console.log("AFFICHAGEDEFI : DefiPrensent : terminée");
 				}
 				else {
-					if (this.$store.state.selectedEquipe) {
+					if (this.$store.state.selectedEquipe.defis_equipes) {
 						console.log("on passe par defisEquipe");
-						filterDefi = this.$store.state.defisEquipe.filter(defi => {
+						filterDefi = this.$store.state.selectedEquipe.defis_equipes.filter(defi => {
 							console.log("AFFICHAGEDEFI : DefiPrensent : elem : "+JSON.stringify(defi));
 							return defi == this.$store.state.selectedDefi;
 						});
-					}
-					else {
-						
 					}
 				}
 				if (filterDefi.length > 0) {

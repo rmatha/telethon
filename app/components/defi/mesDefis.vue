@@ -13,22 +13,22 @@
 						</GridLayout>
 						<ListView for="defiEquipe in $store.state.selectedEquipe.defis_equipes" >
 						  <v-template>
-							<GridLayout rows="auto,*" columns="*,50"  margin="0" @tap="getDefi(defiEquipe.defi)">
-								<Label col="0" raw="0" :text="defiEquipe.defi.categorie.nom +' : '+defiEquipe.defi.nom" class="defiTitle" />
-								<Label col="0" row="1" :text="defiEquipe.defi.description" class="defiDescription" />
+							<GridLayout rows="auto,*" columns="*,50"  margin="0" @tap="getDefi(defiEquipe)">
+								<Label col="0" raw="0" :text="defiEquipe.categorie.nom +' : '+defiEquipe.nom" class="defiTitle" />
+								<Label col="0" row="1" :text="defiEquipe.description" class="defiDescription" />
 								<Image col="1" row="0" rowSpan="2" src="~/assets/icons/right.png" height="30px"/>
 							</GridLayout>
 						  </v-template>
 						</ListView>
 						
 						<button class="boutonAction recup" text="Récupérer les défis de ma ville" @tap="recupereDefis" />
-						<GridLayout rows="auto" columns="*,50,50">
+						<GridLayout v-if="isCoordinateurOrOrganisateur" rows="auto" columns="*,50,50">
 							<Label row="0" col="0" class="m-b-20 titreTelethon" :text="sousTitreCommune" textWrap="true" />
 							<Image row="0" col="1" class="actionButton" src="~/assets/icons/upload.png" @tap="uploadDefisCommune"/>
 							<Image row="0" col="2" src="~/assets/icons/add-256.gif" @tap="affichageCatCommune"/> 
 						</GridLayout>
 									
-						<ListView for="item in $store.state.defisCommune" >
+						<ListView v-if="isCoordinateurOrOrganisateur" for="item in $store.state.defisCommune" >
 						  <v-template>
 							<GridLayout rows="*" columns="*,50"  margin="0" @tap="getDefiCommune(item)">
 								<GridLayout col="0" verticalAlignment="bottom">
@@ -41,6 +41,9 @@
 							</GridLayout>
 						  </v-template>
 						</ListView> 
+						<StackLayout v-else>
+							<Label :text="nbDefiCommune" class="defiTitle"/>
+						</StackLayout>
 					</StackLayout>
 				</ScrollView>
 			</StackLayout>
@@ -59,8 +62,7 @@
 	export default {
 		
 		mounted() {
-			console.log("mesDefis : mounted : mesDefis "+JSON.stringify(this.$store.state.defisEquipe));
-			console.log("mesDefis : mounted : defisCommune "+JSON.stringify(this.$store.state.defisCommune));
+			console.log("mesDefis : mounted : mesDefis "+JSON.stringify(this.$store.state.selectedEquipe.defis_equipes));
 		},
 		data() {
             return {
@@ -71,6 +73,19 @@
 			sousTitreCommune() {
 				return "Défis pour : "+this.$store.state.selectedEquipe.commune;
 			},
+			isCoordinateurOrOrganisateur() {
+				if (this.$store.state.selectedEquipe) {
+					if (this.$store.state.selectedEquipe.isOrganisateur || this.$store.state.selectedEquipe.isAdmin) {
+						return true;
+					}
+				}
+			},
+			nbDefiCommune() {
+				if (this.$store.state.defisCommune) {
+					return "Nombre de défi sur votre commune : "+this.$store.state.defisCommune.length;
+				}
+				return "Pas de défi sur votre commune !"; 
+			}
 
 		},
 		methods: {
@@ -100,15 +115,21 @@
 			recupereDefis() {
 				console.log("Récupération des défis de la commune");
 				let titre = "Les défis de votre commune ont été chargés dans vos défis";
-				if (this.$store.state.selectedEquipe.commune.length > 0) {
+				if (this.$store.state.selectedEquipe.commune) {
 					console.log("defis de la commune : "+this.$store.state.defisCommune);
-					if (this.$store.state.defisCommune.length > 0) {
-						console.log("R2cupération des défis OK");
-						this.$store.dispatch("recupereDefis");
+					if (this.$store.state.defisCommune) {
+						if (this.$store.state.defisCommune.length > 0) {
+							console.log("R2cupération des défis OK");
+							this.$store.dispatch("recupereDefis");
+						}
+						else {
+							console.log("pas de défis pour la commune en cours");
+							titre = "Aucun défi à récupérer sur la commune de l'équipe";
+						}
 					}
 					else {
 						console.log("pas de défis pour la commune en cours");
-						titre = "Aucun défi à récupérer";
+						titre = "Aucun défi à récupérer sur la commune de l'équipe";
 					}
 				}
 				else {

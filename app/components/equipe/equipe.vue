@@ -75,8 +75,10 @@
     export default {
         mounted() {
 			console.log("Equipe en cours est à :"+JSON.stringify(this.$store.state.selectedEquipe));
-			console.log("Liste des participants : "+JSON.stringify(this.$store.state.selectedEquipe.participants));
-			console.log("nombre des participants : "+this.$store.state.selectedEquipe.participants.length);
+			if (this.$store.state.selectedEquipe.participants) {
+				console.log("Liste des participants : "+JSON.stringify(this.$store.state.selectedEquipe.participants));
+				console.log("nombre des participants : "+this.$store.state.selectedEquipe.participants.length);
+			}
 			// vérification des version de la version de l'équipe sur le serveur 
 			const connectionType = connectivity.getConnectionType();
 			console.log("etat de la connexion : "+connectionType);
