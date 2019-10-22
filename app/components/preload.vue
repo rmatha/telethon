@@ -118,7 +118,8 @@
 			// recuperation de la liste des defis de l'equipe
 			console.log("PRELOAD : MOUNTED : liste des participants : "+JSON.stringify(this.$store.state.selectedEquipe.participants));
 			console.log("PRELOAD : MOUNTED : liste des  scores : "+JSON.stringify(this.$store.state.selectedEquipe.scores));
-			//console.log("Liste des villes récupérées  : "+JSON.stringify(villesRef));
+			console.log("PRELOAD : MOUNTED : mesDefis "+JSON.stringify(this.$store.state.selectedEquipe.defis_equipes));
+//console.log("Liste des villes récupérées  : "+JSON.stringify(villesRef));
 			
 		},
         computed: {

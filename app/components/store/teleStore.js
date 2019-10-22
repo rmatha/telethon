@@ -222,7 +222,7 @@ const store = new Vuex.Store({
 		},
 		
 		recupereDefis(state) {
-			this.state.selectedEquipe.defis_equipes = this.state.defisCommune;
+			this.state.selectedEquipe.defis_equipes.defi = this.state.defisCommune;
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
 		
@@ -260,8 +260,8 @@ const store = new Vuex.Store({
 			
 		},
 		deleteDefisEquipe(state,data) {
-			console.log("Nombre de défis equipe avant suppression : "+this.state.selectedEquipe.defis_equipes.length);
-			this.state.selectedEquipe.defis_equipes = this.state.selectedEquipe.defis_equipes.filter(item => {
+			console.log("Nombre de défis equipe avant suppression : "+this.state.selectedEquipe.defis_equipes.defi.length);
+			this.state.selectedEquipe.defis_equipes.defis = this.state.selectedEquipe.defis_equipes.filter(item => {
 				return item !== data.defi;
 			});
 			ApplicationSettings.setString("store", JSON.stringify(this.state));

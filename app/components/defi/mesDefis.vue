@@ -11,7 +11,7 @@
 							<Image row="0" col="1" class="actionButton" src="~/assets/icons/upload.png"/>
 							<Image row="0" col="2" src="~/assets/icons/add-256.gif" @tap="affichageCat"/>
 						</GridLayout>
-						<ListView for="defiEquipe in $store.state.selectedEquipe.defis_equipes" >
+						<ListView for="defiEquipe in $store.state.selectedEquipe.defis_equipes[0].defi" >
 						  <v-template>
 							<GridLayout rows="auto,*" columns="*,50"  margin="0" @tap="getDefi(defiEquipe)">
 								<Label col="0" raw="0" :text="defiEquipe.categorie.nom +' : '+defiEquipe.nom" class="defiTitle" />
