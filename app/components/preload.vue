@@ -237,7 +237,7 @@
 							.get('https://telethon.citeyen.com/public/api/defisCommune/list', {params : params})
 						  .then(responseList => {
 							console.log("Chargement des defis de la commune en base : "+JSON.stringify(responseList.data));
-							this.$store.dispatch("reloadDefisCommune",{"defis" : responseList.data.defis});
+							this.$store.dispatch("reloadDefisCommune",{"defis" : responseList.data});
 						  });
 					}else {
 						this.messages.push("Defis pour la commune à jour ");
@@ -255,13 +255,20 @@
 				.then(response => {
 					// si la version du serveur plus récente, on récupère 
 					console.log("version de l'équipe  en cours local : "+this.$store.state.selectedEquipe.version);
-					console.log("version de l'équipe en cours serveur  : "+JSON.stringify(response.data.version));
+					console.log("version de l'équipe en cours  serveur  : "+JSON.stringify(response.data.version));
 					//if (response.data.version > this.$store.state.selectedEquipe.version) {
 					if (response.data) {
 						console.log("Récupération serveur de l'équipe OK : ");
-						if (response.data.version > this.$store.state.selectedEquipe.version) {
+						this.messages.push("Récupération serveur de l'équipe OK");
+						if (true) {
+						//if (response.data.version > this.$store.state.selectedEquipe.version) {
 							console.log("Mise a jour de la version de l'équipe a partir du serveur");
+							this.messages.push("Mise a jour de la version de l'équipe a partir du serveur");
 							this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
+						}
+						else {
+							console.log("Version de l'équipe déjà à jour");
+							this.messages.push("Version de l'équipe déjà à jour");
 						}
 					};
 				});

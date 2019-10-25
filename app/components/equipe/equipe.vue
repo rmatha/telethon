@@ -30,13 +30,13 @@
 					
 					<StackLayout  v-if="$store.state.selectedEquipe">
 						<GridLayout rows="auto" columns="*,50" >
-							<Label row="0" col="0" class="label" text="Liste des participants de l'équipe" textWrap="true" />
+							<Label row="0" col="0" class="label" text="Liste dess participants de l'équipe" textWrap="true" />
 							<Image row="0" col="1" src="~/assets/icons/addUser.png" @tap="addParticipant"/>
 						</GridLayout>
 						
 						
 					</StackLayout>
-					<ListView v-if="$store.state.selectedEquipe" for="participant in $store.state.selectedEquipe.participants" height="100%" > 
+					<ListView v-if="$store.state.selectedEquipe" for="participant in participantsActifs" height="100%" > 
 						<v-template>
 							<GridLayout rows="40" columns="*"  >
 								<Label :text="libelleProfil(participant)" class="valeur" @tap="editParticipant(participant)"/>
@@ -120,8 +120,13 @@
         },
 		computed: {			
 			titreEquipe() {
-				var reponse = this.$store.state.selectedEquipe ? this.$store.state.selectedEquipe.nom : "Pas d'équipe  sélectionnée";
+				var reponse = this.$store.state.selectedEquipe ? this.$store.state.selectedEquipe.nom : "Pas d'équipe sélectionnée";
 				return reponse;
+			},
+			participantsActifs() {
+				return this.$store.state.selectedEquipe.participants.filter(participant => {
+					return !participant.delete;
+				});
 			},
         },
 
@@ -186,67 +191,6 @@
 			},
 
 
-			uploadEquipe2() {
-				confirm({
-				  title: "Sauvegarde de l'équipe",
-				  message: "Confirmez-vous la sauvegarde de l'équipe sur le serveur ?",
-				  okButtonText: "OK",
-				  cancelButtonText: "NON"
-				}).then(result => {
-				  console.log(result);
-				  if (result) {
-					console.log("On sauvegarde sur le serveur");
-					console.log("Equipe :"+JSON.stringify(this.$store.state.selectedEquipe));
-					console.log("Participants :"+JSON.stringify(this.$store.state.participants));
-					axios
-						  .post('https://www.telethon.citeyen.com/public/api/equipes/upload', {
-							Equipe : this.$store.state.selectedEquipe,
-							Participants : this.$store.state.participants,
-						  })
-						  .then(response => {
-							console.log("update OK");
-							alert({
-							  title: "Chargement de l'équipe",
-							  message: "L'équipe a été sauvegardé sur le serveur",
-							  okButtonText: "OK"
-							}).then(() => {
-							  console.log("Alert dialog closed");
-							  // mise a jour de la version locale à partir de la version serveur
-							  let params = {};
-  							  params["nom"] = this.$store.state.selectedEquipe.nom;
-							  params["commune"] = this.$store.state.selectedEquipe.commune;
-							  axios
-								.get('https://telethon.citeyen.com/public/api/equipes/version', {params : params})
-								.then(response => {
-									console.log("Version de l'équipe sur le serveur : "+response.data.version);
-									let versionEquipeServeur = response.data.version;
-									this.$store.dispatch("setVersionEquipe", {"version" : versionEquipeServeur} ).then(() => {
-									console.log("uploadEquipe : incrementation configVersion OK");
-								  })
-								  .catch(error => {
-									  console.log("uploadEquipe : Pb incrementation : "+error);
-								  });
-								})
-								.catch(error => console.log("equipe : mounted : ERROR : "+error));
-						
-							  
-							});
-						  })
-						  .catch(error => {
-							console.log("updatete KO : "+error);
-							alert({
-							  title: "Problème de sauvegarde",
-							  message: "La sauvegarde n'est pas possible actuellement. Mais vous pouvez continuer à utiliser cette équipe pour saisir les participants et les scores. Vous pourrez faire la sauvegarde plus tard",
-							  okButtonText: "OK"
-							}).then(() => {
-							  console.log("Alert dialog closed");
-							  this.$navigateTo(mesDefis);
-							});
-						  })
-					
-				  }
-				});
-			},
 			uploadEquipe() {
 				confirm({
 				  title: "Sauvegarde de l'équipe TEST",
@@ -264,15 +208,35 @@
 							Equipe : this.$store.state.selectedEquipe
 						  })
 						  .then(response => {
-							console.log("update  OK");
-							alert({
-							  title: "Chargement de l'équipe",
-							  message: "L'équipe a été sauvegardé sur le serveur",
-							  okButtonText: "OK"
-							}).then(() => {
-							  console.log("Alert dialog closed");
-							  
-							});
+								console.log("update OK");
+								// maintenant on récupère les informations sur le serveur pour être synchro
+							
+							
+								// mise a jour de la version locale à partir de la version serveur
+								let params = {};
+								params["commune"] = this.$store.state.selectedEquipe.commune;
+								params["nom"] = this.$store.state.selectedEquipe.nom;
+								console.log("Appel suivant synchro");
+								axios
+								.get('https://telethon.citeyen.com/public/api/equipes/info', {params : params})
+								.then(response => {
+									this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
+									alert({
+									  title: "Chargement de l'équipe",
+									  message: "Synchronisation de l'équipe avec le serveur OK",
+									  okButtonText: "OK"
+									});
+								})
+								.catch(error => {
+									console.log("updatete KO : "+error);
+									alert({
+									  title: "Problème de sauvegarde",
+									  message: "La synchronisation avec le serveur est KO. Mais vous pouvez continuer à utiliser cette équipe pour saisir les participants et les scores. Vous pourrez faire la sauvegarde plus tard",
+									  okButtonText: "OK"
+									}).then(() => {
+									  console.log("Alert dialog closed");
+									});
+								});
 						  })
 						  .catch(error => {
 							console.log("updatete KO : "+error);

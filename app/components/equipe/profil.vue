@@ -13,7 +13,7 @@
 						<Label class="label" ref="label" text="Pseudo" />
 						<TextField class="textfield" hint="Pseudo" v-model="input.nom"/>
 						<Label ref="labelVille" text="Ville d'habitation" class="label" />
-						<TextField class="textfield" ref="textFieldVille" v-model="input.commune" @textChange="onTextChange" />
+						<TextField class="textfield" v-model="input.commune" @textChange="onTextChange" />
 					</StackLayout>
 					<ScrollView v-if="affichageVilles" >
 						<StackLayout backgroundColor="#ffffff" >
@@ -48,9 +48,8 @@
 			console.log("Participant en cours : "+JSON.stringify(this.$store.state.selectedParticipant));
 			if (this.$store.state.selectedParticipant != null) {
 				this.input.nom = this.$store.state.selectedParticipant.nom;
-				this.input.ville = this.$store.state.selectedParticipant.commune;
-				let textField = this.$refs.textFieldVille.nativeView;
-                textField.text = this.input.ville;
+				this.input.commune = this.$store.state.selectedParticipant.commune;
+				
 				
 				console.log("R2cupération des informations du participant");
 			}
@@ -158,7 +157,7 @@
 				// affichage du modal de confirmation
 				confirm({
 				  title: "Confirmation de suppression",
-				  message: "Voulez-vous supprimer le participant : "+this.$store.state.selectedEquipe.selectedParticipant.nom,
+				  message: "Voulez-vous supprimer le participant : "+this.$store.state.selectedParticipant.nom,
 				  okButtonText: "oui",
 				  cancelButtonText: "non"
 				}).then(() => {
@@ -172,20 +171,16 @@
 			selectVille(nom,code) {
 				console.log("Sélection de la ville");
 				console.log(nom);
-				let textField = this.$refs.textFieldVille.nativeView;
-                textField.text = nom;
 				this.input.commune = nom;
 				this.affichageVilles = false;
 
 				
 			},
             onTextChange: function() {
-                let textField = this.$refs.textFieldVille.nativeView;
-                console.log("onTextChange saisie " + textField.text);
-                console.log("onTextChange label " + textField.name);
+                console.log("commune texte : " + this.input.commune);
 				// filtre de la liste villes 
 				this.villes = villesRef.filter(ville => {
-					return ville.nom.toLowerCase().indexOf(textField.text.toLowerCase()) > -1
+					return ville.nom.toLowerCase().indexOf(this.input.commune.toLowerCase()) > -1
 				})
 				if (textField.text.length > 2) {
 					this.affichageVilles = true;

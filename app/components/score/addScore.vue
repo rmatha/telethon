@@ -12,7 +12,7 @@
 					<Label row="1" col="0" v-else :text="participantNom" verticalAlignment="center" horizontalAlignment="center"/>
 					<Label row="0" col="1" class="label" text="Score"  verticalAlignment="center"/>
 					<ListPicker row="1" col="1" ref="scoreEnCours" :items="scoresRef" :selectedIndex="score.score" />
-					<Button row="2" col="0" v-if="$store.state.selectedEquipe.scores" class="boutonAction" text="Supprimer" @tap="supprimerScore" />
+					<Button row="2" col="0" v-if="$store.state.selectedScore" class="boutonAction" text="Supprimer" @tap="supprimerScore" />
 					<Button row="2" col="1" class="boutonAction" text="Enregistrer" @tap="saveScore" />
 				</GridLayout>
 			</StackLayout>
@@ -41,7 +41,7 @@
 				score : {
 					score : 10,
 					participant : null,
-					defi : this.$store.state.selectedDefi,
+					defi : this.$store.state.selectedDefi.defi,
 				},
             }
         },
@@ -65,7 +65,7 @@
 					this.score.participant = this.$store.state.selectedEquipe.participants[indexProfil.selectedIndex];
 				}
 				if (this.$store.state.selectedScore) {
-					console.log("ADDSCORE : SaveScore update :");
+					console.log("ADDSCORE : SaveScore update  :");
 					this.$store.dispatch("updateScore", {"score" : this.score});
 				}
 				else {

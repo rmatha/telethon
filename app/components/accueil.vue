@@ -5,7 +5,7 @@
 			<Footer dock="bottom" />
 			
 			<StackLayout  dock="center" class="root" >
-				<label class="titre mb50" text="Bonjour !"  horizontalAlignment="center"/>
+				<label class="titre mb50" text="Bonjour !!"  horizontalAlignment="center"/>
 				
 				
 				<StackLayout  v-if="isEquipeSelected">
@@ -118,7 +118,10 @@
 			else {
 				console.log("Pas d'équipe en cours !!!");
 			}
-			
+			if (this.$store.state.selectedEquipe) {
+				console.log("on charge l'equipe a partir du serveur");
+				this.reloadEquipeEnCours();
+			};
 			
 		},
         
@@ -141,7 +144,30 @@
 				}
 				return "Pas d'équipe en courss";
 			},
-			
+			reloadEquipeEnCours() {
+				let params = {};
+				params["commune"] = this.$store.state.selectedEquipe.commune;
+				params["nom"] = this.$store.state.selectedEquipe.nom;
+				axios
+				.get('https://telethon.citeyen.com/public/api/equipes/info', {params : params})
+				.then(response => {
+					// si la version du serveur plus récente, on récupère 
+					console.log("version de l'équipe  en cours local : "+this.$store.state.selectedEquipe.version);
+					console.log("version de l'équipe en cours  serveur  : "+JSON.stringify(response.data.version));
+					//if (response.data.version > this.$store.state.selectedEquipe.version) {
+					if (response.data) {
+						console.log("Récupération serveur de l'équipe OK : ");
+						if (true) {
+						//if (response.data.version > this.$store.state.selectedEquipe.version) {
+							console.log("Mise a jour de la version de l'équipe a partir du serveur");
+							this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
+						}
+						else {
+							console.log("Version de l'équipe déjà à jour");
+						}
+					};
+				});
+			},
 
 		}
     };

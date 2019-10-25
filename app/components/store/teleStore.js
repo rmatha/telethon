@@ -65,7 +65,7 @@ const store = new Vuex.Store({
 			this.state.selectedEquipe = data.equipe;
 			this.state.updateEquipe;
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
-			console.log("TELESTORE : setSelectedEquipe : this.selectedEquipe : "+JSON.stringify(this.state.selectedEquipe));
+			console.log("TELESTORE : setSelectedEquipe : this.selectedEquipe :"+JSON.stringify(this.state.selectedEquipe));
 			
 		},
 		
@@ -75,11 +75,6 @@ const store = new Vuex.Store({
 			this.state.versionDefi = 0;
 			this.state.versionEquipe = 0;
 			console.log("telestore : resetConfig : "+JSON.stringify(this.state));
-			ApplicationSettings.setString("store", JSON.stringify(this.state));
-		},
-		
-		setVersionEquipe(state,data) {
-			this.state.versionEquipe = data.version;
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
 		
@@ -167,12 +162,14 @@ const store = new Vuex.Store({
 		},
 		
 		deleteParticipant(state,data) {
-			console.log("Nombre de particpants avant suppression : "+JSON.stringify(this.state.selectedEquipe.participants));
-			this.state.selectedEquipe.participants = this.state.selectedEquipe.participants.filter(item => {
-					return item.nom !== data.participant.nom;
+			console.log("TELESTORE : DELETEPARTICIPANT : Liste de particpants avant suppression : "+JSON.stringify(this.state.selectedEquipe.participants));
+			var indexParticipant = this.state.selectedEquipe.participants.findIndex(item => {
+					return item.nom == data.participant.nom;
 				});
+			console.log("TELESTORE : DELETEPARTICIPANT : index deleted : "+indexParticipant);
+			this.state.selectedEquipe.participants[indexParticipant].delete = true;
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
-			console.log("Nombre de particpants après suppression : "+JSON.stringify(this.state.selectedEquipe.participants));
+			console.log("TELESTORE : DELETEPARTICIPANT : Liste de particpants avant suppression : "+JSON.stringify(this.state.selectedEquipe.participants));
 		},
 		
 		setParticipants(state,data) {
@@ -202,7 +199,7 @@ const store = new Vuex.Store({
 			console.log("TELESTORE : insertScore : score en cours : "+JSON.stringify(data));
 			this.state.selectedEquipe.scores.push(data.score);
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
-			console.log("TELESTORE : insertScore : liste des scores : "+this.state.scoresEquipe.length); 
+			console.log("TELESTORE : insertScore : liste des scores : "+JSON.stringify(this.state.scoresEquipe)); 
 		},
 		
 		updateScore(state,data) {
@@ -215,57 +212,71 @@ const store = new Vuex.Store({
 			console.log("TELESTORE : updateScore : Liste des scores après suppression : "+JSON.stringify(this.state.selectedEquipe.scores));
 		},
 		deleteScore(state,data) {
-			this.state.selectedEquipe.scores = this.state.selectedEquipe.scores.filter(score => {
-				return score !== data.score;
+			var indexScore = this.state.selectedEquipe.scores.findIndex(score => {
+				return score == data.score;
 			});
+			this.state.selectedEquipe.scores[indexScore].delete = true;
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
 		
 		recupereDefis(state) {
-			this.state.selectedEquipe.defis_equipes.defi = this.state.defisCommune;
+			console.log("TELESTORE : RECUPERERDEFIS : defisCommune : "+JSON.stringify(this.state.defiCommune.defis));
+			console.log("TELESTORE : RECUPERERDEFIS : mesDefis : "+JSON.stringify(this.state.selectedEquipe.defis_equipes));
+			
+			for (const defi of this.state.defiCommune.defis) {
+				this.state.selectedEquipe.defis_equipes.push(defi);
+			}
+			console.log("TELESTORE : RECUPERERDEFIS : mesDefis : "+JSON.stringify(this.state.selectedEquipe.defis_equipes));
+			
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
 		
 		deleteDefi(state,data) {
-			console.log("Nombre de défis avant suppression : "+this.state.defis.length);
-			this.state.defis = this.state.defis.filter(defi => {
-				return defi !== data.defi;
+			console.log("Liste des défis de la base avant suppression : "+JSON.stringify(this.state.defis));
+			var indexDefi = this.state.defis.findIndex(defi => {
+				return defi.defi.id == data.defi.id;
 			});
+			console.log("Index récupéré : "+indexDefi);
+			this.state.selectedEquipe.defis_equipes[indexDefi].defi.delete = true;
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
-			console.log("Nombre de défis après suppression : "+this.state.defis.length);
+			console.log("Liste des défis après suppression : "+JSON.stringify(this.state.selectedEquipe.defis_equipes));
 		},
 		
 		deleteDefisCurrentCommune(state,data) {
-			console.log("Nombre de défis commune avant suppression : "+this.state.defisCommune.length);
-			this.state.defisCommune = this.state.defisCommune.filter(item => {
+			console.log("Nombre de défis commune avant suppression : "+this.state.defiCommune.length);
+			this.state.defiCommune = this.state.defiCommune.filter(item => {
 				return item !== data.defi;
 			});
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
-			console.log("Nombre de défis commune après suppression : "+this.state.defisCommune.length);
+			console.log("Nombre de défis commune après suppression : "+this.state.defiCommune.length);
 		},
 		
 		reloadDefisCommune(state,data) {
 			console.log("TELESTORE : RELOADDEFISCOMMUNE : Chargement des defis pour la commune "+this.state.selectedEquipe.commune);
-			this.state.defisCommune = [];
-			console.log("TELESTORE : RELOADDEFISCOMMUNE : Liste des defis à charger : "+JSON.stringify(data.defis));
-			data.defis.forEach (idDefi => {
-				console.log("TELESTORE : RELOADDEFISCOMMUNE : traitement du defis : "+idDefi.id);
-				this.state.defisCommune.push(this.state.defis.filter( defi => {
-					return defi.id == idDefi.id;
-				})[0]);
-				
-			});
+			onsole.log("TELESTORE : RELOADDEFISCOMMUNE : Liste des defis à charger : "+JSON.stringify(data));
+			console.log("TELESTORE : RELOADDEFISCOMMUNE : Liste des defis à charger .defis: "+JSON.stringify(data.defis));
+			this.state.defiCommune = data;
+			console.log("TELESTORE : reloadDefisCommune : defis commune "+JSON.stringify(this.state.defiCommune));
+			console.log("TELESTORE : reloadDefisCommune : defis commune "+JSON.stringify(this.state.defiCommune.defis));
+			console.log("TELESTORE : reloadDefisCommune : defis commune length "+JSON.stringify(this.state.defiCommune.defis.length));
+			
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 			
 			
 		},
 		deleteDefisEquipe(state,data) {
-			console.log("Nombre de défis equipe avant suppression : "+this.state.selectedEquipe.defis_equipes.defi.length);
-			this.state.selectedEquipe.defis_equipes.defis = this.state.selectedEquipe.defis_equipes.filter(item => {
-				return item !== data.defi;
+			console.log("TELESTORE : deleteDefisEquipe : Liste défis equipe avant suppression : "+JSON.stringify(this.state.selectedEquipe.defis_equipes));
+			console.log("TELESTORE : deleteDefisEquipe : data avant suppression : "+JSON.stringify(data.defi));
+			var indexDefiEquipe = this.state.selectedEquipe.defis_equipes.findIndex(item => {
+				console.log("TELESTORE : deleteDefisEquipe : on compare : "+item.defi.id+" : "+data.defi.defi.id);
+				return item.defi.id == data.defi.defi.id;
 			});
+			console.log("TELESTORE : deleteDefisEquipe : récupération de l'index :"+indexDefiEquipe);
+			if (indexDefiEquipe >= 0) {
+				this.state.selectedEquipe.defis_equipes[indexDefiEquipe].delete = true;
+			};
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
-			console.log("Nombre de défis equipe après suppression : "+this.state.selectedEquipe.defis_equipes.length);
+			console.log("TELESTORE : deleteDefisEquipe : Liste defis equipe après suppression : "+JSON.stringify(this.state.selectedEquipe.defis_equipes));
 		},
 		
 		insertDefisCurrentCommune(state,data) {
@@ -284,9 +295,12 @@ const store = new Vuex.Store({
 		},
 		
 		updateDefi(state,data) {
+			console.log("TELESTORE: UPDATEDEFI : "+JSON.stringify(data.defi));
+			console.log("TELESTORE: UPDATEDEFI : "+JSON.stringify(this.state.selectedDefi));
 			var indexDefi = this.state.defis.findIndex(defi => {
-					return (defi.nom == this.state.selectedDefi.nom) & (defi.categorie.nom == this.state.selectedCategorie.nom);
+					return defi.id == this.state.selectedDefi.defi.id;
 				});
+			console.log("TELESTORE: UPDATEDEFI : INDEX : "+indexDefi);
 			// mise a jour des informations
 			this.state.defis[indexDefi].nom = data.defi.nom;
 			this.state.defis[indexDefi].description_courte = data.defi.description_courte;

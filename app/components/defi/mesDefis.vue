@@ -11,30 +11,30 @@
 							<Image row="0" col="1" class="actionButton" src="~/assets/icons/upload.png"/>
 							<Image row="0" col="2" src="~/assets/icons/add-256.gif" @tap="affichageCat"/>
 						</GridLayout>
-						<ListView for="defiEquipe in $store.state.selectedEquipe.defis_equipes[0].defi" >
+						<ListView for="defiEquipe in defisEquipeActifs" >
 						  <v-template>
 							<GridLayout rows="auto,*" columns="*,50"  margin="0" @tap="getDefi(defiEquipe)">
-								<Label col="0" raw="0" :text="defiEquipe.categorie.nom +' : '+defiEquipe.nom" class="defiTitle" />
-								<Label col="0" row="1" :text="defiEquipe.description" class="defiDescription" />
+								<Label col="0" raw="0" :text="defiEquipe.defi.categorie.nom +' : '+defiEquipe.defi.nom" class="defiTitle" />
+								<Label col="0" row="1" :text="defiEquipe.defi.defidescription" class="defiDescription" />
 								<Image col="1" row="0" rowSpan="2" src="~/assets/icons/right.png" height="30px"/>
 							</GridLayout>
 						  </v-template>
 						</ListView>
 						
-						<button class="boutonAction recup" text="Récupérer les défis de ma ville" @tap="recupereDefis" />
+						<button class="boutonAction recup" text="Ajouter les défis de ma ville" @tap="recupereDefis" />
 						<GridLayout v-if="isCoordinateurOrOrganisateur" rows="auto" columns="*,50,50">
 							<Label row="0" col="0" class="m-b-20 titreTelethon" :text="sousTitreCommune" textWrap="true" />
 							<Image row="0" col="1" class="actionButton" src="~/assets/icons/upload.png" @tap="uploadDefisCommune"/>
 							<Image row="0" col="2" src="~/assets/icons/add-256.gif" @tap="affichageCatCommune"/> 
 						</GridLayout>
 									
-						<ListView v-if="isCoordinateurOrOrganisateur" for="item in $store.state.defisCommune" >
+						<ListView v-if="isCoordinateurOrOrganisateur" for="item in $store.state.defiCommune.defis" >
 						  <v-template>
 							<GridLayout rows="*" columns="*,50"  margin="0" @tap="getDefiCommune(item)">
 								<GridLayout col="0" verticalAlignment="bottom">
 									<StackLayout paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16">
 										<Label :text="item.categorie.nom+' : '+item.nom" class="defiTitle" />
-										<Label :text="item.description" class="defiDescription" />
+										<Label :text="item.defidescription" class="defiDescription" />
 									</StackLayout>
 								</GridLayout>
 								<Image col="1" src="~/assets/icons/right.png" height="30px"/>
@@ -80,9 +80,14 @@
 					}
 				}
 			},
+			defisEquipeActifs() {
+				return this.$store.state.selectedEquipe.defis_equipes.filter(defiEquipe => {
+					return !defiEquipe.delete;
+				});
+			},
 			nbDefiCommune() {
-				if (this.$store.state.defisCommune) {
-					return "Nombre de défi sur votre commune : "+this.$store.state.defisCommune.length;
+				if (this.$store.state.defiCommune.defis) {
+					return "Nombre de défi sur votre commune : "+this.$store.state.defiCommune.defis.length;
 				}
 				return "Pas de défi sur votre commune !"; 
 			}
@@ -99,7 +104,7 @@
 					// on poste les defi pour la commune sur le serveur 
 					axios
 						  .post('https://www.telethon.citeyen.com/public/api/defisCommune/upload', {
-							defis : this.$store.state.defisCommune,
+							defis : this.$store.state.defiCommune,
 							commune : this.$store.state.selectedCommune,
 						  })
 						  .then(response => {
@@ -115,10 +120,10 @@
 			recupereDefis() {
 				console.log("Récupération des défis de la commune");
 				let titre = "Les défis de votre commune ont été chargés dans vos défis";
-				if (this.$store.state.selectedEquipe.commune) {
-					console.log("defis de la commune : "+this.$store.state.defisCommune);
-					if (this.$store.state.defisCommune) {
-						if (this.$store.state.defisCommune.length > 0) {
+				if (this.$store.state.selectedEquipe) {
+					console.log("defis de la commune : "+this.$store.state.defiCommune);
+					if (this.$store.state.defiCommune.defis) {
+						if (this.$store.state.defiCommune.defis.length > 0) {
 							console.log("R2cupération des défis OK");
 							this.$store.dispatch("recupereDefis");
 						}
@@ -157,41 +162,17 @@
                 this.$navigateTo(listeChallengesCat);
 			},
 			getDefi(item) {
-				console.log("MESDEFIS : GETDEFI : affichage du defi : "+JSON.stringify(item));
-				var currentCategorie = this.$store.state.categories.filter(function(categorie) {
-					return categorie.nom == item.categorie.nom;
-				});
-				console.log("MESDEFIS  : getDefi : categorie récupérée : "+JSON.stringify(currentCategorie));	
-				if (currentCategorie.length > 0) {
-					this.$store.state.selectedCategorie = currentCategorie[0];
-                }
+				console.log("MESDEFIS : GETDefi : item : "+JSON.stringify(item));
+				this.$store.state.selectedCategorie = item.categorie
 				this.$store.state.selectedDefi = item;
 				this.$store.state.selectedCommune = null;
                 this.$navigateTo(affichageDefi);
 			},
 			getDefiCommune(item) {
-				console.log("MESDEFIS : GETDEFICOMMUNE : affichage du defi : "+JSON.stringify(item));
-				var currentCategorie = this.$store.state.categories.filter(function(categorie) {
-					return categorie.nom == item.categorie.nom;
-				});
-				console.log("MESDEFIS  : getDefiCommune : categorie récupérée : "+JSON.stringify(currentCategorie));	
-				if (currentCategorie.length > 0) {
-					this.$store.state.selectedCategorie = currentCategorie[0];
-                }
+				this.$store.state.selectedCategorie = item.categorie
 				this.$store.state.selectedDefi = item;
 				this.$store.state.selectedCommune = this.$store.state.selectedEquipe.commune;
                 this.$navigateTo(affichageDefi);
-			},
-			
-			getDefiNom(idDefi) {
-				var currentDefi = this.$store.state.defis.filter(defi => {
-					console.log(idDefi+ "---" + defi.id); 
-					if (idDefi == defi.id) return defi.nom;
-				});
-				if(currentDefi.length > 0) {
-					return currentDefi[0].Value;
-				}
-				return "Pas de nom associé au défi";
 			},
         },
 		

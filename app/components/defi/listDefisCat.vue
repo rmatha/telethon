@@ -66,7 +66,8 @@
 		methods: {
 			getDefi(item) {
 				console.log("affichage du defi");
-				this.$store.state.selectedDefi = item;
+				this.$store.state.selectedDefi = {};
+				this.$store.state.selectedDefi.defi = item;
 				console.log("affichage du defi"+JSON.stringify(item));
 				this.$navigateTo(affichageDefi);
 			},
