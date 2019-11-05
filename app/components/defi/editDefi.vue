@@ -8,7 +8,7 @@
 					<GridLayout rows="auto" columns="*,50">
 						<Label row="0" col="0" text="Ajout d'un defi" class="label"/>
 						<Image v-if="$store.state.updateCategorie" row="0" col="1" class="actionButton" src="~/assets/icons/save.png" @tap="saveDefi"/>
-						<Image row="0" col="2" class="actionButton" src="~/assets/icons/save.png" @tap="saveDefi"/>
+						<Image row="0" col="2" class="actionButton" src="~/assets/icons/confirm.png" @tap="saveDefi"/>
 					</GridLayout>
 					<Label text="Catégorie" class="label"/>
 					<Label :text="titreCategorie" class="valeur"/>

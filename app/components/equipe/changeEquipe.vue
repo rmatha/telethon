@@ -12,7 +12,10 @@
 						<StackLayout row="0" colSpan="2" class="menuEquipe"> </StackLayout>
 					</GridLayout>
 					<StackLayout v-if="isNouvelleEquipe" >
-						<Label text="Création de la nouvelle équipe" class="entetePage"/>
+						<GridLayout rows="auto" columns="*,50,50">
+							<Label row="0" col="0" class="m-b-20 titreTelethon" text="Création de la nouvelle équipe" textWrap="true" />
+							<Image row="0" col="2" src="~/assets/icons/confirm.png" @tap="creerEquipe"/>
+						</GridLayout>
 						<Label class="label" text="Nom de l'équipe" />
 						<TextField class="textfield" hint="Ex : the killers..." v-model="input.nom"/>
 						<Label ref="labelVille" class="label" text="Ville du challenge Téléthon"  />
@@ -34,8 +37,6 @@
 							<Image row="1" col="1" v-else class="imageCheck" src="~/assets/icons/checkFalse.png" @tap="updateCoordinateur"/>
 							<Label row="1" col="0" text="Equipe de coordination Téléthon" fontSize="14" class="labelCheck" />
 						</GridLayout>
-						
-						<Button text="Créer l'équipe" @tap="creerEquipe" class="boutonAction"/>
 					</StackLayout>
 					<StackLayout v-if="isExistanteEquipe" >
 						<Label text="Sélection de l'équipe" class="entetePage"/>
@@ -73,25 +74,6 @@
 	
     export default {
         mounted() {
-			console.log("mounted Chargement des villes de Charente"); 
-            console.log("contenu de villesRef"+JSON.stringify(villesRef)); 
-            /*fetch(
-                    "https://geo.api.gouv.fr/departements/16/communes?fields=nom,code&format=json&geometry=centre"
-                )
-                .then(response => response.json())
-                .then(data => {
-                    this.villesRef = data;
-                    console.log("nom de la premiere ville : " + data[0].nom);
-                    console.log("Nombre de villes : " + this.villes.length);    
-                }
-			);
-			console.log("nombre d'équipe en base : "+this.$store.state.equipes.length);
-			*/
-			console.log("Le flag est passé dans le mounted de changeEquipe");
-			//this.$store.state.selectedEquipe.admin = 2;
-			//this.$store.state.selectedEquipe.commune = "Angoulême"; 
-			//console.log("Admin est à :"+this.$store.state.selectedEquipe.admin);
-			console.log("récupération du type : "+this.type);
 			if (this.type == "new") {
 				this.isNouvelleEquipe = true;
 			};
@@ -233,6 +215,14 @@
 				
 			},
 			creerEquipe() {
+				if ((this.input.nom.length <= 0) || (this.input.commune.length <= 0)) {
+					alert({
+							  title: "Création d'équipe",
+							  message: "Veuillez saisir un nom et une commune",
+							  okButtonText: "OK"
+							});
+					return;
+				}
 				let isEquipeExisteDeja = this.$store.state.equipes.filter(equipe => {
 					if (( this.input.commune == equipe.commune) & ( this.input.nom == equipe.nom)) {
 						return true;

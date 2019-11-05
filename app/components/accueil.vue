@@ -118,10 +118,10 @@
 			else {
 				console.log("Pas d'équipe en cours !!!");
 			}
-			if (this.$store.state.selectedEquipe) {
+			/*if (this.$store.state.selectedEquipe) {
 				console.log("on charge l'equipe a partir du serveur");
 				this.reloadEquipeEnCours();
-			};
+			};*/
 			
 		},
         

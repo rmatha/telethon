@@ -120,12 +120,13 @@
 			// chargement des scores pour le defi en cours
 			console.log("AFFICHAGEDEFI : MOUNTED : selectedEquipe.scores : "+JSON.stringify(this.$store.state.selectedEquipe.scores));
 			console.log("AFFICHAGEDEFI : MOUNTED : selectedDefi : "+JSON.stringify(this.$store.state.selectedDefi));
-			this.scoresCurrentDefi = this.$store.state.selectedEquipe.scores.filter(scoreItem => {
-				console.log("AFFICHAGEDEFI : MOUNTED : "+JSON.stringify(scoreItem.defi.id)+" : "+JSON.stringify(this.$store.state.selectedDefi.defi.id));
-				return (scoreItem.defi.id == this.$store.state.selectedDefi.defi.id) & !scoreItem.delete;
-			});
-			console.log("AFFICHAGEDEFI : MOUNTED : Liste des scores pour le DEFI  : "+JSON.stringify(this.scoresCurrentDefi));
-			
+			if (this.$store.state.selectedEquipe.scores) {
+				this.scoresCurrentDefi = this.$store.state.selectedEquipe.scores.filter(scoreItem => {
+					console.log("AFFICHAGEDEFI : MOUNTED : "+JSON.stringify(scoreItem.defi.id)+" : "+JSON.stringify(this.$store.state.selectedDefi.defi.id));
+					return (scoreItem.defi.id == this.$store.state.selectedDefi.defi.id) & !scoreItem.delete;
+				});
+				console.log("AFFICHAGEDEFI : MOUNTED : Liste des scores pour le DEFI  : "+JSON.stringify(this.scoresCurrentDefi));
+			};
         },
 		methods: {
 			changeDetailState() {

@@ -14,7 +14,7 @@
 						<GridLayout rows="auto" columns="*,50,50" >
 							<Label row="0" col="0" class="m-b-20 titreTelethon" :text="titreEquipe" textWrap="true" />
 							<Image row="0" col="1" class="actionButton" src="~/assets/icons/change.png" @tap="changeEquipe"/>
-							<Image v-if="$store.state.updateEquipe" row="0" col="2" class="actionButton" src="~/assets/icons/upload.png" @tap="uploadEquipe"/>
+							<Image v-if="$store.state.updateEquipe" row="0" col="2" class="actionButton" src="~/assets/icons/save.png" @tap="uploadEquipe"/>
 						</GridLayout>
 						<Label text="Votre équipe est Organisateur" v-if="$store.state.selectedEquipe.organisateur"  />
 						<Label text="Votre équipe est Coordinateur " v-if="$store.state.selectedEquipe.admin" />
@@ -124,9 +124,12 @@
 				return reponse;
 			},
 			participantsActifs() {
-				return this.$store.state.selectedEquipe.participants.filter(participant => {
-					return !participant.delete;
-				});
+				if (this.$store.state.selectedEquipe.participants) {
+					return this.$store.state.selectedEquipe.participants.filter(participant => {
+						return !participant.delete;
+					});
+				};
+				return null;
 			},
         },
 

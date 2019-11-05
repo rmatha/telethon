@@ -82,7 +82,8 @@
 					commune : "",
 				},
                 villes: [],
-                affichageVilles: false
+                affichageVilles: false,
+				updateCommune : false,
             };
         },
 		
@@ -173,6 +174,7 @@
 				console.log(nom);
 				this.input.commune = nom;
 				this.affichageVilles = false;
+				this.updateCommune = true;
 
 				
 			},
@@ -182,12 +184,13 @@
 				this.villes = villesRef.filter(ville => {
 					return ville.nom.toLowerCase().indexOf(this.input.commune.toLowerCase()) > -1
 				})
-				if (textField.text.length > 2) {
+				if ((this.input.commune.length > 2) && (!this.updateCommune)) {
 					this.affichageVilles = true;
 				}
 				else {
 					this.affichageVilles = false;
 				};
+				this.updateCommune = false;
 			},
         }
     };

@@ -49,14 +49,9 @@ const store = new Vuex.Store({
 					this.replaceState(
 						Object.assign(this.state, JSON.parse(ApplicationSettings.getString("store")))
 					);
-					console.log("chargement du store terminé : "+JSON.stringify(this.state)); 
-					resolve()
 				}
-				else {
-					console.log("Pas de store dans les settigns");
-					reject();
+				resolve();
 				
-				};
 			});
         },
         
@@ -215,14 +210,19 @@ const store = new Vuex.Store({
 			var indexScore = this.state.selectedEquipe.scores.findIndex(score => {
 				return score == data.score;
 			});
+			console.log("TELESTORE : deleteScore : indexScore : "+indexScore);
 			this.state.selectedEquipe.scores[indexScore].delete = true;
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
+			
+			console.log("TELESTORE : deleteScore : this.state.selectedEquipe.scores : "+JSON.stringify(this.state.selectedEquipe.scores));
 		},
 		
 		recupereDefis(state) {
 			console.log("TELESTORE : RECUPERERDEFIS : defisCommune : "+JSON.stringify(this.state.defiCommune.defis));
 			console.log("TELESTORE : RECUPERERDEFIS : mesDefis : "+JSON.stringify(this.state.selectedEquipe.defis_equipes));
-			
+			//if (!this.state.selectedEquipe.defis_equipes) {
+				this.state.selectedEquipe.defis_equipes = [];
+			//}
 			for (const defi of this.state.defiCommune.defis) {
 				this.state.selectedEquipe.defis_equipes.push(defi);
 			}
@@ -253,9 +253,10 @@ const store = new Vuex.Store({
 		
 		reloadDefisCommune(state,data) {
 			console.log("TELESTORE : RELOADDEFISCOMMUNE : Chargement des defis pour la commune "+this.state.selectedEquipe.commune);
-			onsole.log("TELESTORE : RELOADDEFISCOMMUNE : Liste des defis à charger : "+JSON.stringify(data));
+			console.log("TELESTORE : RELOADDEFISCOMMUNE : Liste des defis à charger : "+JSON.stringify(data));
 			console.log("TELESTORE : RELOADDEFISCOMMUNE : Liste des defis à charger .defis: "+JSON.stringify(data.defis));
 			this.state.defiCommune = data;
+			this.state.versionDefisCommune = data.version;
 			console.log("TELESTORE : reloadDefisCommune : defis commune "+JSON.stringify(this.state.defiCommune));
 			console.log("TELESTORE : reloadDefisCommune : defis commune "+JSON.stringify(this.state.defiCommune.defis));
 			console.log("TELESTORE : reloadDefisCommune : defis commune length "+JSON.stringify(this.state.defiCommune.defis.length));

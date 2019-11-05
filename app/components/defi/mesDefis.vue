@@ -6,12 +6,12 @@
 			<StackLayout dock="center" class="root" >
 				<ScrollView>
 					<StackLayout width="100%" height="100%">
-						<GridLayout rows="auto" columns="*,50,50">
+						<GridLayout v-if="!isCoordinateurOrOrganisateur" rows="auto" columns="*,50,50">
 							<Label row="0" col="0" class="m-b-20 titreTelethon" text="Mes Défis" textWrap="true" />
-							<Image row="0" col="1" class="actionButton" src="~/assets/icons/upload.png"/>
+							<Image row="0" col="1" class="actionButton" src="~/assets/icons/save.png"/>
 							<Image row="0" col="2" src="~/assets/icons/add-256.gif" @tap="affichageCat"/>
 						</GridLayout>
-						<ListView for="defiEquipe in defisEquipeActifs" >
+						<ListView v-if="!isCoordinateurOrOrganisateur" for="defiEquipe in defisEquipeActifs" >
 						  <v-template>
 							<GridLayout rows="auto,*" columns="*,50"  margin="0" @tap="getDefi(defiEquipe)">
 								<Label col="0" raw="0" :text="defiEquipe.defi.categorie.nom +' : '+defiEquipe.defi.nom" class="defiTitle" />
@@ -24,7 +24,7 @@
 						<button class="boutonAction recup" text="Ajouter les défis de ma ville" @tap="recupereDefis" />
 						<GridLayout v-if="isCoordinateurOrOrganisateur" rows="auto" columns="*,50,50">
 							<Label row="0" col="0" class="m-b-20 titreTelethon" :text="sousTitreCommune" textWrap="true" />
-							<Image row="0" col="1" class="actionButton" src="~/assets/icons/upload.png" @tap="uploadDefisCommune"/>
+							<Image row="0" col="1" class="actionButton" src="~/assets/icons/save.png" @tap="uploadDefisCommune"/>
 							<Image row="0" col="2" src="~/assets/icons/add-256.gif" @tap="affichageCatCommune"/> 
 						</GridLayout>
 									
@@ -81,9 +81,12 @@
 				}
 			},
 			defisEquipeActifs() {
-				return this.$store.state.selectedEquipe.defis_equipes.filter(defiEquipe => {
-					return !defiEquipe.delete;
-				});
+				if (this.$store.state.selectedEquipe.defis_equipes) {
+					return this.$store.state.selectedEquipe.defis_equipes.filter(defiEquipe => {
+						return !defiEquipe.delete;
+					});
+				}
+				return;
 			},
 			nbDefiCommune() {
 				if (this.$store.state.defiCommune.defis) {

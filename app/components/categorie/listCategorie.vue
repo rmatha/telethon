@@ -8,7 +8,7 @@
 					<StackLayout width="100%" height="100%">
 						<GridLayout rows="auto" columns="*,50,50">
 							<Label row="0" col="0" text="Liste des catégories" class="label"/>
-							<Image v-if="$store.state.updateCategorie" row="0" col="1" class="actionButton" src="~/assets/icons/upload.png" @tap=""/>
+							<Image v-if="$store.state.updateCategorie" row="0" col="1" class="actionButton" src="~/assets/icons/save.png" @tap=""/>
 							<Image row="0" col="2" src="~/assets/icons/add-256.gif" @tap="addCat()"/>
 							
 						</GridLayout>
