@@ -265,7 +265,7 @@
 
 <style>
 .labelVille {
-	color : black;
+	color : white;
 }
 .titreTelethon {
 	font-size : 38px;

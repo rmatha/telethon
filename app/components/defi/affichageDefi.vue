@@ -24,8 +24,8 @@
 							<Label :text="$store.state.selectedDefi ? $store.state.selectedDefi.defi.bareme : 'Non renseigné'" class="defiDesc"/>
 						</StackLayout>
 						<GridLayout v-if="$store.state.selectedEquipe" rows="auto" columns="*,50" >
-							<Label row="0" col="0" class="label m-b-20" text="Liste des scoresss :" textWrap="true" />
-							<Image row="0" col="1" src="~/assets/icons/add-256.gif" @tap="addScore"/>
+							<Label row="0" col="0" class="label m-b-20" text="Liste des scores :" textWrap="true" />
+							<Image row="0" col="1" v-if="defiPresent" src="~/assets/icons/add-256.gif" @tap="addScore"/>
 						</GridLayout>
 						<ListView  v-if="$store.state.selectedEquipe" for="score in scoresCurrentDefi">
 						  <v-template>

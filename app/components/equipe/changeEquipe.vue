@@ -12,9 +12,9 @@
 						<StackLayout row="0" colSpan="2" class="menuEquipe"> </StackLayout>
 					</GridLayout>
 					<StackLayout v-if="isNouvelleEquipe" >
-						<GridLayout rows="auto" columns="*,50,50">
-							<Label row="0" col="0" class="m-b-20 titreTelethon" text="Création de la nouvelle équipe" textWrap="true" />
-							<Image row="0" col="2" src="~/assets/icons/confirm.png" @tap="creerEquipe"/>
+						<GridLayout rows="auto" columns="*,50">
+							<Label row="0" col="0" class="m-b-20 label" text="Création de la nouvelle équipe" textWrap="true" />
+							<Image row="0" col="1" src="~/assets/icons/confirm.png" @tap="creerEquipe"/>
 						</GridLayout>
 						<Label class="label" text="Nom de l'équipe" />
 						<TextField class="textfield" hint="Ex : the killers..." v-model="input.nom"/>
@@ -168,6 +168,8 @@
 				
 				
 			},
+			
+			
 
 			selectEquipeExistante() { 
 				// récupération de la commune sélectionnée
@@ -191,6 +193,16 @@
 						.get('https://telethon.citeyen.com/public/api/equipes/info', {params : params})
 						.then(response => {
 							this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
+							// chargement des defis de la commune 
+							console.log("CHANGEEQUIPE : creerEquipe :MAJ des defis communes à partir du serveur");
+							let params = {};
+							params["commune"] = this.$store.state.selectedEquipe.commune;
+							axios
+								.get('https://telethon.citeyen.com/public/api/defisCommune/list', {params : params})
+								.then(responseList => {
+									console.log("Chargement des defis de la commune en base : "+JSON.stringify(responseList.data));
+									this.$store.dispatch("reloadDefisCommune",{"defis" : responseList.data,"version" : null});
+								});
 							alert({
 							  title: "Sélection d'équipe",
 							  message: "Sélection de l'équipe validée",
@@ -215,10 +227,10 @@
 				
 			},
 			creerEquipe() {
-				if ((this.input.nom.length <= 0) || (this.input.commune.length <= 0)) {
+				if ((this.input.nom.length <= 0) || (this.input.commune.length <= 0) || (this.input.code.length <= 0)) {
 					alert({
 							  title: "Création d'équipe",
-							  message: "Veuillez saisir un nom et une commune",
+							  message: "Veuillez saisir un nom, une commune et un mot de passe",
 							  okButtonText: "OK"
 							});
 					return;
@@ -241,6 +253,16 @@
 				else {
 					console.log("on peut créer la nouvelle équipe : "+JSON.stringify(this.input));
 					this.$store.dispatch("newEquipe", {"equipe" :  this.input}).then(() => {
+						// chargement des defis de la commune 
+						console.log("CHANGEEQUIPE : creerEquipe :MAJ des defis communes à partir du serveur");
+						let params = {};
+						params["commune"] = this.$store.state.selectedEquipe.commune;
+						axios
+							.get('https://telethon.citeyen.com/public/api/defisCommune/list', {params : params})
+							.then(responseList => {
+								console.log("Chargement des defis de la commune en base : "+JSON.stringify(responseList.data));
+								this.$store.dispatch("reloadDefisCommune",{"defis" : responseList.data,"version" : null});
+							});
 						alert({
 						  title: "Création d'équipe confirmée",
 						  message: "Vous allez être redirigé pour intégrer les membres à votre équipe",

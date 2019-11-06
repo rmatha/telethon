@@ -11,16 +11,13 @@
 							<Image row="0" col="1" class="actionButton" src="~/assets/icons/save.png"/>
 							<Image row="0" col="2" src="~/assets/icons/add-256.gif" @tap="affichageCat"/>
 						</GridLayout>
-						<ListView v-if="!isCoordinateurOrOrganisateur" for="defiEquipe in defisEquipeActifs" >
-						  <v-template>
-							<GridLayout rows="auto,*" columns="*,50"  margin="0" @tap="getDefi(defiEquipe)">
+						<FlexboxLayout v-if="!isCoordinateurOrOrganisateur" flexDirection="column">
+							<GridLayout rows="20,20" columns="*,50"  margin="0" v-for="defiEquipe in defisEquipeActifs" @tap="getDefi(defiEquipe)">
 								<Label col="0" raw="0" :text="defiEquipe.defi.categorie.nom +' : '+defiEquipe.defi.nom" class="defiTitle" />
 								<Label col="0" row="1" :text="defiEquipe.defi.defidescription" class="defiDescription" />
 								<Image col="1" row="0" rowSpan="2" src="~/assets/icons/right.png" height="30px"/>
 							</GridLayout>
-						  </v-template>
-						</ListView>
-						
+						</FlexboxLayout>
 						<button class="boutonAction recup" text="Ajouter les défis de ma ville" @tap="recupereDefis" />
 						<GridLayout v-if="isCoordinateurOrOrganisateur" rows="auto" columns="*,50,50">
 							<Label row="0" col="0" class="m-b-20 titreTelethon" :text="sousTitreCommune" textWrap="true" />
@@ -63,6 +60,7 @@
 		
 		mounted() {
 			console.log("mesDefis : mounted : mesDefis "+JSON.stringify(this.$store.state.selectedEquipe.defis_equipes));
+			console.log("mesDefis : mounted : defis commune "+JSON.stringify(this.$store.state.defiCommune));
 		},
 		data() {
             return {

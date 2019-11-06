@@ -1,23 +1,16 @@
 <template>
     <!-- Bottom navigation -->
 	<StackLayout dock="bottom" :class="getClassMenu" ref="logoContainer" >
-		<Image v-if="menuOn" src="~/assets/ResourcePage/footerDown.png" class="rootFooter root"  stretch="aspectFill" width="100%" height="200px"  @swipe="loadMenu" @tap="loadMenu"/>
-		<Image v-else src="~/assets/ResourcePage/footerUp.png" class="rootFooter root"  stretch="aspectFill" width="100%" height="200px"  @tap="loadMenu" @swipe="loadMenu"/>
-		<GridLayout  rows="105,105,105,*" columns="*,2*" horizontalAlignment="center" class="innerFooter">
-			<!--<Image src="~/assets/icons/equipe.jpg" @tap="navProfil" row="0" col="0" />
-			<Image src="~/assets/icons/challenges.png" @tap="navChallenges" row="0" col="1" />
-			<Image src="~/assets/icons/Star-Red.png" @tap="navResultats" row="0" col="2" />-->
-			<Image  class="menuIcon" src="~/assets/icons/equipe_y.png" col="0" row="0"  />
-			<Label class="menuText" text="Equipe"  row="0" col="1" @tap="navProfil"  />
-			<Label class="menuBorder" text=""  row="0" col="0" colSpan="2" @tap="navProfil"  />
-			<Image  class="menuIcon" src="~/assets/icons/challenges_y.png" row="1" col="0"/>
-			<Label class="menuText" text="Défis" row="1" col="1" @tap="navChallenges"/>
-			<Label class="menuBorder" text=""  row="1" colSpan="2" @tap="navChallenges"  />
-			<Image class="menuIcon" src="~/assets/icons/resultat_y.png" row="2" col="0" />
-			<Label class="menuText" text="Score" row="2" col="1" @tap="navResultats"/>
-			<Label class="menuBorder" text=""  row="2" colSpan="2" @tap="navResultats"  />
+		
+		<GridLayout  rows="auto,auto" columns="*,*,*" class="footerBandeau">
+			<Label row="0" col="0" class="center" text="Equipe" @tap="navProfil"></Label>
+			<Image row="1" col="0" src.decode="font://&#xf0c0;" class="fa t-72" @tap="navProfil"></Image>
+			
+			<Label row="0" col="1" class="center" text="Défis" @tap="navChallenges"></Label>
+            <Image row="1" col="1" src.decode="font://&#xf164;" class="fa t-72" @tap="navChallenges"></Image>
 
-
+			<Label row="0" col="2" class="center" text="Résultats" @tap="navResultats"></Label>
+			<Image row="1" col="2" src.decode="font://&#xf201;" class="fa t-72" @tap="navResultats"></Image>
 			
 		</GridLayout>
 	</StackLayout>
@@ -56,14 +49,33 @@
 			navProfil() {
 				this.$navigateTo(profil);
 				this.menuOn = false;
+			
 			},
 			navChallenges() {
-				this.$navigateTo(mesDefis);
-				this.menuOn = false;
+				if (this.$store.state.selectedEquipe) {
+					this.$navigateTo(mesDefis);
+					this.menuOn = false;
+				}
+				else {
+					alert({
+						  title: "Selection d'une équipe",
+						  message: "Veuillez sélectionner une équipe avant d'afficher les défis",
+						  okButtonText: "OK"
+						})
+				}
 			},
 			navResultats() {
-				this.$navigateTo(resultats);
-				this.menuOn = false;
+				if (this.$store.state.selectedEquipe) {
+					this.$navigateTo(resultats);
+					this.menuOn = false;
+				}
+				else {
+					alert({
+						  title: "Selection d'une équipe",
+						  message: "Veuillez sélectionner une équipe avant d'afficher les résultats",
+						  okButtonText: "OK"
+						})
+				}
 			},
 		},
 		components: {

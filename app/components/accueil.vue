@@ -81,7 +81,13 @@
 			nbDefisEquipe() {
 				var messageDefi = "Pas de défis enregistrés";
 				if (this.$store.state.selectedEquipe.defis_equipes) {
-					messageDefi ="Nombre de défis pour l'équipe : "+this.$store.state.selectedEquipe.defis_equipes.length;
+					var nbDefisActifs = this.$store.state.selectedEquipe.defis_equipes.filter(defi => {
+						console.log("ACCUEIL : nbDefisEquipe : "+JSON.stringify(defi));
+						return !defi.delete;
+					});
+					if (nbDefisActifs.length > 0) {
+						messageDefi ="Nombre de défis pour l'équipe : "+nbDefisActifs.length;
+					}
 				}
 				return messageDefi;
 			},
@@ -130,10 +136,28 @@
 				this.$navigateTo(changeEquipe, { props: {type : type}});
 			},
 			navMesDefis() {
-				this.$navigateTo(mesDefis);
+				if (this.$store.state.selectedEquipe) {
+					this.$navigateTo(mesDefis);
+				}
+				else {
+					alert({
+						  title: "Selection d'une équipe",
+						  message: "Veuillez sélectionner une équipe avant d'afficher les défis",
+						  okButtonText: "OK"
+						})
+				}
 			},
 			navScore() {
-				this.$navigateTo(resultats);
+				if (this.$store.state.selectedEquipe) {
+					this.$navigateTo(resultats);
+				}
+				else {
+					alert({
+						  title: "Selection d'une équipe",
+						  message: "Veuillez sélectionner une équipe avant d'afficher les défis",
+						  okButtonText: "OK"
+						})
+				}
 			},
 			navEquipe() {
 				this.$navigateTo(equipe);

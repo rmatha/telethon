@@ -98,9 +98,14 @@ const store = new Vuex.Store({
 		},
 		
 		newEquipe(state,data) {
-			this.state.selectedEquipe = data.equipe;
-			this.state.equipes.push(data.equipe);
-			ApplicationSettings.setString("store", JSON.stringify(this.state));
+			console.log("TELESTORE : NEWEQUIPE : enregistrement de l'équipe");
+			return new Promise((resolve) => {
+				this.state.selectedEquipe = data.equipe;
+				this.state.equipes.push(data.equipe);
+				ApplicationSettings.setString("store", JSON.stringify(this.state));
+				resolve();
+			});
+			
 		},
 		
 		
@@ -192,6 +197,9 @@ const store = new Vuex.Store({
 		
 		insertScore(state,data) {
 			console.log("TELESTORE : insertScore : score en cours : "+JSON.stringify(data));
+			if (!this.state.selectedEquipe.scores) {
+				this.state.selectedEquipe.scores = [];
+			}
 			this.state.selectedEquipe.scores.push(data.score);
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 			console.log("TELESTORE : insertScore : liste des scores : "+JSON.stringify(this.state.scoresEquipe)); 
@@ -224,6 +232,7 @@ const store = new Vuex.Store({
 				this.state.selectedEquipe.defis_equipes = [];
 			//}
 			for (const defi of this.state.defiCommune.defis) {
+				defi.delete = false;
 				this.state.selectedEquipe.defis_equipes.push(defi);
 			}
 			console.log("TELESTORE : RECUPERERDEFIS : mesDefis : "+JSON.stringify(this.state.selectedEquipe.defis_equipes));
@@ -256,7 +265,9 @@ const store = new Vuex.Store({
 			console.log("TELESTORE : RELOADDEFISCOMMUNE : Liste des defis à charger : "+JSON.stringify(data));
 			console.log("TELESTORE : RELOADDEFISCOMMUNE : Liste des defis à charger .defis: "+JSON.stringify(data.defis));
 			this.state.defiCommune = data;
-			this.state.versionDefisCommune = data.version;
+			if (data.version) {
+				this.state.versionDefisCommune = data.version;
+			}
 			console.log("TELESTORE : reloadDefisCommune : defis commune "+JSON.stringify(this.state.defiCommune));
 			console.log("TELESTORE : reloadDefisCommune : defis commune "+JSON.stringify(this.state.defiCommune.defis));
 			console.log("TELESTORE : reloadDefisCommune : defis commune length "+JSON.stringify(this.state.defiCommune.defis.length));
@@ -281,12 +292,21 @@ const store = new Vuex.Store({
 		},
 		
 		insertDefisCurrentCommune(state,data) {
+			if (!this.state.defisCommune) {
+				this.state.defisCommune = [];
+			}
 			this.state.defisCommune.push(data.defi);
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
 		
 		insertDefisEquipe(state,data) {
+			console.log("TELESTORE : insertDefisEquipe : before : "+JSON.stringify(this.state.selectedEquipe.defis_equipes));
+			if (!this.state.selectedEquipe.defis_equipes) {
+				this.state.selectedEquipe.defis_equipes = [];
+			}
+			data.defi.delete = false;
 			this.state.selectedEquipe.defis_equipes.push(data.defi);
+			console.log("TELESTORE : insertDefisEquipe : after : "+JSON.stringify(this.state.selectedEquipe.defis_equipes));
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
 		
