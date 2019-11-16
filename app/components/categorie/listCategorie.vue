@@ -65,34 +65,34 @@
 		methods: {
 			showActions(itemRef) {
 				this.selectedCategorie = itemRef;
-				console.log("listCategorie showActions : nouvelleCategorie :"+this.selectedCategorie);
+				//console.log("listCategorie showActions : nouvelleCategorie :"+this.selectedCategorie);
 			},
 			isShowActions(itemRef) {
-				console.log("listCategorie isShowActions : itemRef "+itemRef);
-				console.log("listCategorie isShowActions : this.selectedCategorie "+this.selectedCategorie);
+				//console.log("listCategorie isShowActions : itemRef "+itemRef);
+				//console.log("listCategorie isShowActions : this.selectedCategorie "+this.selectedCategorie);
 				if (itemRef == this.selectedCategorie) {
 					return true;
 				};
 				return false;
 			},
 			nbDefis(itemRef) {
-				console.log("listCategorie state.defis :"+JSON.stringify(this.$store.state.defis));
-				console.log("listCategorie itemRef:"+JSON.stringify(itemRef));
+				//console.log("listCategorie state.defis :"+JSON.stringify(this.$store.state.defis));
+				//console.log("listCategorie itemRef:"+JSON.stringify(itemRef));
 				
 				var nbDefisCat = this.$store.state.defis.filter(item => {
-					console.log("listCategorie : "+item.categorie.nom +" : "+itemRef.nom); 
+					//console.log("listCategorie : "+item.categorie.nom +" : "+itemRef.nom); 
 					return item.categorie.nom == itemRef.nom;
 				});
 				return "Nombre de défis : "+nbDefisCat.length;
 			},
 			addCat() {
-				console.log("Ajout d'une catégorie");
+				//console.log("Ajout d'une catégorie");
 				this.$store.state.selectedCategorie = null;
 				this.$navigateTo(addCategorie);
 			},
 			
             selectCategorie(categorie) {
-				console.log("listCategorie : ouverture des defis pour la categorie : "+categorie.nom);
+				//console.log("listCategorie : ouverture des defis pour la categorie : "+categorie.nom);
 				this.$store.state.selectedCategorie = categorie;
 				this.$navigateTo(listDefisCat);
 			},

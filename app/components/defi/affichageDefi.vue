@@ -27,20 +27,17 @@
 							<Label row="0" col="0" class="label m-b-20" text="Liste des scores :" textWrap="true" />
 							<Image row="0" col="1" v-if="defiPresent" src="~/assets/icons/add-256.gif" @tap="addScore"/>
 						</GridLayout>
-						<ListView  v-if="$store.state.selectedEquipe" for="score in scoresCurrentDefi">
-						  <v-template>
-							<GridLayout rows="auto" columns="*,50" width="100%" margin="0" @tap="editScore(score)">
+						<FlexboxLayout v-if="$store.state.selectedEquipe" flexDirection="column">
+							<GridLayout v-for="(score,index) in scoresCurrentDefi" :key="index" rows="auto" columns="*,50" @tap="editScore(score)" >
 								<GridLayout col="0" verticalAlignment="bottom">
 									<StackLayout paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16">
-										<Label :text="score.participant.nom" class="defiTitle" />
+										<Label :text="scoreParticipant(score)" class="defiTitle" />
 										
 									</StackLayout>
 								</GridLayout>
 								<Label col="1" :text="score.score" class="defiTitle" />
 							</GridLayout>
-									
-						  </v-template>
-						</ListView>
+						</FlexboxLayout>
 						<Button class="boutonAction" v-if="defiPresent" :text="enleverDefiLabel" @tap="enleverDefi"/>
 						<Button class="boutonAction" v-else :text="ajouterDefiLabel" @tap="ajouterDefi"/>	
 					</StackLayout>
@@ -64,6 +61,7 @@
 	
 	export default {
 		computed: {
+			
 			ajouterDefiLabel() {
 				if(this.$store.state.selectedCommune) {
 					return "Ajouter a ma commune";
@@ -78,33 +76,33 @@
 			},
 			defiPresent() {			
 				
-				console.log("on vérifie si le défi est présent");
-				console.log("this.$store.state.selectedCommune :"+this.$store.state.selectedCommune);
-				console.log("this.$store.state.selectedCategorie :"+JSON.stringify(this.$store.state.selectedCategorie ));
+				//console.log("on vérifie si le défi est présent");
+				//console.log("this.$store.state.selectedCommune :"+this.$store.state.selectedCommune);
+				//console.log("this.$store.state.selectedCategorie :"+JSON.stringify(this.$store.state.selectedCategorie ));
 				var filterDefi = []
 				if (this.$store.state.selectedCommune) {
 					
 					filterDefi = this.$store.state.defiCommune.defis.filter(defi => {
-						console.log("AFFICHAGEDEFI : DefiPrensent : defis : "+JSON.stringify(defi));
+						//console.log("AFFICHAGEDEFI : DefiPrensent : defis : "+JSON.stringify(defi));
 						return defi == this.$store.state.selectedDefi;
 					});
-					console.log("AFFICHAGEDEFI : DefiPrensent : terminée");
+					//console.log("AFFICHAGEDEFI : DefiPrensent : terminée");
 				}
 				else {
 					if (this.$store.state.selectedEquipe.defis_equipes) {
-						console.log("on passe par defisEquipe");
+						//console.log("on passe par defisEquipe");
 						filterDefi = this.$store.state.selectedEquipe.defis_equipes.filter(defi => {
-							console.log("AFFICHAGEDEFI : DefiPrensent : elem : "+JSON.stringify(defi));
-							console.log("AFFICHAGEDEFI : DefiPrensent : selectedDEfi : "+JSON.stringify(this.$store.state.selectedDefi));
+							//console.log("AFFICHAGEDEFI : DefiPrensent : elem : "+JSON.stringify(defi));
+							//console.log("AFFICHAGEDEFI : DefiPrensent : selectedDEfi : "+JSON.stringify(this.$store.state.selectedDefi));
 							return (defi == this.$store.state.selectedDefi) & !defi.delete;
 						});
 					}
 				}
 				if (filterDefi.length > 0) {
-					console.log("le défi a été trouvé");
+					//console.log("le défi a été trouvé");
 					return true;
 				}
-				console.log("le défi n'a pas été trouvé");
+				//console.log("le défi n'a pas été trouvé");
 				return false;
 				
 			},
@@ -118,17 +116,20 @@
         },
 		mounted() {
 			// chargement des scores pour le defi en cours
-			console.log("AFFICHAGEDEFI : MOUNTED : selectedEquipe.scores : "+JSON.stringify(this.$store.state.selectedEquipe.scores));
-			console.log("AFFICHAGEDEFI : MOUNTED : selectedDefi : "+JSON.stringify(this.$store.state.selectedDefi));
+			//console.log("AFFICHAGEDEFI : MOUNTED : selectedEquipe.scores : "+JSON.stringify(this.$store.state.selectedEquipe.scores));
+			//console.log("AFFICHAGEDEFI : MOUNTED : selectedDefi : "+JSON.stringify(this.$store.state.selectedDefi));
 			if (this.$store.state.selectedEquipe.scores) {
 				this.scoresCurrentDefi = this.$store.state.selectedEquipe.scores.filter(scoreItem => {
-					console.log("AFFICHAGEDEFI : MOUNTED : "+JSON.stringify(scoreItem.defi.id)+" : "+JSON.stringify(this.$store.state.selectedDefi.defi.id));
+					//console.log("AFFICHAGEDEFI : MOUNTED : "+JSON.stringify(scoreItem.defi.id)+" : "+JSON.stringify(this.$store.state.selectedDefi.defi.id));
 					return (scoreItem.defi.id == this.$store.state.selectedDefi.defi.id) & !scoreItem.delete;
 				});
-				console.log("AFFICHAGEDEFI : MOUNTED : Liste des scores pour le DEFI  : "+JSON.stringify(this.scoresCurrentDefi));
+				//console.log("AFFICHAGEDEFI : MOUNTED : Liste des scores pour le DEFI  : "+JSON.stringify(this.scoresCurrentDefi));
 			};
         },
 		methods: {
+			scoreParticipant(score) {
+				return score.participant ? score.participant.nom : "Pas de nom associé";
+			},
 			changeDetailState() {
 				this.detail = !this.detail;
 			},
@@ -137,12 +138,12 @@
 				return profilEnCours.nom;
 			},
 			editScore(item) {
-				console.log("Edit d'un  score :");
+				//console.log("Edit d'un  score :");
 				this.$store.state.selectedScore = item;
 				this.$navigateTo(addScore);
 			},
 			addScore() {
-				console.log("Ajout d'un score");
+				//console.log("Ajout d'un score");
 				this.$store.state.selectedScore = null;
 				this.$navigateTo(addScore);
 			},
@@ -154,9 +155,9 @@
 				  okButtonText: "OK",
 				  cancelButtonText: "NON"
 				}).then(result => {
-				  console.log(result);
+				  //console.log(result);
 				  if (result) {
-						console.log("on supprime ! ");
+						//console.log("on supprime ! ");
 						this.$store.dispatch("deleteDefi", {"defi" : this.$store.state.selectedDefi});
 						this.$store.state.selectedDefi = null;
 						alert({
@@ -164,7 +165,7 @@
 						  message: "Le défis a été supprimé de l'application",
 						  okButtonText: "OK"
 						}).then(() => {
-						  console.log("Alert dialog closed");
+						  //console.log("Alert dialog closed");
 						  this.$navigateTo(listDefisCat);
 						});
 					
@@ -172,17 +173,17 @@
 						
 					}
 					else {
-						console.log("pas touche !");
+						//console.log("pas touche !");
 					}
 				});
 			},
 			enleverDefi() {
 				if (this.$store.state.selectedCommune) {
-					console.log("on enleve de la liste de defisCommune");
+					//console.log("on enleve de la liste de defisCommune");
 					this.$store.dispatch("deleteDefisCurrentCommune", {"defi" : this.$store.state.selectedDefi});
 				}
 				else {
-					console.log("on enleve de la liste de defisEquipe");
+					//console.log("on enleve de la liste de defisEquipe");
 					this.$store.dispatch("deleteDefisEquipe", {"defi" : this.$store.state.selectedDefi});
 				}
 				alert({
@@ -190,17 +191,17 @@
 					  message: "Le défis a été supprimé de la liste",
 					  okButtonText: "OK"
 					}).then(() => {
-					  console.log("Alert dialog closed");
+					  //console.log("Alert dialog closed");
 					  this.$navigateTo(affichageDefi);
 					});
 			},
 			ajouterDefi() {
 				if (this.$store.state.selectedCommune) {
-					console.log("on ajoute de la liste de defisCommune");
+					//console.log("on ajoute de la liste de defisCommune");
 					this.$store.dispatch("insertDefisCurrentCommune", {defi : this.$store.state.selectedDefi});
 				}
 				else {
-					console.log("on ajoute de la liste de defisEquipe");
+					//console.log("on ajoute de la liste de defisEquipe");
 					this.$store.dispatch("insertDefisEquipe", {defi : this.$store.state.selectedDefi});
 				}
 				alert({
@@ -208,7 +209,7 @@
 					  message: "Le défis a été ajouté à la liste",
 					  okButtonText: "OK"
 					}).then(() => {
-					  console.log("Alert dialog closed");
+					  //console.log("Alert dialog closed");
 					  this.$navigateTo(affichageDefi);
 					});
 			},

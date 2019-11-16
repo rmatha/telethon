@@ -18,7 +18,7 @@
 					<ScrollView v-if="affichageVilles" >
 						<StackLayout backgroundColor="#ffffff" >
 							<GridLayout v-for="ville in villes" rows="40" columns="*"  >
-								<Label :text="ville.nom" @tap="selectVille(ville.nom,ville.code)" class="labelVille"/>
+								<Label :text="ville.nom" @tap="selectVille(ville.nom,ville.code)" />
 							</GridLayout>
 						</StackLayout>
 					</ScrollView>
@@ -45,18 +45,18 @@
     export default {
         mounted() {
 			
-			console.log("Participant en cours : "+JSON.stringify(this.$store.state.selectedParticipant));
+			//console.log("Participant en cours : "+JSON.stringify(this.$store.state.selectedParticipant));
 			if (this.$store.state.selectedParticipant != null) {
 				this.input.nom = this.$store.state.selectedParticipant.nom;
 				this.input.commune = this.$store.state.selectedParticipant.commune;
 				
 				
-				console.log("R2cupération des informations du participant");
+				//console.log("R2cupération des informations du participant");
 			}
 			else {
-				console.log("nouveau participant");
+				//console.log("nouveau participant");
 			}
-			console.log("Equipe en cours : "+this.$store.state.selectedEquipe.nom);
+			//console.log("Equipe en cours : "+this.$store.state.selectedEquipe.nom);
 			
 			
         },
@@ -98,7 +98,7 @@
 							var doublon = this.$store.state.selectedEquipe.participants.filter(item => {
 								return item.nom == this.input.nom;
 							});
-							console.log("PROFIL :SAVE: doublon size : "+doublon.length);
+							//console.log("PROFIL :SAVE: doublon size : "+doublon.length);
 							if (doublon.length > 0) {
 								// le nom existe dajà donc on refuse 
 								alert({
@@ -123,7 +123,7 @@
 					}
 					else {
 						// on ajoute un nouveau participant si n'existe pas déjà dans la liste des participants
-						console.log("PROFIL : SAVE : on créé un participant");
+						//console.log("PROFIL : SAVE : on créé un participant");
 						if (this.$store.state.selectedEquipe.participants) {
 							this.$store.state.selectedEquipe.participants.forEach (participant => {
 								if (participant.nom == this.input.nom) {
@@ -132,7 +132,7 @@
 							});
 						};
 						if (!doublon) {
-							console.log("PROFIL : SAVE : on ajoute le participant:  : "+JSON.stringify(this.input));
+							//console.log("PROFIL : SAVE : on ajoute le participant:  : "+JSON.stringify(this.input));
 							this.$store.dispatch("addParticipant", {"participant" : this.input});
 							this.$store.state.updateEquipe = true;
 							this.$navigateTo(equipe);
@@ -162,16 +162,15 @@
 				  okButtonText: "oui",
 				  cancelButtonText: "non"
 				}).then(() => {
-					console.log("on supprime !");
+					//console.log("on supprime !");
 					this.$store.dispatch("deleteParticipant", {"participant" : this.input});
-					this.updateEquipe = true;
 					this.$navigateTo(equipe);
 				});
 					
 			},
 			selectVille(nom,code) {
-				console.log("Sélection de la ville");
-				console.log(nom);
+				//console.log("Sélection de la ville");
+				//console.log(nom);
 				this.input.commune = nom;
 				this.affichageVilles = false;
 				this.updateCommune = true;
@@ -179,11 +178,13 @@
 				
 			},
             onTextChange: function() {
-                console.log("commune texte : " + this.input.commune);
+                //console.log("commune texte : " + this.input.commune);
 				// filtre de la liste villes 
-				this.villes = villesRef.filter(ville => {
-					return ville.nom.toLowerCase().indexOf(this.input.commune.toLowerCase()) > -1
-				})
+				if (this.input.commune) {
+					this.villes = villesRef.filter(ville => {
+						return ville.nom.toLowerCase().indexOf(this.input.commune.toLowerCase()) > -1
+					})
+				};
 				if ((this.input.commune.length > 2) && (!this.updateCommune)) {
 					this.affichageVilles = true;
 				}

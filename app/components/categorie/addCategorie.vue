@@ -36,9 +36,9 @@
             }
         },
 		mounted() {
-			console.log("Edition de la categorie");
+			//console.log("Edition de la categorie");
 			if (this.$store.state.selectedCategorie) {
-				console.log("Chargement de cat");
+				//console.log("Chargement de cat");
 				this.categorie = this.$store.state.selectedCategorie;
 			};
 			
@@ -46,13 +46,13 @@
 		methods: {
 			saveCategorie() {
 				if (this.$store.state.selectedCategorie) {
-					console.log("on update la catégorie : "+this.categorie.nom);
+					//console.log("on update la catégorie : "+this.categorie.nom);
 					this.$store.dispatch("updateCategorie", {"categorie" : this.categorie});
 					this.$store.state.updateCategorie = true;
 					this.$navigateTo(listCategorie);
 				}
 				else {
-					console.log("on ajoute la catégorie : "+this.categorie.nom);
+					//console.log("on ajoute la catégorie : "+this.categorie.nom);
 					this.$store.dispatch("addCategorie", {"categorie" : this.categorie});
 					this.$store.state.updateCategorie = true;
 					this.$navigateTo(listCategorie);

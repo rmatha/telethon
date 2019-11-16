@@ -55,10 +55,10 @@
 		mounted() {
 			// recueration du defi s"il existe 
 			if (this.$store.state.selectedDefi) {
-				console.log("editDefi : mounted : on récupère le defi en cours :"+JSON.stringify(this.$store.state.selectedDefi.defi));
+				//console.log("editDefi : mounted : on récupère le defi en cours :"+JSON.stringify(this.$store.state.selectedDefi.defi));
 			}
 			else {
-				console.log("editDefi : mounted : création d'un nouveau défi :");
+				//console.log("editDefi : mounted : création d'un nouveau défi :");
 				if (this.$store.state.selectedCategorie) {
 						// récupération de la catégorie en cours
 					this.defi.categorie = this.$store.state.selectedCategorie;
@@ -77,7 +77,7 @@
         },
 		methods: {
 			saveDefi() {
-				console.log("on sauvegarde le defi : "+JSON.stringify(this.defi));
+				//console.log("on sauvegarde le defi : "+JSON.stringify(this.defi));
 				if (this.$store.state.selectedDefi) {
 					this.$store.dispatch("updateDefi", {"defi" : this.$store.state.selectedDefi.defi});
 				}

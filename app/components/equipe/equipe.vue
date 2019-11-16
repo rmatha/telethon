@@ -36,16 +36,15 @@
 						
 						
 					</StackLayout>
-					<ListView v-if="$store.state.selectedEquipe" for="participant in participantsActifs" height="100%" > 
-						<v-template>
-							<GridLayout rows="40" columns="*"  >
-								<Label :text="libelleProfil(participant)" class="valeur" @tap="editParticipant(participant)"/>
-							</GridLayout>
-						</v-template>
-					</ListView>
+					<FlexboxLayout v-if="$store.state.selectedEquipe" flexDirection="column">
+						<GridLayout rows="40" columns="*" v-for="(participant, index) in participantsActifs" :key="index">
+					
+							<Label :text="libelleProfil(participant)" class="valeur" @tap="editParticipant(participant)"/>
+						</GridLayout>
+					</FlexboxLayout>
 					
 					<StackLayout v-else >
-						<Label text="! Pas de particpants inscrits !" textWrap="true" class="valeur" @tap="editParticipant(participant)"/>
+						<Label text="! Pas de particpants inscrits ! " textWrap="true" class="valeur" @tap="editParticipant(participant)"/>
 						<Label text="Ajouter des participants via le bouton à droite" textWrap="true" class="valeur" @tap="editParticipant(participant)"/>
 					</StackLayout>
 					
@@ -74,28 +73,29 @@
 	
     export default {
         mounted() {
-			console.log("Equipe en cours est à :"+JSON.stringify(this.$store.state.selectedEquipe));
+			//console.log("Equipe en cours est à :"+JSON.stringify(this.$store.state.selectedEquipe));
 			if (this.$store.state.selectedEquipe.participants) {
-				console.log("Liste des participants : "+JSON.stringify(this.$store.state.selectedEquipe.participants));
-				console.log("nombre des participants : "+this.$store.state.selectedEquipe.participants.length);
+				//console.log("Liste des participants : "+JSON.stringify(this.$store.state.selectedEquipe.participants));
+				//console.log("nombre des participants : "+this.$store.state.selectedEquipe.participants.length);
 			}
 			// vérification des version de la version de l'équipe sur le serveur 
 			const connectionType = connectivity.getConnectionType();
-			console.log("etat de la connexion : "+connectionType);
+			//console.log("etat de la connexion : "+connectionType);
 			if (connectionType !== connectivity.connectionType.none) {
-				console.log("On peut récupérer la version de l'équipe sur le serveur");
+				//console.log("On peut récupérer la version de l'équipe sur le serveur");
 				if (this.$store.state.selectedEquipe) {
-					console.log("Version equipe locale : "+this.$store.state.selectedEquipe.version);
+					//console.log("Version equipe locale : "+this.$store.state.selectedEquipe.version);
 					let params = {};
-					params["nom"] = this.$store.state.selectedEquipe.nom;
 					params["commune"] = this.$store.state.selectedEquipe.commune;
+					params["nom"] = this.$store.state.selectedEquipe.nom;
+								
 					axios
 						.get('https://telethon.citeyen.com/public/api/equipes/version', {params : params})
 						.then(response => {
-							console.log("Version de l'équipe sur le serveur : "+response.data.version);
+							//console.log("Version de l'équipe sur le serveur : "+response.data.version);
 							let versionEquipeServeur = response.data.version;
 							if (versionEquipeServeur > this.$store.state.selectedEquipe.version) {
-								console.log("on doit demander si on récupère les nouveaux participants du serveur");
+								//console.log("on doit demander si on récupère les nouveaux participants du serveur");
 								confirm({
 									title: "Mise à jour de l'équipe",
 									message: "Une version plus récente a été trouvé sur le serveur. Voulez-vous récupérer la mise à jour ?",
@@ -103,6 +103,27 @@
 									cancelButtonText: "NON"
 								}).then(result => {
 									if (result) {
+										axios
+										.get('https://telethon.citeyen.com/public/api/equipes/info', {params : params})
+										.then(response => {
+											this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
+											alert({
+											  title: "Chargement de l'équipe",
+											  message: "Synchronisation de l'équipe avec le serveur OK",
+											  okButtonText: "OK"
+											});
+											
+										})
+										.catch(error => {
+											//console.log("updatete KO  : "+error);
+											alert({
+											  title: "Problème de sauvegarde",
+											  message: "La synchronisation avec le serveur est KO. Mais vous pouvez continuer à utiliser cette équipe pour saisir les participants et les scores. Vous pourrez faire la sauvegarde plus tard",
+											  okButtonText: "OK"
+											}).then(() => {
+											  //console.log("Alert dialog closed");
+											});
+										});
 										this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
 									}
 								});
@@ -150,68 +171,68 @@
 				.takePicture({ width: 700, height: 700, keepAspectRatio: true })
 				.then(
 				  imageAsset => {
-					console.log("Result is an image asset instance");
+					//console.log("Result is an image asset instance");
 					this.imageSrc = imageAsset;
 					const source = new imageSourceModule.ImageSource();
 					source.fromAsset(imageAsset).then(imageSource => {
 						const folder = fileSystemModule.knownFolders.documents().path;
-						console.log("folder : "+folder);
+						//console.log("folder : "+folder);
 						const fileName = "picture.png";
 						const path = fileSystemModule.path.join(folder,fileName);
 						const picsaved = imageSource.saveToFile(path, "png");
 
 						if (picsaved) {
-							console.log("Saved");
+							//console.log("Saved");
 						}
 						else {
-							console.log("picture NOT saved");
+							//console.log("picture NOT saved");
 						}
 					});
 				  },
 				  error => console.log(error)
 				)
 				.catch(err => {
-				  console.log("Error -> " + err.message);
+				  //console.log("Error -> " + err.message);
 				});
 			},
 			libelleProfil(participantTemp) {
 				return participantTemp.nom;
 			},
 			addParticipant(participantTemp) {
-				console.log("Ajout d'un participant");
+				//console.log("Ajout d'un participant");
 				this.$store.dispatch("setSelectedParticipant",{"participant" : null});
 				this.$navigateTo(profil);
 			},
 			editParticipant(participantTemp) {
-				console.log("edition du aprticipant :"+participantTemp);
+				//console.log("edition du aprticipant :"+participantTemp);
 				this.$store.dispatch("setSelectedParticipant",{"participant" : participantTemp});
 				this.$navigateTo(profil);
 			},
 			
 			changeEquipe() {
-				console.log("on change d'équipe");
+				//console.log("on change d'équipe");
 				this.$navigateTo(changeEquipe);
 			},
 
 
 			uploadEquipe() {
 				confirm({
-				  title: "Sauvegarde de l'équipe TEST",
+				  title: "Sauvegarde de l'équipe",
 				  message: "Confirmez-vous la sauvegarde de l'équipe sur le serveur ?",
 				  okButtonText: "OK",
 				  cancelButtonText: "NON"
 				}).then(result => {
-				  console.log(result);
+				  //console.log(result);
 				  if (result) {
-					console.log("On sauvegarde sur le serveur TEST");
-					console.log("Equipe :"+JSON.stringify(this.$store.state.selectedEquipe));
-					console.log("Participants :"+JSON.stringify(this.$store.state.participants));
+					//console.log("On sauvegarde sur le serveur");
+					//console.log("Equipe :"+JSON.stringify(this.$store.state.selectedEquipe));
+					//console.log("Participants :"+JSON.stringify(this.$store.state.participants));
 					axios
 						  .post('https://www.telethon.citeyen.com/public/api/equipes/uploadEquipe', {
 							Equipe : this.$store.state.selectedEquipe
 						  })
 						  .then(response => {
-								console.log("update OK");
+								//console.log("update OK");
 								// maintenant on récupère les informations sur le serveur pour être synchro
 							
 							
@@ -219,7 +240,7 @@
 								let params = {};
 								params["commune"] = this.$store.state.selectedEquipe.commune;
 								params["nom"] = this.$store.state.selectedEquipe.nom;
-								console.log("Appel suivant synchro");
+								//console.log("Appel suivant synchro");
 								axios
 								.get('https://telethon.citeyen.com/public/api/equipes/info', {params : params})
 								.then(response => {
@@ -231,24 +252,24 @@
 									});
 								})
 								.catch(error => {
-									console.log("updatete KO : "+error);
+									//console.log("updatete KO : "+error);
 									alert({
 									  title: "Problème de sauvegarde",
 									  message: "La synchronisation avec le serveur est KO. Mais vous pouvez continuer à utiliser cette équipe pour saisir les participants et les scores. Vous pourrez faire la sauvegarde plus tard",
 									  okButtonText: "OK"
 									}).then(() => {
-									  console.log("Alert dialog closed");
+									  //console.log("Alert dialog closed");
 									});
 								});
 						  })
 						  .catch(error => {
-							console.log("updatete KO : "+error);
+							//console.log("updatete KO : "+error);
 							alert({
 							  title: "Problème de sauvegarde",
 							  message: "La sauvegarde n'est pas possible actuellement. Mais vous pouvez continuer à utiliser cette équipe pour saisir les participants et les scores. Vous pourrez faire la sauvegarde plus tard",
 							  okButtonText: "OK"
 							}).then(() => {
-							  console.log("Alert dialog closed");
+							  //console.log("Alert dialog closed");
 							  this.$navigateTo(mesDefis);
 							});
 						  })

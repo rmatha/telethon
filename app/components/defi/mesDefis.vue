@@ -55,12 +55,13 @@
 	import affichageDefi from "./affichageDefi";
 	import preload from "../preload";
 	import axios from 'axios';
+	import mesDefis from './mesDefis';
 	
 	export default {
 		
 		mounted() {
-			console.log("mesDefis : mounted : mesDefis "+JSON.stringify(this.$store.state.selectedEquipe.defis_equipes));
-			console.log("mesDefis : mounted : defis commune "+JSON.stringify(this.$store.state.defiCommune));
+			//console.log("mesDefis : mounted : mesDefis "+JSON.stringify(this.$store.state.selectedEquipe.defis_equipes));
+			//console.log("mesDefis : mounted : defis  commune "+JSON.stringify(this.$store.state.defiCommune));
 		},
 		data() {
             return {
@@ -119,27 +120,28 @@
 			},
 			
 			recupereDefis() {
-				console.log("Récupération des défis de la commune");
+				//console.log("Récupération des défis de la commune");
 				let titre = "Les défis de votre commune ont été chargés dans vos défis";
 				if (this.$store.state.selectedEquipe) {
-					console.log("defis de la commune : "+this.$store.state.defiCommune);
+					//console.log("defis de la commune : "+this.$store.state.defiCommune);
 					if (this.$store.state.defiCommune.defis) {
 						if (this.$store.state.defiCommune.defis.length > 0) {
-							console.log("R2cupération des défis OK");
+							//console.log("R2cupération des défis OK");
 							this.$store.dispatch("recupereDefis");
+							this.$navigateTo(mesDefis);
 						}
 						else {
-							console.log("pas de défis pour la commune en cours");
+							//console.log("pas de défis pour la commune en cours");
 							titre = "Aucun défi à récupérer sur la commune de l'équipe";
 						}
 					}
 					else {
-						console.log("pas de défis pour la commune en cours");
+						//console.log("pas de défis pour la commune en cours");
 						titre = "Aucun défi à récupérer sur la commune de l'équipe";
 					}
 				}
 				else {
-					console.log("pas de commune selectionné");
+					//console.log("pas de commune selectionné");
 					titre = "Veuillez renseigner votre commune pour pouvoir récupérer les défis";
 				}
 				alert({
@@ -147,23 +149,23 @@
 					  message: titre,
 					  okButtonText: "OK"
 					}).then(() => {
-					  console.log("Alert dialog closed");
+					  //console.log("Alert dialog closed");
 					});
 			},
             affichageCat() {
-				console.log("liste des defi");
+				//console.log("liste des defi");
 				this.$store.state.selectedCommune = null;
 				this.$store.state.affichageDefiType = "equipe";
                 this.$navigateTo(listeChallengesCat);
             },
 			affichageCatCommune() {
-				console.log("liste des defis commune");
+				//console.log("liste des defis commune");
 				this.$store.state.affichageDefiType = "commune";
 				this.$store.state.selectedCommune = this.$store.state.selectedEquipe.commune;
                 this.$navigateTo(listeChallengesCat);
 			},
 			getDefi(item) {
-				console.log("MESDEFIS : GETDefi : item : "+JSON.stringify(item));
+				//console.log("MESDEFIS : GETDefi : item : "+JSON.stringify(item));
 				this.$store.state.selectedCategorie = item.categorie
 				this.$store.state.selectedDefi = item;
 				this.$store.state.selectedCommune = null;

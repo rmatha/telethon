@@ -59,8 +59,8 @@
 				return "le Participant "+moyenne.idProfil+" a une moyenne de "+moyenne.moyenne;
 			},
 			charger() {
-				console.log("Lancement du chargement du tableau");
-				console.log(this.$_.random(20));
+				//console.log("Lancement du chargement du tableau");
+				//console.log(this.$_.random(20));
 				this.scoreEquipe = [];
 				this.scoreEquipe.push({id : 0,idDefi : 0,idProfil : 0 ,score : 7});
 				this.scoreEquipe.push({id : 1,idDefi : 1,idProfil : 1 ,score : 20});
@@ -75,26 +75,26 @@
 				this.message = "";
 				// on gére pour les moyennes par défis
 				var scoreByDefi = _.groupBy(this.scoreEquipe,"idDefi");
-				console.log(JSON.stringify(scoreByDefi));
-				console.log("--------------------------");
+				//console.log(JSON.stringify(scoreByDefi));
+				//console.log("--------------------------");
 				_.forEach(scoreByDefi, function(scoreTemp,idDefi) {
-					console.log("idDefi : "+idDefi+" enregistrements : "+JSON.stringify(scoreTemp));
+					//console.log("idDefi : "+idDefi+" enregistrements : "+JSON.stringify(scoreTemp));
 					var scores = _.map(scoreTemp,"score");
-					console.log("scores : "+JSON.stringify(scores));
+					//console.log("scores : "+JSON.stringify(scores));
 					var moyenne = _.meanBy(scoreTemp, 'score');
-					console.log("moyenne : "+moyenne);
+					//console.log("moyenne : "+moyenne);
 					this.moyenneDefi.push({ idDefi:idDefi, moyenne : moyenne});
 				}.bind(this));
 				// on gére pour les moyennes par participant
 				var scoreByProfil = _.groupBy(this.scoreEquipe,"idProfil");
-				console.log(JSON.stringify(scoreByProfil));
-				console.log("--------------------------");
+				//console.log(JSON.stringify(scoreByProfil));
+				//console.log("--------------------------");
 				_.forEach(scoreByProfil, function(scoreTemp,idProfil) {
-					console.log("idProfil : "+idProfil+" enregistrements : "+JSON.stringify(scoreTemp));
+					//console.log("idProfil : "+idProfil+" enregistrements : "+JSON.stringify(scoreTemp));
 					var scores = _.map(scoreTemp,"score");
-					console.log("scores : "+JSON.stringify(scores));
+					//console.log("scores : "+JSON.stringify(scores));
 					var moyenne = _.meanBy(scoreTemp, 'score');
-					console.log("moyenne : "+moyenne);
+					//console.log("moyenne : "+moyenne);
 					this.moyenneProfil.push({ idProfil:idProfil, moyenne : moyenne});
 				}.bind(this));
 			},

@@ -65,11 +65,11 @@
 					this.score.participant = this.$store.state.selectedEquipe.participants[indexProfil.selectedIndex];
 				}
 				if (this.$store.state.selectedScore) {
-					console.log("ADDSCORE : SaveScore update  :");
+					//console.log("ADDSCORE : SaveScore update  :");
 					this.$store.dispatch("updateScore", {"score" : this.score});
 				}
 				else {
-					console.log("ADDSCORE : SaveScore insert :");
+					//console.log("ADDSCORE : SaveScore insert :");
 					this.$store.dispatch("insertScore", {"score" : this.score});
 				}
 				this.$store.state.selectedScore = null;
@@ -82,7 +82,7 @@
 				  message: "Le score a été supprimé",
 				  okButtonText: "OK"
 				}).then(() => {
-				  console.log("Alert dialog closed");
+				  //console.log("Alert dialog closed");
 				  this.$navigateTo(affichageDefi);
 				});
 				

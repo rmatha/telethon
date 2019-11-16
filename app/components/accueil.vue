@@ -82,7 +82,7 @@
 				var messageDefi = "Pas de défis enregistrés";
 				if (this.$store.state.selectedEquipe.defis_equipes) {
 					var nbDefisActifs = this.$store.state.selectedEquipe.defis_equipes.filter(defi => {
-						console.log("ACCUEIL : nbDefisEquipe : "+JSON.stringify(defi));
+						//console.log("ACCUEIL : nbDefisEquipe : "+JSON.stringify(defi));
 						return !defi.delete;
 					});
 					if (nbDefisActifs.length > 0) {
@@ -98,34 +98,34 @@
 			},
 			isEquipeSelected() {
 				var temp = this.$store.state.selectedEquipe ? true : false;
-				console.log("isEquipeSelected : "+temp);
+				//console.log("isEquipeSelected : "+temp);
 				return temp;
 			}
         },
         mounted() {
-			console.log("ACCUEIL : STATE : selectedEquipe "+JSON.stringify(this.$store.state.selectedEquipe));
+			//console.log("ACCUEIL : STATE : selectedEquipe "+JSON.stringify(this.$store.state.selectedEquipe));
 			// chargement des données en fonction de l'équipe en cours
 			//this.$store.dispatch("queryDonnees", isEquipeSelected);
 			// vérification si une connexion est disponible
 			const connectionType = connectivity.getConnectionType();
 			if (connectionType !== connectivity.connectionType.none) {
 				// vérification de la version de l'equipe en cours 
-				console.log("Reseau OK");
+				//console.log("Reseau OK");
 				
 			}
 			else {
-				console.log("Pas de réseau !!!");
+				//console.log("Pas de réseau !!!");
 			}
-			console.log("HOME : chargement de l'équipe en cours !!");
+			//console.log("HOME : chargement de l'équipe en cours !!");
 			if (this.$store.state.selectedEquipe) {
-				console.log("HOME : on a bien récupéré l'équipe :"+this.$store.state.selectedEquipe.nom);
+				//console.log("HOME : on a bien récupéré l'équipe :"+this.$store.state.selectedEquipe.nom);
 				//on peut mettre a jour les tables mesDefis et participants
 			}
 			else {
-				console.log("Pas d'équipe en cours !!!");
+				//console.log("Pas d'équipe en cours !!!");
 			}
 			/*if (this.$store.state.selectedEquipe) {
-				console.log("on charge l'equipe a partir du serveur");
+				//console.log("on charge l'equipe a partir du serveur");
 				this.reloadEquipeEnCours();
 			};*/
 			
@@ -176,18 +176,18 @@
 				.get('https://telethon.citeyen.com/public/api/equipes/info', {params : params})
 				.then(response => {
 					// si la version du serveur plus récente, on récupère 
-					console.log("version de l'équipe  en cours local : "+this.$store.state.selectedEquipe.version);
-					console.log("version de l'équipe en cours  serveur  : "+JSON.stringify(response.data.version));
+					//console.log("version de l'équipe  en cours local : "+this.$store.state.selectedEquipe.version);
+					//console.log("version de l'équipe en cours  serveur  : "+JSON.stringify(response.data.version));
 					//if (response.data.version > this.$store.state.selectedEquipe.version) {
 					if (response.data) {
-						console.log("Récupération serveur de l'équipe OK : ");
+						//console.log("Récupération serveur de l'équipe OK : ");
 						if (true) {
 						//if (response.data.version > this.$store.state.selectedEquipe.version) {
-							console.log("Mise a jour de la version de l'équipe a partir du serveur");
+							//console.log("Mise a jour de la version de l'équipe a partir du serveur");
 							this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
 						}
 						else {
-							console.log("Version de l'équipe déjà à jour");
+							//console.log("Version de l'équipe déjà à jour");
 						}
 					};
 				});

@@ -3,8 +3,8 @@
 		<DockLayout stretchLastChild="true">
         <Header dock="top" />
         <Footer dock="bottom" />
-			<StackLayout dock="center" class="root" >
-			<ScrollView row="1" col="0" >
+		<StackLayout dock="center" class="root" >
+			<ScrollView height="100%"x>
 				<StackLayout>  
 					<GridLayout rows="*" columns="*,*" marginBottom="5">
 						<Button :class="getClassButtonNouvelleEquipe" row="0" col="0" text="Nouvelle équipe" @tap="nouvelleEquipe" />
@@ -19,7 +19,7 @@
 						<Label class="label" text="Nom de l'équipe" />
 						<TextField class="textfield" hint="Ex : the killers..." v-model="input.nom"/>
 						<Label ref="labelVille" class="label" text="Ville du challenge Téléthon"  />
-						<TextField class="textfield" ref="textFieldVille" @textChange="onTextChange" v-model="input.commune"/>
+						<TextField class="textfield" ref="textFieldVille" @textChange="onTextChange" @blur="lostFocus" v-model="input.commune"/>
 						<ScrollView v-if="affichageVilles" height="500">
 							<StackLayout backgroundColor="#3c495e" >
 								<GridLayout v-for="ville in villes" rows="40" columns="*"  >
@@ -30,12 +30,11 @@
 						<Label class="label"  text="Mot de passe" />
 						<TextField class="textfield" v-model="input.code"/>
 						<GridLayout rows="auto,auto" columns="*,50" marginBottom="5">
-							<Image row="0" col="1" v-if="input.organisateur" class="imageCheck" src="~/assets/icons/checkTrue.png" @tap="updateOrganisateur"/>
-							<Image row="0" col="1" v-else  class="imageCheck"src="~/assets/icons/checkFalse.png" @tap="updateOrganisateur"/>
 							<Label row="0" col="0" text="Equipe organisatrice" fontSize="14" class="labelCheck" />
-							<Image row="1" col="1" v-if="input.admin" class="imageCheck" src="~/assets/icons/checkTrue.png" @tap="updateCoordinateur"/>
-							<Image row="1" col="1" v-else class="imageCheck" src="~/assets/icons/checkFalse.png" @tap="updateCoordinateur"/>
+							<Switch row="0"col="1" checked="false" class="switch-light" v-model="input.organisateur" />
 							<Label row="1" col="0" text="Equipe de coordination Téléthon" fontSize="14" class="labelCheck" />
+							<Switch row="1"col="1" checked="false" class="switch-light" v-model="input.admin" />
+							
 						</GridLayout>
 					</StackLayout>
 					<StackLayout v-if="isExistanteEquipe" >
@@ -83,16 +82,16 @@
         },
 		computed: {	
 			getClassButtonNouvelleEquipe () {
-				console.log("isNouvelleEquipe : "+this.isNouvelleEquipe);
+				//console.log("isNouvelleEquipe : "+this.isNouvelleEquipe);
 				return this.isNouvelleEquipe ? "active" : "nonActive";
 			},
 			getClassButtonExistanteEquipe () {
-				console.log("isExistanteEquipe : "+this.isExistanteEquipe);
+				//console.log("isExistanteEquipe : "+this.isExistanteEquipe);
 				return this.isExistanteEquipe ? "active" : "nonActive";
 			},
 			isOrganisateur(){
 				if (this.input.admin == 1){
-					console.log("Le flag orga est vert");
+					//console.log("Le flag orga est vert");
 					return(true);
 					
 				}
@@ -115,6 +114,7 @@
                 villes: [],
 				affichageVilles : false,
 				affichageEquipes : false,
+				isValidVille : false,
 				equipesVille : [],
 				equipeSelected : "",
             };
@@ -125,19 +125,19 @@
 				this.input.admin = 0;
 				prompt({
 				  title: "Code de l'équipe",
-				  message: "Veuillez saisir le code des organisateurs qui vous a été donné par l'équipe de coordination téléthon:",
+				  message: "Veuillez saisir le code des organisateurs qui vous a été donné par l'équipe de coordination téléthon :",
 				  okButtonText: "OK",
 				  cancelButtonText: "Cancel",
 				  defaultText: "",
 				}).then(result => {
-					console.log(`Dialog result: ${result.result}, text: ${result.text}`);
+					//console.log(`Dialog result: ${result.result}, text: ${result.text}`);
 					if (result.result & (result.text == "16340")) {
-						console.log("c'est un orga");
+						//console.log("c'est un orga");
 						this.input.organisateur = true;
 					}
 					else {
 						alert("Erreur mauvais code");
-						console.log("ce n'est pas un orga");
+						//console.log("ce n'est pas un orga");
 					}
 					
 				});
@@ -154,14 +154,14 @@
 				  cancelButtonText: "Cancel",
 				  defaultText: "",
 				}).then(result => {
-					console.log(`Dialog result: ${result.result}, text: ${result.text}`);
+					//console.log(`Dialog result: ${result.result}, text: ${result.text}`);
 					if (result.result & (result.text == "16340")) {
-						console.log("c'est un admin");
+						//console.log("c'est un admin");
 						this.input.admin = true;
 					}
 					else {
 						alert("Erreur mauvais code");
-						console.log("ce n'est pas une corrdination");
+						//console.log("ce n'est pas une corrdination");
 					}
 					
 				});
@@ -175,7 +175,7 @@
 				// récupération de la commune sélectionnée
 				let indexEquipe = this.$refs.equipeEnCours.nativeView;
 				this.equipeSelected = this.equipesVille[indexEquipe.selectedIndex];
-				console.log("selectEquipeExistante : sélectionde l'équipe :"+this.equipeSelected.nom+" : sur la commune : "+this.equipeSelected.commune+ " est le code : "+ this.equipeSelected.code);
+				//console.log("selectEquipeExistante : sélectionde l'équipe :"+this.equipeSelected.nom+" : sur la commune : "+this.equipeSelected.commune+ " est le code : "+ this.equipeSelected.code);
 				prompt({
 				  title: "Code de l'équipe",
 				  message: "Veuillez saisir le code de l'équipe:",
@@ -184,7 +184,7 @@
 				  defaultText: "",
 				}).then(result => {
 					if (result.result & (result.text == this.equipeSelected.code)) {
-						console.log("selection ok");
+						//console.log("selection ok");
 						// il faut récupérer les informations de l'équipe en cours sur le serveur 
 						let params = {};
 						params["commune"] = this.equipeSelected.commune;
@@ -194,13 +194,13 @@
 						.then(response => {
 							this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
 							// chargement des defis de la commune 
-							console.log("CHANGEEQUIPE : creerEquipe :MAJ des defis communes à partir du serveur");
+							//console.log("CHANGEEQUIPE : creerEquipe :MAJ des defis communes à partir du serveur");
 							let params = {};
 							params["commune"] = this.$store.state.selectedEquipe.commune;
 							axios
 								.get('https://telethon.citeyen.com/public/api/defisCommune/list', {params : params})
 								.then(responseList => {
-									console.log("Chargement des defis de la commune en base : "+JSON.stringify(responseList.data));
+									//console.log("Chargement des defis de la commune en base : "+JSON.stringify(responseList.data));
 									this.$store.dispatch("reloadDefisCommune",{"defis" : responseList.data,"version" : null});
 								});
 							alert({
@@ -214,13 +214,13 @@
 						});
 					}
 					else {
-						console.log("selction equipe KO");
+						//console.log("selction equipe KO");
 						alert({
 						  title: "Sélection d'équipe",
 						  message: "Le code n'est pas correct",
 						  okButtonText: "OK"
 						}).then(() => {
-						  console.log("pas le bon code ! ");
+						  //console.log("pas le bon code ! ");
 						});
 					}
 				});
@@ -247,20 +247,20 @@
 					  message: "Le nom de cette équipe est déjà utilisé sur cette commune. Utilisez un autre nom ou appuyez sur 'Equipe existante' pour sélectionner cette équipe",
 					  okButtonText: "OK"
 					}).then(() => {
-					  console.log("Alert dialog closed");
+					  //console.log("Alert dialog closed");
 					});
 				}
 				else {
-					console.log("on peut créer la nouvelle équipe : "+JSON.stringify(this.input));
+					//console.log("on peut créer la nouvelle équipe : "+JSON.stringify(this.input));
 					this.$store.dispatch("newEquipe", {"equipe" :  this.input}).then(() => {
 						// chargement des defis de la commune 
-						console.log("CHANGEEQUIPE : creerEquipe :MAJ des defis communes à partir du serveur");
+						//console.log("CHANGEEQUIPE : creerEquipe :MAJ des defis communes à partir du serveur");
 						let params = {};
 						params["commune"] = this.$store.state.selectedEquipe.commune;
 						axios
 							.get('https://telethon.citeyen.com/public/api/defisCommune/list', {params : params})
 							.then(responseList => {
-								console.log("Chargement des defis de la commune en base : "+JSON.stringify(responseList.data));
+								//console.log("Chargement des defis de la commune en base : "+JSON.stringify(responseList.data));
 								this.$store.dispatch("reloadDefisCommune",{"defis" : responseList.data,"version" : null});
 							});
 						alert({
@@ -287,8 +287,8 @@
 				this.affichageVilles = false;
 			},
 			selectVille(nom,code) {
-				console.log("Sélection de la ville"+nom);
-				console.log("Liste des equipes :"+JSON.stringify(this.$store.state.equipes));
+				//console.log("Sélection de la ville"+nom);
+				//console.log("Liste des equipes :"+JSON.stringify(this.$store.state.equipes));
 				let textField = this.$refs.textFieldVille.nativeView;
                 textField.text = nom;
 				this.affichageVilles = false; 
@@ -301,16 +301,15 @@
 				else {
 					this.affichageEquipes = false; 
 				};
+				this.isValidVille = true;
 			},
             onTextChange: function() {
-                let textField = this.$refs.textFieldVille.nativeView;
-                console.log("onTextChange saisie " + textField.text);
-                console.log("onTextChange label " + textField.name);
+				this.isValidVille = false;
 				// filtre de la liste villes 
 				this.villes = villesRef.filter(ville => {
-					return ville.nom.toLowerCase().indexOf(textField.text.toLowerCase()) > -1
+					return ville.nom.toLowerCase().indexOf(this.input.commune.toLowerCase()) > -1
 				})
-				if (textField.text.length > 2) {
+				if (this.input.commune.length > 2) {
 					this.affichageVilles = true;
 				}
 				else {
@@ -319,6 +318,17 @@
                 //ApplicationSettings.setString(textField.name, textField.text);
                 //this.firstTx = textField.text;
             },
+			lostFocus: function() {
+				if (!this.isValidVille) {
+					alert({
+					  title: "Sélection de la commune",
+					  message: "Il faut saisir une commune parmi la liste des communes qui s'affiche en fonction de votre saisie",
+					  okButtonText: "OK"
+					}).then(() => {
+					  this.input.commune = "";
+					});
+				}
+			},
         }
     };
 </script>

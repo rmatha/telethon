@@ -4,7 +4,7 @@
 		
 		<GridLayout  rows="auto,auto" columns="*,*,*" class="footerBandeau">
 			<Label row="0" col="0" class="center" text="Equipe" @tap="navProfil"></Label>
-			<Image row="1" col="0" src.decode="font://&#xf0c0;" class="fa t-72" @tap="navProfil"></Image>
+			<Image row="1" col="0" src.decode="font://&#xf0c0;" :class="updateEquipe" @tap="navProfil"></Image>
 			
 			<Label row="0" col="1" class="center" text="Défis" @tap="navChallenges"></Label>
             <Image row="1" col="1" src.decode="font://&#xf164;" class="fa t-72" @tap="navChallenges"></Image>
@@ -34,8 +34,14 @@
 					return "menu menuTop";
 				}
 				return "menu" ;
+			},
+			updateEquipe() {
+				if (this.$store.state.updateEquipe) {
+					return "fa t-72 red";
+				}
+				return "fa t-72";
 			}
-        },
+		},
         mounted() {
 			this.menuOn = false;
 			var orientationModule = require("@irman/nativescript-screen-orientation");
@@ -43,7 +49,7 @@
 		},
 		methods: {
 			loadMenu(){
-				console.log("changement de menuOn");
+				//console.log("changement de menuOn");
 				this.menuOn = !this.menuOn;
 			},
 			navProfil() {
@@ -88,6 +94,11 @@
 
 
 <style>
+
+	.red {
+		color : red;
+	}
+	
 	.innerFooter {
 		background-color : #fff;
 		width : 100%;
