@@ -8,6 +8,21 @@
 // Import common styles
 @import 'app-common';
 
+.sideStackLayout {
+	font-size: 18px;
+	color: white;
+	padding-left: 20px ;
+}
+
+.sideTitleStackLayout {
+	color: white;
+	font-size: 32px;
+	padding-bottom: 32px;
+}
+.labelVille {
+	background-color: white;
+	color: black;
+}
 .footerBandeau {
 	background-color : #F8F8F8;
 	height : 250px;

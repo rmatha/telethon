@@ -30,12 +30,9 @@
 					</GridLayout>
 				</StackLayout>
 				<StackLayout v-else>
-					<Label class="labelEquipeSelect" text="Pour commencer vous devez définir votre équipe" textWrap="true" horizontalAlignment="center" />
-					<GridLayout rows="100,100" columns="auto,auto" horizontalAlignment="center" >
-						<Image  src="~/assets/icons/equipeAdd.png" col="0" row="0" @tap="navChangeEquipe('new')" />
-						<Image  src="~/assets/icons/equipeSearch.png" col="1" row="0" @tap="navChangeEquipe('search')" />
-						<Label class="actionLabel" text="Créer une équipe"  row="1" col="0" @tap="navChangeEquipe('new')"/>
-						<Label class="actionLabel" text="Sélectionner une équipe"  row="1" col="1" @tap="navChangeEquipe('search')"  />
+					<GridLayout rows="100,*,200" columns="200,*" horizontalAlignment="center" >
+						<Label row="1" col="0" colSpan="2" class="labelEquipeSelect" text="Pour commencer vous devez définir votre équipe" textWrap="true" horizontalAlignment="center" />
+						<Image row="2" col="0"  src="~/assets/fleche_rouge.png"  />
 					</GridLayout>
 				</StackLayout>
 				

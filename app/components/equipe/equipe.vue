@@ -4,52 +4,77 @@
         <Header dock="top" />
         <Footer dock="bottom" />
 		<StackLayout dock="center" class="root" >
-			
-				<StackLayout class="m-20"  width="100%" height="100%">
+			<RadSideDrawer ref="drawer">
+				<StackLayout ~drawerContent class="sideStackLayout">
+					<StackLayout class="sideTitleStackLayout">
+						<Label text="Menu" style="horizontal-align: center"></Label>
+					</StackLayout>
+					<StackLayout class="sideStackLayout">
+						<GridLayout rows="100,100,*" columns="*" >
+							<Label row="0" col="0" text="Créer une nouvelle équipe" class="sideLabel sideLightGrayLabel"  @tap="creerEquipe"></Label>
+							<Label row="1" col="0" text="sélectionner une équipe existante" class="sideLabel"  @tap="changeEquipe"></Label>
+							<Label row="2" col="0" text="Fermer" color="lightgray" padding="10" style="horizontal-align: center" @tap="onCloseDrawerTap"></Label>
+						</GridLayout>
+					</StackLayout>
+					
+				</StackLayout>
+				<StackLayout ~mainContent>
+					<StackLayout class="m-20"  width="100%" height="100%">
 					<!--<GridLayout rows="200" columns="*" >
 						<Image row="0" col="0" v-if="imageSrc" :src="imageSrc" class="imageEquipe" @tap="takePicture"></Image>
 						<Label  row="0" col="0" v-else text="Appuyer pour changer votre image d'équipe" @tap="takePicture" />
 					</GridLayout>-->
-					<StackLayout v-if="$store.state.selectedEquipe" >
-						<GridLayout rows="auto" columns="*,50,50" >
-							<Label row="0" col="0" class="m-b-20 titreTelethon" :text="titreEquipe" textWrap="true" />
-							<Image row="0" col="1" class="actionButton" src="~/assets/icons/change.png" @tap="changeEquipe"/>
-							<Image v-if="$store.state.updateEquipe" row="0" col="2" class="actionButton" src="~/assets/icons/save.png" @tap="uploadEquipe"/>
-						</GridLayout>
-						<Label text="Votre équipe est Organisateur" v-if="$store.state.selectedEquipe.organisateur"  />
-						<Label text="Votre équipe est Coordinateur " v-if="$store.state.selectedEquipe.admin" />
-						<Label class="label" text="Commune des défis Téléthon" />
-						<Label class="valeur" :text="$store.state.selectedEquipe.commune" />
+						<StackLayout v-if="$store.state.selectedEquipe" >
+							<GridLayout rows="auto" columns="50,*,50" >
+								<Image row="0" col="0" class="actionButton" src="~/assets/menu_icon.png" @tap="onOpenDrawerTap"/>
+								<Label row="0" col="1" class="m-b-20 titreTelethon" :text="titreEquipe" textWrap="true" />
+								<Image v-if="$store.state.updateEquipe" row="0" col="2" class="actionButton" src="~/assets/icons/save.png" @tap="uploadEquipe"/>
+							</GridLayout>
+							<Label text="Votre équipe est Organisateur" v-if="$store.state.selectedEquipe.organisateur"  />
+							<Label text="Votre équipe est Coordinateur " v-if="$store.state.selectedEquipe.admin" />
+							<Label class="label" text="Commune des défis Téléthon" />
+							<Label class="valeur" :text="$store.state.selectedEquipe.commune" />
+
+							
+						</StackLayout>
+						<StackLayout v-else>
+							<GridLayout rows="50,100,*" columns="50,*">
+								<Image row="0" col="0" class="actionButton" src="~/assets/menu_icon.png" @tap="onOpenDrawerTap"/>
+								<Image row="1" col="0" src="~/assets/fleche_rouge2.png" />
+								<Label row="2" col="0" colSpan="2" text="! Pas d'équipe sélectionnée ! " textWrap="true" class="valeur"/>
+							</GridLayout>
+						</StackLayout>
 
 						
-					</StackLayout>
-					<StackLayout v-else>
-						<button text="créer ou sélectionner son equipe" @tap="changeEquipe" />
-					</StackLayout>
-
-					
-					<StackLayout  v-if="$store.state.selectedEquipe">
-						<GridLayout rows="auto" columns="*,50" >
-							<Label row="0" col="0" class="label" text="Liste dess participants de l'équipe" textWrap="true" />
-							<Image row="0" col="1" src="~/assets/icons/addUser.png" @tap="addParticipant"/>
-						</GridLayout>
+						<StackLayout  v-if="$store.state.selectedEquipe">
+							<GridLayout rows="auto" columns="*,50" >
+								<Label row="0" col="0" class="label" text="Liste dess participants de l'équipe" textWrap="true" />
+								<Image row="0" col="1" src="~/assets/icons/addUser.png" @tap="addParticipant"/>
+							</GridLayout>
+							
+							
+						</StackLayout>
+						<FlexboxLayout v-if="$store.state.selectedEquipe" flexDirection="column">
+							<GridLayout rows="40" columns="*" v-for="(participant, index) in participantsActifs" :key="index">
+						
+								<Label :text="libelleProfil(participant)" class="valeur" @tap="editParticipant(participant)"/>
+							</GridLayout>
+						</FlexboxLayout>
+						
+						<StackLayout v-else >
+							<GridLayout v-if="paticipantsActifs" rows="100,*" columns="auto,*">
+								<Image row="0" col="0" src="~/assets/fleche_rouge2.png" @tap="changeEquipe"/>
+								<Label row="1" col="0" colSpan="2" text="! Pas de participants inscrits ! " class="valeur" @tap="editParticipant(participant)"/>
+							</GridLayout>
+						</StackLayout>
 						
 						
 					</StackLayout>
-					<FlexboxLayout v-if="$store.state.selectedEquipe" flexDirection="column">
-						<GridLayout rows="40" columns="*" v-for="(participant, index) in participantsActifs" :key="index">
-					
-							<Label :text="libelleProfil(participant)" class="valeur" @tap="editParticipant(participant)"/>
-						</GridLayout>
-					</FlexboxLayout>
-					
-					<StackLayout v-else >
-						<Label text="! Pas de particpants inscrits ! " textWrap="true" class="valeur" @tap="editParticipant(participant)"/>
-						<Label text="Ajouter des participants via le bouton à droite" textWrap="true" class="valeur" @tap="editParticipant(participant)"/>
-					</StackLayout>
-					
-					
 				</StackLayout>
+			</RadSideDrawer>
+
+
+				
 				
 		
 		</StackLayout>
@@ -73,8 +98,8 @@
 	
     export default {
         mounted() {
-			//console.log("Equipe en cours est à :"+JSON.stringify(this.$store.state.selectedEquipe));
-			if (this.$store.state.selectedEquipe.participants) {
+			console.log("Equipe en cours est :"+JSON.stringify(this.$store.state.selectedEquipe));
+			if (this.$store.state.selectedEquipe) {
 				//console.log("Liste des participants : "+JSON.stringify(this.$store.state.selectedEquipe.participants));
 				//console.log("nombre des participants : "+this.$store.state.selectedEquipe.participants.length);
 			}
@@ -164,6 +189,15 @@
         },
 		
         methods: {
+			onNavigationButtonTap() {
+				Frame.topmost().goBack();
+			},
+			onOpenDrawerTap() {
+				this.$refs.drawer.showDrawer();
+			},
+			onCloseDrawerTap() {
+				this.$refs.drawer.closeDrawer();
+			},
 			takePicture: function() {
 			  // TEST
 			  camera.requestPermissions();
@@ -211,9 +245,29 @@
 			
 			changeEquipe() {
 				//console.log("on change d'équipe");
-				this.$navigateTo(changeEquipe);
+				this.$navigateTo(changeEquipe, {
+					transition: {
+						name:'fade',
+						duration: 200
+					},
+					props: {
+						type : "search"
+					}
+				});
 			},
 
+			creerEquipe() {
+				//console.log("on change d'équipe");
+				this.$navigateTo(changeEquipe, {
+					transition: {
+						name:'fade',
+						duration: 200
+					},
+					props: {
+						type : "new"
+					}
+				});
+			},
 
 			uploadEquipe() {
 				confirm({

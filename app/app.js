@@ -13,7 +13,11 @@ import { TNSFontIcon, fonticon } from "nativescript-fonticon";
 //TNSFontIcon.debug = true; 
 
 import teleStore from "./components/store/teleStore";
+import RadChartPlugin from 'nativescript-ui-sidedrawer/vue';
 
+
+
+Vue.use(RadChartPlugin);
 Vue.config.silent = false;
 
 TNSFontIcon.paths = {
