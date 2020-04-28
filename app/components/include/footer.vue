@@ -1,6 +1,6 @@
 <template>
     <!-- Bottom navigation -->
-	<StackLayout dock="bottom" :class="getClassMenu" ref="logoContainer" >
+	<StackLayout dock="bottom" class="menu" >
 		
 		<GridLayout  rows="auto,auto" columns="*,*,*" class="footerBandeau">
 			<Label row="0" col="0" class="center" text="Equipe" @tap="navProfil"></Label>
@@ -29,12 +29,7 @@
             };
         },
         computed: {
-			getClassMenu() {
-				if (this.menuOn) {
-					return "menu menuTop";
-				}
-				return "menu" ;
-			},
+			
 			updateEquipe() {
 				if (this.$store.state.updateEquipe) {
 					return "fa t-72 red";
@@ -48,19 +43,24 @@
         	orientationModule.setCurrentOrientation("portrait");
 		},
 		methods: {
-			loadMenu(){
-				//console.log("changement de menuOn");
-				this.menuOn = !this.menuOn;
+			
+			tapFlash(currentElement) {
+				if (currentElement.className) {
+					currentElement.className = currentElement.className + " flash";
+				}
+				else {
+					currentElement.className = "flash";
+				}
 			},
-			navProfil() {
+			navProfil(args) {
+				this.tapFlash(args.object);
 				this.$navigateTo(profil);
-				this.menuOn = false;
 			
 			},
-			navChallenges() {
+			navChallenges(args) {
+				this.tapFlash(args.object);
 				if (this.$store.state.selectedEquipe) {
 					this.$navigateTo(mesDefis);
-					this.menuOn = false;
 				}
 				else {
 					alert({
@@ -70,10 +70,10 @@
 						})
 				}
 			},
-			navResultats() {
+			navResultats(args) {
+				this.tapFlash(args.object);
 				if (this.$store.state.selectedEquipe) {
 					this.$navigateTo(resultats);
-					this.menuOn = false;
 				}
 				else {
 					alert({
@@ -94,7 +94,32 @@
 
 
 <style>
-
+	
+	.sideDrawerTitre {
+		font-size : 40px;
+		padding : 0 0 20 0;
+		text-align : center;
+	}
+	.upLine {
+		border-width: 2 0 0 0;
+		border-color: white;
+		border-radius : 0;
+		padding : 10 0 0 0;
+		width : 100%;
+		text-align : left;
+	}
+	.textFermer {
+		text-align : center;
+		padding : 100px 0 0 0;
+	}
+	.flash {
+		animation-name: flashAnim;
+		animation-duration: 1;
+	}
+	@keyframes flashAnim {
+		from { transform: rotate(0deg); }
+		to { transform: rotate(360deg); }
+	}
 	.red {
 		color : red;
 	}
@@ -104,61 +129,9 @@
 		width : 100%;
 	}
 	.menu {
-		height : 200px;
-	}
-	
-	.menuTop {
-		height: 100%;
-	}
-	.labelMenu {
-		color : black;
-		height : 200px;
+		height : 160px;
 	}
 
-	.menuIcon {
-		z-index: 2;
-		width : 10%;
-		margin-left: 15%;
-	}
-	.menuText{
-  
-	  /* font */
-	  background-color:#fbc62d;
-	  color: white;
-	  font-weight: bold;
-	  font-style: normal;
-	  font-stretch: normal;
-	  font-size: 20px;
-	  horizontal-alignment : left;
-	  vertical-alignment : center;
-	  margin-right : 20px;
-	  border-radius: 30%;
-	  border-width: 2.5%;
-	  width : 60%;
-	  height: 14%;
-	  padding-top: 12.5%;
-	  padding-left: 75%;
-	  border-color: #fbc62d;
-	  z-index: 2;
-	}
-	.menuBorder{
-  
-	  /* font */
-	  background-color:white;
-	  color: #fbc62d;
-	  font-weight: bold;
-	  font-style: normal;
-	  font-stretch: normal;
-	  font-size: 20px;
-	  horizontal-alignment : center;
-	  margin-right :  10px;
-	  border-radius: 30%;
-	  border-width: 2.5%;
-	  width : 85%;
-	  height: 14%;
-	  z-index: 1;
-	  border-color: #fbc62d;
 
-	}
 	
 </style>

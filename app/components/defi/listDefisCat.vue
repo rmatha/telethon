@@ -6,7 +6,7 @@
 			<StackLayout dock="center" class="root" >
 			<StackLayout>
 				<GridLayout  rows="auto" columns="*,50,50,50">
-					<Label row="0" col="0" class="titre mb50" :text="$store.state.selectedCategorie.nom" textAlignment="center" 
+					<Label row="0" col="0" class="titre" :text="$store.state.selectedCategorie.nom" textAlignment="center" />
 					<Image row="0" col="1" v-if="$store.state.updateDefi" class="actionButton" src="~/assets/icons/upload.png" @tap="uploadDefis"/>
 					<Image row="0" col="2" class="actionButton" src="~/assets/icons/delete.png" @tap="deleteCategorie"/>
 					<Image row="0" col="3" class="actionButton" src="~/assets/icons/modify.png" @tap="editCat"/>

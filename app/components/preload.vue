@@ -43,7 +43,7 @@
 		data() {
             return {
 				networkStatus : "",
-				messages : [],
+				messages : ["Version 1.4"],
 				connexion : false,
 				go : false,
 				equipesAll : [],

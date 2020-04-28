@@ -4,28 +4,32 @@
 			<Header dock="top" />
 			<Footer dock="bottom" />
 			
-			<StackLayout  dock="center" class="root" >
-				<label class="titre mb50" text="Bonjour !!"  horizontalAlignment="center"/>
-				
+			<StackLayout  v-if="loading" dock="center" class="root" >
+				<GridLayout rows="*" columns="*,auto,*">
+					
+				</GridLayout>
+			</StackLayout>
+			<StackLayout  v-else dock="center" class="root" >
+				<label class="titre mb50" text="Bonjour !!!!"  horizontalAlignment="center"/>
 				
 				<StackLayout  v-if="isEquipeSelected">
-					<GridLayout rows="*,*,*" columns="*,auto">
+					<GridLayout rows="*,*,*" columns="*,40">
 						<StackLayout row="0" col="0">
 							<label class="label" text="Equipe :"  />
 							<label class="valeur" :text="nomEquipe"  />
 							<label class="valeur" :text="nbParticipantsEquipe"  />
 						</StackLayout>
-						<Image  src="~/assets/icons/modify.png" col="1" row="0" @tap="navEquipe" stretch="none" />
+						<Image  src="~/assets/icons/modify.png" col="1" row="0" @tap="navEquipe" verticalAlignment="top"/>
 						<StackLayout row="1" col="0">	
 							<label class="label" text="Défis : "  />
 							<label class="valeur" :text="nbDefisEquipe"  />
 						</StackLayout>
-						<Image  src="~/assets/icons/modify.png" col="1" row="1" @tap="navMesDefis" stretch="none" />
+						<Image  src="~/assets/icons/modify.png" col="1" row="1" @tap="navMesDefis" verticalAlignment="top"/>
 						<StackLayout row="2" col="0">	
 							<label class="label" text="Score : "/>
 							<label class="valeur" :text="moyenneEquipe"  /><Label :text="networkStatus" />
 						</StackLayout>
-						<Image  src="~/assets/icons/modify.png" col="1" row="2" @tap="navScore" stretch="none" class="modify"/>
+						<Image  src="~/assets/icons/modify.png" col="1" row="2" @tap="navScore" verticalAlignment="top"/>
 						
 					</GridLayout>
 				</StackLayout>
@@ -56,7 +60,8 @@
             return {
 				networkStatus : "",
 				connexion : false,
-				categories : []
+				categories : [],
+				loading : false
             };
         },
 		computed: {
@@ -129,10 +134,19 @@
 		},
         
 		methods: {
+			tapFlash(currentElement) {
+				if (currentElement.className) {
+					currentElement.className = currentElement.className + " flash";
+				}
+				else {
+					currentElement.className = "flash";
+				}
+			},
 			navChangeEquipe(type) {
 				this.$navigateTo(changeEquipe, { props: {type : type}});
 			},
-			navMesDefis() {
+			navMesDefis(args) {
+				this.tapFlash(args.object);
 				if (this.$store.state.selectedEquipe) {
 					this.$navigateTo(mesDefis);
 				}
@@ -144,7 +158,8 @@
 						})
 				}
 			},
-			navScore() {
+			navScore(args) {
+				this.tapFlash(args.object);
 				if (this.$store.state.selectedEquipe) {
 					this.$navigateTo(resultats);
 				}
@@ -156,7 +171,8 @@
 						})
 				}
 			},
-			navEquipe() {
+			navEquipe(args) {
+				this.tapFlash(args.object);
 				this.$navigateTo(equipe);
 			},
 			titreEquipe() {
@@ -194,6 +210,9 @@
     };
 </script>
 <style>
+
+
+
 .chargement {
 	margin-top : 50%;
 	text-align : center;

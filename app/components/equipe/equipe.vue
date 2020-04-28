@@ -6,18 +6,17 @@
 		<StackLayout dock="center" class="root" >
 			<RadSideDrawer ref="drawer">
 				<StackLayout ~drawerContent class="sideStackLayout">
-					<StackLayout class="sideTitleStackLayout">
-						<Label text="Menu" style="horizontal-align: center"></Label>
+						<StackLayout class="sideDrawerTitre">
+							<Label text="Menu"></Label>
+						</StackLayout>
+						<StackLayout class="sideStackLayout">
+							<GridLayout rows="50,50,*" columns="*" >
+								<Label row="0" col="0" text="Créer une nouvelle équipe" class="upLine"  @tap="creerEquipe"></Label>
+								<Label row="1" col="0" text="sélectionner une équipe existante" class="upLine"  @tap="changeEquipe"></Label>
+								<Label row="2" col="0" text="Fermer" class="upLine textFermer" @tap="onCloseDrawerTap"></Label>
+							</GridLayout>
+						</StackLayout>
 					</StackLayout>
-					<StackLayout class="sideStackLayout">
-						<GridLayout rows="100,100,*" columns="*" >
-							<Label row="0" col="0" text="Créer une nouvelle équipe" class="sideLabel sideLightGrayLabel"  @tap="creerEquipe"></Label>
-							<Label row="1" col="0" text="sélectionner une équipe existante" class="sideLabel"  @tap="changeEquipe"></Label>
-							<Label row="2" col="0" text="Fermer" color="lightgray" padding="10" style="horizontal-align: center" @tap="onCloseDrawerTap"></Label>
-						</GridLayout>
-					</StackLayout>
-					
-				</StackLayout>
 				<StackLayout ~mainContent>
 					<StackLayout class="m-20"  width="100%" height="100%">
 					<!--<GridLayout rows="200" columns="*" >
@@ -27,7 +26,7 @@
 						<StackLayout v-if="$store.state.selectedEquipe" >
 							<GridLayout rows="auto" columns="50,*,50" >
 								<Image row="0" col="0" class="actionButton" src="~/assets/menu_icon.png" @tap="onOpenDrawerTap"/>
-								<Label row="0" col="1" class="m-b-20 titreTelethon" :text="titreEquipe" textWrap="true" />
+								<Label row="0" col="1" class="m-b-20 titreTelethon"  horizontalAlignment="center" :text="titreEquipe" textWrap="true" />
 								<Image v-if="$store.state.updateEquipe" row="0" col="2" class="actionButton" src="~/assets/icons/save.png" @tap="uploadEquipe"/>
 							</GridLayout>
 							<Label text="Votre équipe est Organisateur" v-if="$store.state.selectedEquipe.organisateur"  />
@@ -38,10 +37,10 @@
 							
 						</StackLayout>
 						<StackLayout v-else>
-							<GridLayout rows="50,100,*" columns="50,*">
+							<GridLayout rows="50,100,*" columns="50,200,*">
 								<Image row="0" col="0" class="actionButton" src="~/assets/menu_icon.png" @tap="onOpenDrawerTap"/>
-								<Image row="1" col="0" src="~/assets/fleche_rouge2.png" />
-								<Label row="2" col="0" colSpan="2" text="! Pas d'équipe sélectionnée ! " textWrap="true" class="valeur"/>
+								<Image row="1" col="0" colSpan="2" horizontalAlignment="left" src="~/assets/fleche_rouge2.png" />
+								<Label row="2" col="0" colSpan="3" verticalAlignment="center"  horizontalAlignment="center" text="! Pas d'équipe sélectionnée ! " textWrap="true" class="valeur"/>
 							</GridLayout>
 						</StackLayout>
 
@@ -62,7 +61,7 @@
 						</FlexboxLayout>
 						
 						<StackLayout v-else >
-							<GridLayout v-if="paticipantsActifs" rows="100,*" columns="auto,*">
+							<GridLayout rows="100,*" columns="auto,*">
 								<Image row="0" col="0" src="~/assets/fleche_rouge2.png" @tap="changeEquipe"/>
 								<Label row="1" col="0" colSpan="2" text="! Pas de participants inscrits ! " class="valeur" @tap="editParticipant(participant)"/>
 							</GridLayout>
@@ -339,9 +338,7 @@
 </script>
 
 <style>
-.labelVille {
-	color : white;
-}
+
 .titreTelethon {
 	font-size : 38px;
 }

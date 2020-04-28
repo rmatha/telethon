@@ -1,63 +1,82 @@
 <template>
 	<page class="page" actionBarHidden="true">
 		<DockLayout stretchLastChild="true">
-        <Header dock="top" />
-        <Footer dock="bottom" />
-		<StackLayout dock="center" class="root" >
-			<ScrollView height="100%"x>
-				<StackLayout>  
-					<GridLayout rows="*" columns="*,*" marginBottom="5">
-						<Button :class="getClassButtonNouvelleEquipe" row="0" col="0" text="Nouvelle équipe" @tap="nouvelleEquipe" />
-						<Button :class="getClassButtonExistanteEquipe" row="0" col="1" text="Equipe existante" @tap="equipeExistante" /> 
-						<StackLayout row="0" colSpan="2" class="menuEquipe"> </StackLayout>
-					</GridLayout>
-					<StackLayout v-if="isNouvelleEquipe" >
-						<GridLayout rows="auto" columns="*,50">
-							<Label row="0" col="0" class="m-b-20 label" text="Création de la nouvelle équipe" textWrap="true" />
-							<Image row="0" col="1" src="~/assets/icons/confirm.png" @tap="creerEquipe"/>
-						</GridLayout>
-						<Label class="label" text="Nom de l'équipe" />
-						<TextField class="textfield" hint="Ex : the killers..." v-model="input.nom"/>
-						<Label ref="labelVille" class="label" text="Ville du challenge Téléthon"  />
-						<TextField class="textfield" ref="textFieldVille" @textChange="onTextChange" @blur="lostFocus" v-model="input.commune"/>
-						<ScrollView v-if="affichageVilles" height="500">
-							<StackLayout backgroundColor="#3c495e" >
-								<GridLayout v-for="ville in villes" rows="40" columns="*"  >
-									<Label :text="ville.nom" @tap="selectVille(ville.nom,ville.code)" class="labelVille"/>
-								</GridLayout>
-							</StackLayout>
-						</ScrollView>
-						<Label class="label"  text="Mot de passe" />
-						<TextField class="textfield" v-model="input.code"/>
-						<GridLayout rows="auto,auto" columns="*,50" marginBottom="5">
-							<Label row="0" col="0" text="Equipe organisatrice" fontSize="14" class="labelCheck" />
-							<Switch row="0"col="1" checked="false" class="switch-light" v-model="input.organisateur" />
-							<Label row="1" col="0" text="Equipe de coordination Téléthon" fontSize="14" class="labelCheck" />
-							<Switch row="1"col="1" checked="false" class="switch-light" v-model="input.admin" />
-							
-						</GridLayout>
-					</StackLayout>
-					<StackLayout v-if="isExistanteEquipe" >
-						<Label text="Sélection de l'équipe" class="entetePage"/>
-						<GridLayout rows="30, auto" marginBottom="5">
-							<Label ref="labelVille" row="1" text="Ville du challenge Téléthon" opacity="0.4" fontSize="14" class="input" />
-							<TextField ref="textFieldVille" row="1" borderBottomColor="#fff" padding="0"
-						borderBottomWidth="3" @textChange="onTextChange" v-model="input.commune"/>
-						</GridLayout>
-						<ScrollView v-if="affichageVilles" height="500">
-							<StackLayout >
-								<GridLayout v-for="ville in villes" rows="40" columns="*"  >
-									<Label :text="ville.nom" @tap="selectVille(ville.nom,ville.code)" class="labelVille"/>
-								</GridLayout>
-							</StackLayout>
-						</ScrollView>
-						<ListPicker v-if="affichageEquipes" ref="equipeEnCours" :items="equipesVille" textField="nom" @tap="selectEquipeExistante()"  />
-						<Label v-else textWrap="true" text="Il n'existe pas encore d'équipe sur cette commune. Utiliser 'Créer une équipe'" />
+			<Header dock="top" />
+			<Footer dock="bottom" />
+			<StackLayout dock="center" class="root cadre" >
+				<RadSideDrawer ref="drawer">
+					<StackLayout ~drawerContent class="sideStackLayout">
+						
+						<StackLayout class="sideDrawerTitre">
+							<Label text="Menu"></Label>
+						</StackLayout>
+						<StackLayout class="sideStackLayout">
+							<GridLayout rows="50,50,*" columns="*" >
+								<Label row="0" col="0" text="Créer une nouvelle équipe" class="upLine"  @tap="nouvelleEquipe"></Label>
+								<Label row="1" col="0" text="sélectionner une équipe existante" class="upLine"  @tap="equipeExistante"></Label>
+								<Label row="2" col="0" text="Fermer" class="upLine textFermer" @tap="onCloseDrawerTap"></Label>
+							</GridLayout>
+						</StackLayout>
 						
 					</StackLayout>
-				</StackLayout>
-			</ScrollView>
+					<ScrollView ~mainContent height="100%">
+						<StackLayout>  
+							
+							<StackLayout class="cadre" v-if="isNouvelleEquipe" >
+								<GridLayout rows="70" columns="50,*">
+									<Image row="0" col="0" class="actionButton" src="~/assets/menu_icon.png" @tap="onOpenDrawerTap"/>
+									<Label row="0" col="1" class="titre" horizontalAlignment="center" text="Nouvelle équipe" textWrap="true" />
+									
+								</GridLayout>
+								<Label class="label" text="Nom de l'équipe" />
+								<TextField class="textfield" hint="Ex : the killers..." v-model="input.nom"/>
+								<Label ref="labelVille" class="label" text="Ville du challenge Téléthon"  />
+								<TextField class="textfield" ref="textFieldVille" @textChange="onTextChange" @blur="lostFocus" v-model="input.commune"/>
+								<ScrollView v-if="affichageVilles" height="500">
+									<StackLayout backgroundColor="#3c495e" >
+										<GridLayout v-for="ville in villes" rows="40" columns="*"  >
+											<Label :text="ville.nom" @tap="selectVille(ville.nom,ville.code)" class="labelVille"/>
+										</GridLayout>
+									</StackLayout>
+								</ScrollView>
+								<Label class="label"  text="Mot de passe" />
+								<TextField class="textfield" v-model="input.code"/>
+								<GridLayout rows="auto,auto" columns="*,50" marginBottom="5">
+									<Label row="0" col="0" text="Equipe organisatrice" fontSize="14" class="labelCheck" />
+									<Switch row="0"col="1" checked="false" class="switch-light" v-model="input.organisateur" />
+									<Label row="1" col="0" text="Equipe de coordination Téléthon" fontSize="14" class="labelCheck" />
+									<Switch row="1"col="1" checked="false" class="switch-light" v-model="input.admin" />
+									
+								</GridLayout>
+								<Button text="Créer" horizontalAlignment="center" @tap="creerEquipe"/>
+							</StackLayout>
+							<StackLayout v-if="isExistanteEquipe" >
+								<GridLayout rows="70" columns="50,*">
+									<Image row="0" col="0" class="actionButton" src="~/assets/menu_icon.png" @tap="onOpenDrawerTap"/>
+									<Label row="0" col="1" class="titre" horizontalAlignment="center" text="Sélection de l'équipe" textWrap="true" />
+									
+								</GridLayout>
+								<GridLayout rows="30, auto" marginBottom="5">
+									<Label ref="labelVille" row="1" text="Ville du challenge Téléthon" opacity="0.4" fontSize="14" class="input" />
+									<TextField ref="textFieldVille" row="1" borderBottomColor="#fff" padding="0"
+								borderBottomWidth="3" @textChange="onTextChange" v-model="input.commune"/>
+								</GridLayout>
+								<ScrollView v-if="affichageVilles" height="500">
+									<StackLayout >
+										<GridLayout v-for="ville in villes" rows="40" columns="*">
+											<Label :text="ville.nom" @tap="selectVille(ville.nom,ville.code)" class="labelVille"/>
+										</GridLayout>
+									</StackLayout>
+								</ScrollView>
+								<ListPicker v-if="affichageEquipes" ref="equipeEnCours" :items="equipesVille" textField="nom" @tap="selectEquipeExistante()"  />
+								<Label v-else textWrap="true" text="Il n'existe pas encore d'équipe sur cette commune. Utiliser 'Créer une équipe'" />
+								
+							</StackLayout>
+						</StackLayout>
+					</ScrollView>
+				</RadSideDrawer>
 			</StackLayout>
+			
 		</DockLayout>
 		
 		
@@ -121,6 +140,15 @@
         },
 	
         methods: { 
+			onNavigationButtonTap() {
+				Frame.topmost().goBack();
+			},
+			onOpenDrawerTap() {
+				this.$refs.drawer.showDrawer();
+			},
+			onCloseDrawerTap() {
+				this.$refs.drawer.closeDrawer();
+			},
 			updateOrganisateur() {
 				this.input.admin = 0;
 				prompt({
@@ -280,11 +308,13 @@
 				this.isNouvelleEquipe = true;
 				this.isExistanteEquipe = false;
 				this.affichageVilles = false;
+				this.$refs.drawer.closeDrawer();
 			},
 			equipeExistante() {
 				this.isNouvelleEquipe = false;
 				this.isExistanteEquipe = true;
 				this.affichageVilles = false;
+				this.$refs.drawer.closeDrawer();
 			},
 			selectVille(nom,code) {
 				//console.log("Sélection de la ville"+nom);
@@ -302,6 +332,7 @@
 					this.affichageEquipes = false; 
 				};
 				this.isValidVille = true;
+				this.$refs.textFieldVille.nativeView.dismissSoftInput()
 			},
             onTextChange: function() {
 				this.isValidVille = false;
@@ -334,6 +365,7 @@
 </script>
 
 <style>
+
 .imageCheck {
 	width : 100px;
 	margin : 20px;

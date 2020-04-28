@@ -8,6 +8,9 @@
 // Import common styles
 @import 'app-common';
 
+.cadre {
+	margin : 30px;
+}
 .sideStackLayout {
 	font-size: 18px;
 	color: white;
@@ -24,9 +27,8 @@
 	color: black;
 }
 .footerBandeau {
-	background-color : #F8F8F8;
-	height : 250px;
-	margin-top : 20px;
+	background-color : white;
+	height : 170px;
 }
 
 .t-72 {
@@ -64,9 +66,6 @@
 	text-align : center;
 }
 
-.preload {
-	
-}
 
 .imageActions {
 	width : 100px;
@@ -102,55 +101,12 @@
 .page, .menu {
 	background-color : #fbc62d;
 }
-  .Rectangle-15 {
-	position: absolute;
-	width: 100%;
-	height: 4.35%;
-	background-image: linear-gradient(to left, #7367ec, #7395ef);
-	position: relative;
-	display: inline-block; 
-	z-index: 1;
-  }
   
-  .Version-2019 {
-	width: auto;
-	height: auto;
-	margin-left: 37%;
-	font-family: Montserrat;
-	font-size: 14.5%;
-	font-weight: bold;
-	font-style: normal;
-	font-stretch: normal;
-	line-height: 1.2;
-	color: #ffffff;
-	z-index: 2;
-  }
-  .Info-main {
-	width: auto;
-	height: auto;
-	font-family: Montserrat;
-	font-size: 17%;
-	font-weight: bold;
-	font-style: normal;
-	font-stretch: normal;
-	line-height: 1.2;
-	color: black;
-	z-index: 2;
-  }
-  .Info-space{
-	margin-left:5%;
-	margin-top:50%;
-  }
-
   .Header {
 	width: 110%;
 	height:100%;
 	margin-bottom: 0%;
 	z-index: 0;
-  }
-  .iPhone-XXS-11 {
-	position: relative;
-  
   }
   .Footer{
 	width: 125%;
@@ -172,19 +128,7 @@
 	font-family: montserrat; 
 	z-index: 2;
   }
-  .IconTeam{
-	padding:10%;
-	width: 8%;
-	height:8%;
-	z-index:3;
-  }
-  .IconDefis{
-	padding:10%;
-	width: 8%;
-	height:8%;; 
-	z-index:3;
-  }
-  .IconScore{
+  .IconTeam, .IconDefis,.IconScore{
 	padding:10%;
 	width: 8%;
 	height:8%;; 
