@@ -40,8 +40,10 @@
         data() {
             return {
 				categorie: {
-					nom : ""
+					nom : "",
+					
 				},
+				images : [],
             }
         },
 		mounted() {

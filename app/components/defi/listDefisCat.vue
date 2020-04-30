@@ -1,38 +1,49 @@
 <template>
     <page class="page" actionBarHidden="true">
 		<DockLayout stretchLastChild="true">
-        <Header dock="top" />
-        <Footer dock="bottom" />
-			<StackLayout dock="center" class="root" >
-			<StackLayout>
-				<GridLayout  rows="auto" columns="*,50,50,50">
-					<Label row="0" col="0" class="titre" :text="$store.state.selectedCategorie.nom" textAlignment="center" />
-					<Image row="0" col="1" v-if="$store.state.updateDefi" class="actionButton" src="~/assets/icons/upload.png" @tap="uploadDefis"/>
-					<Image row="0" col="2" class="actionButton" src="~/assets/icons/delete.png" @tap="deleteCategorie"/>
-					<Image row="0" col="3" class="actionButton" src="~/assets/icons/modify.png" @tap="editCat"/>
-				</GridLayout>
-				<GridLayout  rows="auto" columns="*,50">
-					<Label row="0" col="0" text="Liste des défis" textAlignment="center" fontSize="24"/>
-					<Image row="0" col="1" v-if="$store.state.isAdmin" src="~/assets/icons/add-256.gif" @tap="addDefi"/>
-				</GridLayout>
-				<ListView key="$store.state.defis" for="item in defisCat" height="100%" >
-				  <v-template>
-					<GridLayout rows="*" columns="*,50" width="100%" margin="0" @tap="getDefi(item)">
-						<GridLayout col="0" verticalAlignment="bottom">
-							<StackLayout paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16">
-								<Label :text="item.nom" class="defiTitle" />
-								<Label :text="item.description_courte" class="defiDescription" />
-							</StackLayout>
+			<Header dock="top" />
+			<Footer dock="bottom" />
+			<RadSideDrawer ref="drawer">
+				<StackLayout ~drawerContent class="sideStackLayout">
+					<StackLayout class="sideDrawerTitre">
+						<Label text="Menu"></Label>
+					</StackLayout>
+					<StackLayout class="sideStackLayout">
+						<GridLayout rows="50,50,50,*" columns="*" >
+							<Label row="0" col="0" text="Modifier la catégorie" class="upLine"  @tap="editCat"></Label>
+							<Label row="1" col="0" text="Supprimer la catégorie" class="upLine"  @tap="deleteCategorie"></Label>
+							<Label row="2" col="0" v-if="$store.state.updateDefi" text="Sauvegarder la catégorie" class="upLine"  @tap="uploadDefis"></Label>
+							<Label row="3" col="0" text="Fermer" class="upLine textFermer" @tap="onCloseDrawerTap"></Label>
 						</GridLayout>
-						<Image col="1" src="~/assets/icons/right.png" height="30px"/>
+					</StackLayout>
+				</StackLayout>
+				<StackLayout ~mainContent dock="center" class="root" >
+					<GridLayout class="borderBottom ml-10" rows="auto" columns="50,*">
+						<Image row="0" col="0" class="actionButton" src="~/assets/menu_icon.png" @tap="onOpenDrawerTap"/>
+						<Label row="0" col="1" class="titre" :text="$store.state.selectedCategorie.nom" textAlignment="center" />
 					</GridLayout>
-							
-							
-							
-				  </v-template>
-				</ListView>
-			</StackLayout>
-			</StackLayout>
+					<GridLayout  rows="auto" columns="*,50">
+						<Label row="0" col="0" class="ml-10" text="Liste des défis" textAlignment="left" fontSize="24"/>
+						<Image row="0" col="1" v-if="$store.state.isAdmin" src="~/assets/icons/add-256.gif" @tap="addDefi"/>
+					</GridLayout>
+					<ListView key="$store.state.defis" for="item in defisCat" height="100%" >
+					  <v-template>
+						<GridLayout rows="*" columns="*,50" width="100%" margin="0" @tap="getDefi(item)">
+							<GridLayout col="0" verticalAlignment="bottom">
+								<StackLayout paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16">
+									<Label :text="item.nom" class="defiTitle" />
+									<Label :text="item.description_courte" class="defiDescription" />
+								</StackLayout>
+							</GridLayout>
+							<Image col="1" src="~/assets/icons/right.png" height="30px"/>
+						</GridLayout>
+								
+								
+								
+					  </v-template>
+					</ListView>
+				</StackLayout>
+			</RadSideDrawer>
 		</DockLayout>
 	</page>
 	
@@ -64,6 +75,15 @@
 			
         },
 		methods: {
+			onNavigationButtonTap() {
+				Frame.topmost().goBack();
+			},
+			onOpenDrawerTap() {
+				this.$refs.drawer.showDrawer();
+			},
+			onCloseDrawerTap() {
+				this.$refs.drawer.closeDrawer();
+			},
 			getDefi(item) {
 				//console.log("affichage du defi");
 				this.$store.state.selectedDefi = {};
@@ -159,6 +179,18 @@
 </script>
 
 <style>
+.ml-10 {
+	margin : 0 0 0 10;
+}
+.mu-10 {
+	margin : 10 0 0 0;
+}
+.borderBottom {
+	border-width: 0 0 2 0;
+	border-color: gray;
+	border-radius : 0;
+	padding : 0 0 10 0;
+}
 .defiTitle {
 	color : black;
 	font-weight: bold;

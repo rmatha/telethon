@@ -47,7 +47,7 @@
 						
 						<StackLayout  v-if="$store.state.selectedEquipe">
 							<GridLayout rows="auto" columns="*,50" >
-								<Label row="0" col="0" class="label" text="Liste dess participants de l'équipe" textWrap="true" />
+								<Label row="0" col="0" class="label" text="Liste des participants de l'équipe" textWrap="true" />
 								<Image row="0" col="1" src="~/assets/icons/addUser.png" @tap="addParticipant"/>
 							</GridLayout>
 							

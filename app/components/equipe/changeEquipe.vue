@@ -56,11 +56,8 @@
 									<Label row="0" col="1" class="titre" horizontalAlignment="center" text="Sélection de l'équipe" textWrap="true" />
 									
 								</GridLayout>
-								<GridLayout rows="30, auto" marginBottom="5">
-									<Label ref="labelVille" row="1" text="Ville du challenge Téléthon" opacity="0.4" fontSize="14" class="input" />
-									<TextField ref="textFieldVille" row="1" borderBottomColor="#fff" padding="0"
-								borderBottomWidth="3" @textChange="onTextChange" v-model="input.commune"/>
-								</GridLayout>
+								<Label ref="labelVille" class="label" text="Ville du challenge Téléthon"  />
+								<TextField class="textfield" ref="textFieldVille" @textChange="onTextChange" v-model="input.commune"/>
 								<ScrollView v-if="affichageVilles" height="500">
 									<StackLayout >
 										<GridLayout v-for="ville in villes" rows="40" columns="*">

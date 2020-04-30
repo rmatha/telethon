@@ -15,13 +15,13 @@
 						<Button class="boutonAction" v-else text="Afficher les détails du défi" @tap="changeDetailState"/>
 						<StackLayout v-if="detail">
 							<Label class="label" text="Description Courte :"  />
-							<Label :text="$store.state.selectedDefi ? $store.state.selectedDefi.defi.description_courte : 'Non renseigné'" class="defiDesc"/>
+							<Label :text="$store.state.selectedDefi ? $store.state.selectedDefi.defi.description_courte : 'Non renseigné'" class="defiDesc" textWrap="true"/>
 							<Label class="label" text="Description Longue :"  />
-							<Label :text="$store.state.selectedDefi ? $store.state.selectedDefi.defi.description_longue : 'Non renseigné'" class="defiDesc"/>
+							<Label :text="$store.state.selectedDefi ? $store.state.selectedDefi.defi.description_longue : 'Non renseigné'" class="defiDesc" textWrap="true"/>
 							<Label class="label" text="Règlement :"  />
-							<Label :text="$store.state.selectedDefi ? $store.state.selectedDefi.defi.reglementation : 'Non renseigné'" class="defiDesc"/>
+							<Label :text="$store.state.selectedDefi ? $store.state.selectedDefi.defi.reglementation : 'Non renseigné'" class="defiDesc" textWrap="true"/>
 							<Label class="label" text="Barême :"  />
-							<Label :text="$store.state.selectedDefi ? $store.state.selectedDefi.defi.bareme : 'Non renseigné'" class="defiDesc"/>
+							<Label :text="$store.state.selectedDefi ? $store.state.selectedDefi.defi.bareme : 'Non renseigné'" class="defiDesc" textWrap="true"/>
 						</StackLayout>
 						<GridLayout v-if="$store.state.selectedEquipe" rows="auto" columns="*,50" >
 							<Label row="0" col="0" class="label m-b-20" text="Liste des scores :" textWrap="true" />
@@ -227,6 +227,7 @@
 	color : black;
 	font-size: 10px;
 	font-weight: normal;
+	margin : 0 20 0 20;
 	
 }
 

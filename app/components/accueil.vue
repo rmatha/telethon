@@ -10,7 +10,7 @@
 				</GridLayout>
 			</StackLayout>
 			<StackLayout  v-else dock="center" class="root" >
-				<label class="titre mb50" text="Bonjour !!!!"  horizontalAlignment="center"/>
+				<label class="titre mb50" text="Bonjour !"  horizontalAlignment="center"/>
 				
 				<StackLayout  v-if="isEquipeSelected">
 					<GridLayout rows="*,*,*" columns="*,40">
@@ -18,6 +18,7 @@
 							<label class="label" text="Equipe :"  />
 							<label class="valeur" :text="nomEquipe"  />
 							<label class="valeur" :text="nbParticipantsEquipe"  />
+							<label class="valeur" :text="communeEquipe"  />
 						</StackLayout>
 						<Image  src="~/assets/icons/modify.png" col="1" row="0" @tap="navEquipe" verticalAlignment="top"/>
 						<StackLayout row="1" col="0">	
@@ -35,7 +36,7 @@
 				</StackLayout>
 				<StackLayout v-else>
 					<GridLayout rows="100,*,200" columns="200,*" horizontalAlignment="center" >
-						<Label row="1" col="0" colSpan="2" class="labelEquipeSelect" text="Pour commencer vous devez définir votre équipe" textWrap="true" horizontalAlignment="center" />
+						<Label row="1" col="0" colSpan="3" class="labelEquipeSelect" text="Pour commencer vous devez définir votre équipe" textWrap="true" horizontalAlignment="center" />
 						<Image row="2" col="0"  src="~/assets/fleche_rouge.png"  />
 					</GridLayout>
 				</StackLayout>
@@ -65,6 +66,9 @@
             };
         },
 		computed: {
+			communeEquipe() {
+				return "Commune : "+this.$store.state.selectedEquipe.commune;
+			},
 			moyenneEquipe() {
 				if (this.$store.state.selectedEquipe.scores) {
 					return "Moyenne de l'équipe : "+(this.$store.state.selectedEquipe.scores.length > 0 ?	_.round(_.meanBy(this.$store.state.selectedEquipe.scores, 'score'),2) : "Pas de score enregistré"); 
@@ -105,7 +109,7 @@
 			}
         },
         mounted() {
-			//console.log("ACCUEIL : STATE : selectedEquipe "+JSON.stringify(this.$store.state.selectedEquipe));
+			console.log("ACCUEIL : STATE : selectedEquipe "+JSON.stringify(this.$store.state.selectedEquipe));
 			// chargement des données en fonction de l'équipe en cours
 			//this.$store.dispatch("queryDonnees", isEquipeSelected);
 			// vérification si une connexion est disponible

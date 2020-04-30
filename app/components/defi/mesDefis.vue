@@ -8,7 +8,7 @@
 					<StackLayout width="100%" height="100%">
 						<GridLayout v-if="!isCoordinateurOrOrganisateur" rows="auto" columns="*,50,50">
 							<Label row="0" col="0" class="m-b-20 titreTelethon" text="Mes Défis" textWrap="true" />
-							<Image row="0" col="1" class="actionButton" src="~/assets/icons/save.png"/>
+							<Image row="0" col="1" class="actionButton" src="~/assets/icons/save.png" @tap="uploadEquipe"/>
 							<Image row="0" col="2" src="~/assets/icons/add-256.gif" @tap="affichageCat"/>
 						</GridLayout>
 						<FlexboxLayout v-if="!isCoordinateurOrOrganisateur" flexDirection="column">
@@ -96,7 +96,71 @@
 
 		},
 		methods: {
+			uploadEquipe() {
+				confirm({
+				  title: "Sauvegarde de l'équipe et les défis",
+				  message: "Confirmez-vous la sauvegarde de l'équipe sur le serveur ?",
+				  okButtonText: "OK",
+				  cancelButtonText: "NON"
+				}).then(result => {
+				  //console.log(result);
+				  if (result) {
+					//console.log("On sauvegarde sur le serveur");
+					//console.log("Equipe :"+JSON.stringify(this.$store.state.selectedEquipe));
+					//console.log("Participants :"+JSON.stringify(this.$store.state.participants));
+					axios
+						  .post('https://www.telethon.citeyen.com/public/api/equipes/uploadEquipe', {
+							Equipe : this.$store.state.selectedEquipe
+						  })
+						  .then(response => {
+								//console.log("update OK");
+								// maintenant on récupère les informations sur le serveur pour être synchro
+							
+							
+								// mise a jour de la version locale à partir de la version serveur
+								let params = {};
+								params["commune"] = this.$store.state.selectedEquipe.commune;
+								params["nom"] = this.$store.state.selectedEquipe.nom;
+								//console.log("Appel suivant synchro");
+								axios
+								.get('https://telethon.citeyen.com/public/api/equipes/info', {params : params})
+								.then(response => {
+									this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
+									alert({
+									  title: "Chargement de l'équipe",
+									  message: "Synchronisation de l'équipe avec le serveur OK",
+									  okButtonText: "OK"
+									});
+								})
+								.catch(error => {
+									//console.log("updatete KO : "+error);
+									alert({
+									  title: "Problème de sauvegarde",
+									  message: "La synchronisation avec le serveur est KO. Mais vous pouvez continuer à utiliser cette équipe pour saisir les participants et les scores. Vous pourrez faire la sauvegarde plus tard",
+									  okButtonText: "OK"
+									}).then(() => {
+									  //console.log("Alert dialog closed");
+									});
+								});
+						  })
+						  .catch(error => {
+							//console.log("updatete KO : "+error);
+							alert({
+							  title: "Problème de sauvegarde",
+							  message: "La sauvegarde n'est pas possible actuellement. Mais vous pouvez continuer à utiliser cette équipe pour saisir les participants et les scores. Vous pourrez faire la sauvegarde plus tard",
+							  okButtonText: "OK"
+							}).then(() => {
+							  //console.log("Alert dialog closed");
+							  this.$navigateTo(mesDefis);
+							});
+						  })
+					
+				  }
+				});
+			},
 			uploadDefisCommune() {
+				console.log("defis : "+JSON.stringify(this.$store.state.defiCommune));
+				console.log("commune : "+JSON.stringify(this.$store.state.selectedCommune));
 				confirm({
 				  title: "Sauvegarde des défis pour la commune",
 				  message: "Confirmez-vous la sauvegarde des défis pour la commune ?",
@@ -107,7 +171,7 @@
 					axios
 						  .post('https://www.telethon.citeyen.com/public/api/defisCommune/upload', {
 							defis : this.$store.state.defiCommune,
-							commune : this.$store.state.selectedCommune,
+							commune : this.$store.state.selectedEquipe.commune,
 						  })
 						  .then(response => {
 							alert({
