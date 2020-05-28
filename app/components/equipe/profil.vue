@@ -7,7 +7,7 @@
 					<GridLayout rows="auto" columns="*,50,50" >
 							<Label row="0" col="0" class="m-b-20 sousTitre" text="Edition participant" textWrap="true" />
 							<Image row="0" col="1" class="actionButton" src="~/assets/icons/delete.png" @tap="deleteProfil"/>
-							<Image row="0" col="2" class="actionButton" src="~/assets/icons/save.png" @tap="save"/>
+							<Image row="0" col="2" class="actionButton" src="~/assets/icons/add-256.gif" @tap="save"/>
 						</GridLayout>
 					<StackLayout>
 						<Label class="label" ref="label" text="Pseudo" />
@@ -162,9 +162,10 @@
 				  okButtonText: "oui",
 				  cancelButtonText: "non"
 				}).then(() => {
-					//console.log("on supprime !");
+					console.log("on supprime !");
 					this.$store.dispatch("deleteParticipant", {"participant" : this.input});
 					this.$navigateTo(equipe);
+					this.$store.state.updateEquipe = true;
 				});
 					
 			},

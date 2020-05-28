@@ -12,16 +12,15 @@
 						</StackLayout>
 						<StackLayout class="sideStackLayout">
 							<GridLayout rows="50,50,*" columns="*" >
-								<Label row="0" col="0" text="Créer une nouvelle équipe" class="upLine"  @tap="nouvelleEquipe"></Label>
-								<Label row="1" col="0" text="sélectionner une équipe existante" class="upLine"  @tap="equipeExistante"></Label>
+								<Label row="0" col="0" text="Créer une nouvelle équipe" class="upLine"  @tap="selectNouvelleEquipe"></Label>
+								<Label row="1" col="0" text="sélectionner une équipe existante" class="upLine"  @tap="selectEquipeExistante"></Label>
 								<Label row="2" col="0" text="Fermer" class="upLine textFermer" @tap="onCloseDrawerTap"></Label>
 							</GridLayout>
 						</StackLayout>
 						
 					</StackLayout>
-					<ScrollView ~mainContent height="100%">
-						<StackLayout>  
-							
+					<StackLayout ~mainContent >
+						<StackLayout   width="100%" height="100%">  
 							<StackLayout class="cadre" v-if="isNouvelleEquipe" >
 								<GridLayout rows="70" columns="50,*">
 									<Image row="0" col="0" class="actionButton" src="~/assets/menu_icon.png" @tap="onOpenDrawerTap"/>
@@ -43,9 +42,9 @@
 								<TextField class="textfield" v-model="input.code"/>
 								<GridLayout rows="auto,auto" columns="*,50" marginBottom="5">
 									<Label row="0" col="0" text="Equipe organisatrice" fontSize="14" class="labelCheck" />
-									<Switch row="0"col="1" checked="false" class="switch-light" v-model="input.organisateur" />
+									<Switch ref="labelOrga" row="0"col="1" :checked="input.organisateur" class="switch-light" v-model="input.organisateur" @tap="setOrganisateur" />
 									<Label row="1" col="0" text="Equipe de coordination Téléthon" fontSize="14" class="labelCheck" />
-									<Switch row="1"col="1" checked="false" class="switch-light" v-model="input.admin" />
+									<Switch row="1"col="1" checked="false" class="switch-light" v-model="input.admin" @tap="setCoordinateur" />
 									
 								</GridLayout>
 								<Button text="Créer" horizontalAlignment="center" @tap="creerEquipe"/>
@@ -65,12 +64,12 @@
 										</GridLayout>
 									</StackLayout>
 								</ScrollView>
-								<ListPicker v-if="affichageEquipes" ref="equipeEnCours" :items="equipesVille" textField="nom" @tap="selectEquipeExistante()"  />
+								<ListPicker v-if="affichageEquipes" ref="equipeEnCours" :items="equipesVille" textField="nom" @tap="selectListEquipe"  />
 								<Label v-else textWrap="true" text="Il n'existe pas encore d'équipe sur cette commune. Utiliser 'Créer une équipe'" />
 								
 							</StackLayout>
 						</StackLayout>
-					</ScrollView>
+					</StackLayout>
 				</RadSideDrawer>
 			</StackLayout>
 			
@@ -89,35 +88,31 @@
 	
     export default {
         mounted() {
+			console.log("changeEquipe : mounted : type : "+this.type);
 			if (this.type == "new") {
-				this.isNouvelleEquipe = true;
+				this.nouvelleEquipe = true;
+				this.existanteEquipe = false;
+				console.log("changeEquipe : mounted : on veut creer une nouvelle équipe : "+this.nouvelleEquipe);
 			};
 			if (this.type == "search") {
-				this.isExistanteEquipe = true;
+				this.existanteEquipe = true;
+				this.nouvelleEquipe = false;
+				console.log("changeEquipe : mounted : on veut récupérer une équipe : "+this.existanteEquipe);
 			};
         },
 		computed: {	
-			getClassButtonNouvelleEquipe () {
-				//console.log("isNouvelleEquipe : "+this.isNouvelleEquipe);
-				return this.isNouvelleEquipe ? "active" : "nonActive";
+			isNouvelleEquipe() {
+				return this.nouvelleEquipe;
 			},
-			getClassButtonExistanteEquipe () {
-				//console.log("isExistanteEquipe : "+this.isExistanteEquipe);
-				return this.isExistanteEquipe ? "active" : "nonActive";
-			},
-			isOrganisateur(){
-				if (this.input.admin == 1){
-					//console.log("Le flag orga est vert");
-					return(true);
-					
-				}
-			},
+			isExistanteEquipe() {
+				return this.existanteEquipe;
+			}
         },
 		props: ['type'],
 		data() {
             return {
-                isNouvelleEquipe : false,
-				isExistanteEquipe : false,
+                nouvelleEquipe : false,
+				existanteEquipe : false,
 				input: {
 					nom: "",
                     commune: "",
@@ -146,61 +141,62 @@
 			onCloseDrawerTap() {
 				this.$refs.drawer.closeDrawer();
 			},
-			updateOrganisateur() {
-				this.input.admin = 0;
-				prompt({
-				  title: "Code de l'équipe",
-				  message: "Veuillez saisir le code des organisateurs qui vous a été donné par l'équipe de coordination téléthon :",
-				  okButtonText: "OK",
-				  cancelButtonText: "Cancel",
-				  defaultText: "",
-				}).then(result => {
-					//console.log(`Dialog result: ${result.result}, text: ${result.text}`);
-					if (result.result & (result.text == "16340")) {
-						//console.log("c'est un orga");
-						this.input.organisateur = true;
-					}
-					else {
-						alert("Erreur mauvais code");
-						//console.log("ce n'est pas un orga");
-					}
+			setOrganisateur() {
+				if (!this.input.organisateur) {
+					prompt({
+					  title: "Code de l'équipe",
+					  message: "Veuillez saisir le code des organisateurs qui vous a été donné par l'équipe de coordination téléthon :",
+					  okButtonText: "OK",
+					  cancelButtonText: "Cancel",
+					  defaultText: "",
+					}).then(result => {
+						//console.log(`Dialog result: ${result.result}, text: ${result.text}`);
+						if (result.result & (result.text == "16340")) {
+							//console.log("c'est un orga");
+						}
+						else {
+							alert("Erreur : mauvais code");
+							
+							this.input.organisateur = false;
+						}
+						
+					});
+				}
 					
-				});
-				
-				
 			},
 
-			updateCoordinateur() {
-				this.input.admin = 0;
-				prompt({
-				  title: "Code de l'équipe",
-				  message: "Veuillez saisir le code des organisateurs qui vous a été donné par l'équipe de coordination téléthon:",
-				  okButtonText: "OK",
-				  cancelButtonText: "Cancel",
-				  defaultText: "",
-				}).then(result => {
-					//console.log(`Dialog result: ${result.result}, text: ${result.text}`);
-					if (result.result & (result.text == "16340")) {
-						//console.log("c'est un admin");
-						this.input.admin = true;
-					}
-					else {
-						alert("Erreur mauvais code");
-						//console.log("ce n'est pas une corrdination");
-					}
-					
-				});
+			setCoordinateur() {
+				if (!this.input.admin) {
+					prompt({
+					  title: "Code de l'équipe",
+					  message: "Veuillez saisir le code des organisateurs qui vous a été donné par l'équipe de coordination téléthon:",
+					  okButtonText: "OK",
+					  cancelButtonText: "Cancel",
+					  defaultText: "",
+					}).then(result => {
+						//console.log(`Dialog result: ${result.result}, text: ${result.text}`);
+						if (result.result & (result.text == "321")) {
+							//console.log("c'est un admin");
+						}
+						else {
+							alert("Erreur : mauvais code");
+							//console.log("ce n'est pas une corrdination");
+							
+							this.input.admin = false;
+						}
+						
+					});
 				
-				
+				}
 			},
 			
 			
 
-			selectEquipeExistante() { 
+			selectListEquipe() { 
 				// récupération de la commune sélectionnée
 				let indexEquipe = this.$refs.equipeEnCours.nativeView;
 				this.equipeSelected = this.equipesVille[indexEquipe.selectedIndex];
-				//console.log("selectEquipeExistante : sélectionde l'équipe :"+this.equipeSelected.nom+" : sur la commune : "+this.equipeSelected.commune+ " est le code : "+ this.equipeSelected.code);
+				console.log("selectEquipeExistante : sélectionde l'équipe :"+this.equipeSelected.nom+" : sur la commune : "+this.equipeSelected.commune+ " est le code : "+ this.equipeSelected.code);
 				prompt({
 				  title: "Code de l'équipe",
 				  message: "Veuillez saisir le code de l'équipe:",
@@ -215,7 +211,7 @@
 						params["commune"] = this.equipeSelected.commune;
 						params["nom"] = this.equipeSelected.nom;
 						axios
-						.get('https://telethon.citeyen.com/public/api/equipes/info', {params : params})
+						.get('https://telethon2020.citeyen.com/api/equipe/info', {params : params})
 						.then(response => {
 							this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
 							// chargement des defis de la commune 
@@ -223,10 +219,10 @@
 							let params = {};
 							params["commune"] = this.$store.state.selectedEquipe.commune;
 							axios
-								.get('https://telethon.citeyen.com/public/api/defisCommune/list', {params : params})
+								.get('https://telethon2020.citeyen.com/api/commune/info', {params : params})
 								.then(responseList => {
 									//console.log("Chargement des defis de la commune en base : "+JSON.stringify(responseList.data));
-									this.$store.dispatch("reloadDefisCommune",{"defis" : responseList.data,"version" : null});
+									this.$store.dispatch("reloadDefisCommune",{"defis" : responseList.data.defis,"version" : responseList.data.version});
 								});
 							alert({
 							  title: "Sélection d'équipe",
@@ -283,17 +279,17 @@
 						let params = {};
 						params["commune"] = this.$store.state.selectedEquipe.commune;
 						axios
-							.get('https://telethon.citeyen.com/public/api/defisCommune/list', {params : params})
+							.get('https://telethon2020.citeyen.com/api/commune/info', {params : params})
 							.then(responseList => {
 								//console.log("Chargement des defis de la commune en base : "+JSON.stringify(responseList.data));
-								this.$store.dispatch("reloadDefisCommune",{"defis" : responseList.data,"version" : null});
+								this.$store.dispatch("reloadDefisCommune",{"defis" : responseList.data.defis,"version" : responseList.data.version});
 							});
 						alert({
 						  title: "Création d'équipe confirmée",
 						  message: "Vous allez être redirigé pour intégrer les membres à votre équipe",
 						  okButtonText: "OK"
 						}).then(() => {
-							this.updateEquipe = true;
+							this.$store.state.updateEquipe = true;
 							this.$navigateTo(equipe);
 						});
 					});
@@ -301,15 +297,15 @@
 				
 				
 			},
-			nouvelleEquipe() {
-				this.isNouvelleEquipe = true;
-				this.isExistanteEquipe = false;
+			selectNouvelleEquipe() {
+				this.nouvelleEquipe = true;
+				this.existanteEquipe = false;
 				this.affichageVilles = false;
 				this.$refs.drawer.closeDrawer();
 			},
-			equipeExistante() {
-				this.isNouvelleEquipe = false;
-				this.isExistanteEquipe = true;
+			selectEquipeExistante() {
+				this.nouvelleEquipe = false;
+				this.existanteEquipe = true;
 				this.affichageVilles = false;
 				this.$refs.drawer.closeDrawer();
 			},

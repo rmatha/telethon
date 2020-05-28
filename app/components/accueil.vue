@@ -86,13 +86,28 @@
 			},
 			nbDefisEquipe() {
 				var messageDefi = "Pas de défis enregistrés";
-				if (this.$store.state.selectedEquipe.defis_equipes) {
-					var nbDefisActifs = this.$store.state.selectedEquipe.defis_equipes.filter(defi => {
-						//console.log("ACCUEIL : nbDefisEquipe : "+JSON.stringify(defi));
-						return !defi.delete;
-					});
-					if (nbDefisActifs.length > 0) {
-						messageDefi ="Nombre de défis pour l'équipe : "+nbDefisActifs.length;
+				if (this.$store.state.selectedEquipe.admin || this.$store.state.selectedEquipe.organisateur) {
+					var messageDefi = "Pas de défis enregistrés pour la commune";
+					if (this.$store.state.defiCommune.defis) {
+						var nbDefisActifs = this.$store.state.defiCommune.defis.filter(defi => {
+							//console.log("ACCUEIL : nbDefisEquipe : "+JSON.stringify(defi));
+							return !defi.delete;
+						});
+						if (nbDefisActifs.length > 0) {
+							messageDefi ="Nombre de défis pour la commne : "+nbDefisActifs.length;
+						}
+					}
+				}
+				else {
+					var messageDefi = "Pas de défis enregistrés pour l'équipe";
+					if (this.$store.state.selectedEquipe.defis_equipes) {
+						var nbDefisActifs = this.$store.state.selectedEquipe.defis_equipes.filter(defi => {
+							//console.log("ACCUEIL : nbDefisEquipe : "+JSON.stringify(defi));
+							return !defi.delete;
+						});
+						if (nbDefisActifs.length > 0) {
+							messageDefi ="Nombre de défis pour l'équipe : "+nbDefisActifs.length;
+						}
 					}
 				}
 				return messageDefi;
@@ -109,7 +124,28 @@
 			}
         },
         mounted() {
-			console.log("ACCUEIL : STATE : selectedEquipe "+JSON.stringify(this.$store.state.selectedEquipe));
+			
+			axios
+				.get('https://telethon2020.citeyen.com/api/equipe/list')
+				.then(response => {
+					console.log("liste equipe serveur :"+JSON.stringify(response.data.equipes)); 
+					console.log("Version equipe serveur :"+response.data.version); 
+					console.log("Version equipe locale :"+this.$store.state.versionEquipe); 
+					if (response.data.version > this.$store.state.versionEquipe) {
+						// mise a jour de la table de categories
+						console.log("MAJ des equipes à partir du serveur");
+						this.messages.push("MAJ des équipes à partir du serveur");
+						this.$store.dispatch("reloadEquipes",{"equipes" : response.data.equipes,"version" : response.data.version});
+					}else {
+						this.messages.push("Equipes  à jour ");
+					}
+					this.go = true;
+				});
+				
+			console.log("ACCUEIL : mounted : defi ");
+			console.log(JSON.stringify(this.$store.state.defis));
+			console.log("ACCUEIL : mounted : selectedEquipe "+JSON.stringify(this.$store.state.selectedEquipe));
+			console.log("ACCUEIL : mounted : defis  commune "+JSON.stringify(this.$store.state.defiCommune));
 			// chargement des données en fonction de l'équipe en cours
 			//this.$store.dispatch("queryDonnees", isEquipeSelected);
 			// vérification si une connexion est disponible
@@ -190,7 +226,7 @@
 				params["commune"] = this.$store.state.selectedEquipe.commune;
 				params["nom"] = this.$store.state.selectedEquipe.nom;
 				axios
-				.get('https://telethon.citeyen.com/public/api/equipes/info', {params : params})
+				.get('https://telethon2020.citeyen.com/api/equipe/info', {params : params})
 				.then(response => {
 					// si la version du serveur plus récente, on récupère 
 					//console.log("version de l'équipe  en cours local : "+this.$store.state.selectedEquipe.version);

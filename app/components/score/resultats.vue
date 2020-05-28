@@ -158,7 +158,7 @@ export default {
 					let params = {};
 					params["commune"] = this.$store.state.selectedEquipe.commune;
 					axios
-						.get('https://telethon.citeyen.com/public/api/scores/list', {params : params})
+						.get('https://telethon2020.citeyen.com/api/score/list', {params : params})
 						.then(response => {
 							//console.log("RESULTAT : monted : aPPEL AXIOS ok");
 							this.classementCommune = response.data;
@@ -166,7 +166,7 @@ export default {
 						});
 					// on peut récupérer le classement du departement
 					axios
-						.get('https://telethon.citeyen.com/public/api/scores/departement')
+						.get('https://telethon2020.citeyen.com/api/score/departement')
 						.then(response => {
 							//console.log("RESULTAT : monted : aPPEL AXIOS bis ok");
 							this.classementDepartement = response.data;

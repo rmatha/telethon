@@ -187,7 +187,7 @@
 					this.$store.dispatch("deleteDefisEquipe", {"defi" : this.$store.state.selectedDefi});
 				}
 				alert({
-					  title: "Ajout du défi",
+					  title: "Suppression du défi",
 					  message: "Le défis a été supprimé de la liste",
 					  okButtonText: "OK"
 					}).then(() => {

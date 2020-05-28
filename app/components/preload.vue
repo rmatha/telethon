@@ -51,25 +51,32 @@
         },
 		mounted() {
 			// initialisation du store avant quoi que ce soit
+			console.log("PRELOAD  : Lancement du init !");
 			this.$store.dispatch("init")
 			.then( ()=> {
 				// vérification de la connectivité
-				
+				console.log("PRELOAD  : vérification de la connectivité");
 				this.messages.push("Récupération du store OK");
 				const connectionType = connectivity.getConnectionType();
 				if (connectionType !== connectivity.connectionType.none) {
 						this.messages.push("Accès internet valide");
+						console.log("PRELOAD : Accès internet valide");
 						// récupération de la liste des equipes existantes
 						// TODO il faudra le déplacer dans le changeEquipe
 						this.reloadEquipes();
+						console.log("PRELOAD : Chargement des équipes OK");
 						// chargement des categories
 						this.reloadCategories();	
+						console.log("PRELOAD : Chargement des catégories OK");
 						this.reloadDefis();
-						if (this.$store.state.selectedEquipe.commune) {
+						console.log("PRELOAD : Chargement des défis OK");
+						if (this.$store.state.selectedEquipe) {
 							this.messages.push("Récupération des defis de la commune");
+							console.log("PRELOAD : Chargement des défis de la commune OK");
 							this.reloadDefisCommune();
 						};
 						// chargement des defis de la commune si elle est définie
+						console.log("PRELOAD : store en cours "+this.$store);
 						let message = this.$store.state.selectedEquipe ? this.$store.state.selectedEquipe.nom : "Pas d'équipe sélectionnée";
 						
 						// chargement de la version de l'équipe sur le serveur pour récupérer la dernière version si nécessaire
@@ -80,6 +87,8 @@
 						*/
 						//console.log("équipe en cours : "+message);
 						this.messages.push("équipe en cours : "+message);
+						console.log("PRELOAD : équipe en cours "+message);
+						this.go = true;
 						
 				}
 				else {
@@ -97,11 +106,16 @@
 			})
 			.catch(() => {
 				if (connectionType !== connectivity.connectionType.none) {
-						this.messages.push("Accès internet validé");
+						console.log("PRELOAD  : acces internet OK");
+						this.messages.push("chargement des équipes");
 						this.reloadEquipes();
+						console.log("PRELOAD  : Chargement des équipes");
 						this.reloadCategories();	
+						console.log("PRELOAD  : Chargement des défis");
 						this.reloadDefis();
+						console.log("PRELOAD  : Chargement de l'équipe en cours");
 						this.reloadEquipeEnCours();
+						console.log("PRELOAD  : fin des chargements");
 						this.go = true;
 					
 				}
@@ -142,16 +156,12 @@
 				//récuperation du numero de version locale pour les categories
 				// révupération de la version des catégories sur le serveur 
 				axios
-				.get('https://telethon.citeyen.com/public/api/categories/version')
+				.get('https://telethon2020.citeyen.com/api/categorie/list')
 				.then(response => {
-					if (response.data.version > this.$store.state.versionCategorie) {
+					if ((response.data.version > this.$store.state.versionCategorie) || (this.$store.state.categories.length == 0)) {
 						// mise a jour de la table de categories
 						this.messages.push("MAJ des catégories à partir du serveur");
-						axios
-						  .get('https://telethon.citeyen.com/public/api/categories/list')
-						  .then(responseList => {
-							this.$store.dispatch("reloadCategories",{"categories" : responseList.data,"version" : response.data.version});
-						  });
+						this.$store.dispatch("reloadCategories",{"categories" : response.data.categories,"version" : response.data.version});
 					}else {
 						this.messages.push("Catégories à jour");
 					}
@@ -163,20 +173,13 @@
 				//console.log("Version defi locale : "+this.$store.state.versionDefi);
 				// révupération de la version des catégories sur le serveur 
 				axios
-				.get('https://telethon.citeyen.com/public/api/defis/version')
+				.get('https://telethon2020.citeyen.com/api/defi/list')
 				.then(response => {
-					var versionServeur = response.data.version
 					//console.log("Version defi serveur :"+versionServeur); 
 					if ((response.data.version > this.$store.state.versionDefi) || (this.$store.state.defis.length == 0)) {
 						// mise a jour de la table de categories
-						//console.log("MAJ des défis à partir du serveur");
-						this.messages.push("MAJ des défis à partir du serveur : ");
-						axios
-						  .get('https://telethon.citeyen.com/public/api/defis/list')
-						  .then(responseList => {
-							//console.log("Chargement des  defis en base : "+JSON.stringify(responseList.data));
-							this.$store.dispatch("reloadDefis",{"defis" : responseList.data,"version" : versionServeur});
-						  });
+						console.log("MAJ des défis à partir du serveur");
+						this.$store.dispatch("reloadDefis",{"defis" : response.data.defis,"version" : response.data.version});
 					}else {
 						this.messages.push("Defis à jour");
 					}
@@ -186,19 +189,14 @@
 				//console.log("Version equipe locale : "+this.$store.state.versionEquipe);
 				// révupération de la version des catégories sur le serveur 
 				axios
-				.get('https://telethon.citeyen.com/public/api/equipes/version')
+				.get('https://telethon2020.citeyen.com/api/equipe/list')
 				.then(response => {
 					//console.log("Version equipe serveur :"+response.data.version); 
 					if (response.data.version > this.$store.state.versionEquipe) {
 						// mise a jour de la table de categories
 						//console.log("MAJ des equipes à partir du serveur");
 						this.messages.push("MAJ des équipes à partir du serveur");
-						axios
-						  .get('https://telethon.citeyen.com/public/api/equipes/list')
-						  .then(responseList => {
-							//console.log("Chargement des equipes en base : "+JSON.stringify(responseList.data));
-							this.$store.dispatch("reloadEquipes",{equipes : responseList.data,version : response.data.version});
-						  });
+						this.$store.dispatch("reloadEquipes",{"equipes" : response.data.equipes,"version" : response.data.version});
 					}else {
 						this.messages.push("Equipes  à jour ");
 					}
@@ -211,23 +209,11 @@
 				let params = {};
 				params["commune"] = this.$store.state.selectedEquipe.commune;
 				axios
-				.get('https://telethon.citeyen.com/public/api/communes/version', {params : params})
+				.get('https://telethon2020.citeyen.com/api/commune/info', {params : params})
 				.then(response => {
 					//console.log("Version defis communes serveur :"+response.data.version); 
-					if (response.data.version > this.$store.state.versionDefisCommune) {
-						// mise a jour de la table de categories
-						//console.log("MAJ des defis communes à partir du serveur");
-						this.messages.push("MAJ des defis commune à  partir du serveur");
-						
-						axios
-							.get('https://telethon.citeyen.com/public/api/defisCommune/list', {params : params})
-						  .then(responseList => {
-							//console.log("Chargement des defis de la commune en base : "+JSON.stringify(responseList.data));
-							this.$store.dispatch("reloadDefisCommune",{"defis" : responseList.data,"version" : response.data.version});
-						  });
-					}else {
-						this.messages.push("Defis pour la commune à jour ");
-					}
+					this.messages.push("MAJ des defis commune à  partir du serveur");
+					this.$store.dispatch("reloadDefisCommune",{"defis" : response.data.defis,"version" : response.data.version});
 					this.go = true;
 				});
 				
@@ -237,7 +223,7 @@
 				params["commune"] = this.$store.state.selectedEquipe.commune;
 				params["nom"] = this.$store.state.selectedEquipe.nom;
 				axios
-				.get('https://telethon.citeyen.com/public/api/equipes/info', {params : params})
+				.get('https://telethon2020.citeyen.com/api/equipe/info', {params : params})
 				.then(response => {
 					// si la version du serveur plus récente, on récupère 
 					//console.log("version de l'équipe  en cours local : "+this.$store.state.selectedEquipe.version);

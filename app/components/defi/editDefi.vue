@@ -13,15 +13,15 @@
 					<Label text="Catégorie" class="label"/>
 					<Label :text="titreCategorie" class="valeur"/>
 					<Label class="label" ref="labelDefiNom" text="Nom du défi" />
-					<TextField class="textfield" hint="Ex : le jonglage infernal" v-model="$store.state.selectedDefi.defi.nom"/>
+					<TextField class="textfield" hint="Ex : le jonglage infernal" v-model="currentDefi.nom"/>
 					<Label class="label" ref="labelDefiDescCourte" text="Description courte" />
-					<TextField class="textfield" hint="Champ affiché avec le titre dans les listes" v-model="$store.state.selectedDefi.defi.description_courte"/>
+					<TextField class="textfield" hint="Champ affiché avec le titre dans les listes" v-model="currentDefi.description_courte"/>
 					<Label class="label" ref="labelDefiDescLongue" text="Description complète" />
-					<TextView class="textView" hint="Descritpion détaillée visible dans la fiche du défi" v-model="$store.state.selectedDefi.defi.description_longue"/>
+					<TextView class="textView" hint="Descritpion détaillée visible dans la fiche du défi" v-model="currentDefi.description_longue"/>
 					<Label class="label" ref="labelDefiReglementation" text="Règlementation" />
-					<TextView class="textView" hint="Description des règles du jeu" v-model="$store.state.selectedDefi.defi.reglementation"/>
+					<TextView class="textView" hint="Description des règles du jeu" v-model="currentDefi.reglementation"/>
 					<Label class="label" ref="labelDefiBareme" text="Bareme" />
-					<TextView class="textView" hint="Comment calculer le score" v-model="$store.state.selectedDefi.defi.bareme"/>
+					<TextView class="textView" hint="Comment calculer le score" v-model="currentDefi.bareme"/>
 					<Button text="Enregistrer" @tap="saveDefi" />
 
 				</StackLayout>
@@ -42,47 +42,46 @@
 		computed: {
 			titreCategorie() {
 				
-				if (this.$store.state.selectedDefi.defi.categorie) {
-					return this.$store.state.selectedDefi.defi.categorie.nom;
+				if (this.$store.state.selectedCategorie) {
+					return this.$store.state.selectedCategorie.nom;
 				}
 				return "Pas de catégorie sélectionnée";
 			},
         },
         data() {
             return {
+				currentDefi: {
+					id : "",
+					nom : "",
+					description_courte : "",
+					description_longue : "",
+					reglementation : "",
+					bareme : "",
+					categorie : "",
+					deleted : false
+				},
             }
         },
 		mounted() {
 			// recueration du defi s"il existe 
 			if (this.$store.state.selectedDefi) {
-				//console.log("editDefi : mounted : on récupère le defi en cours :"+JSON.stringify(this.$store.state.selectedDefi.defi));
+				this.currentDefi = this.$store.state.selectedDefi;				
 			}
-			else {
-				//console.log("editDefi : mounted : création d'un nouveau défi :");
-				if (this.$store.state.selectedCategorie) {
-						// récupération de la catégorie en cours
-					this.defi.categorie = this.$store.state.selectedCategorie;
-				}
-				else {
-					alert({
-					  title: "Modification du défi",
-					  message: "La catégorie n'est pas définie ! Retour à la liste des catégories!",
-					  okButtonText: "OK"
-					}).then(() => {
-						this.navigateTo(listCat);
-					});
-				}
+			if (this.$store.state.selectedCategorie) {
+				this.currentDefi.categorie = this.$store.state.selectedCategorie;				
 			}
 			
         },
 		methods: {
 			saveDefi() {
-				//console.log("on sauvegarde le defi : "+JSON.stringify(this.defi));
+				console.log("sauvegarde du defi");
 				if (this.$store.state.selectedDefi) {
-					this.$store.dispatch("updateDefi", {"defi" : this.$store.state.selectedDefi.defi});
+					console.log("on update le defi : "+JSON.stringify(this.currentDefi));
+					this.$store.dispatch("updateDefi", {"defi" : this.currentDefi});
 				}
 				else {
-					this.$store.dispatch("insertDefi",{"defi" : this.$store.state.selectedDefi.defi});
+					console.log("on ajoute le defi : "+JSON.stringify(this.currentDefi));
+					this.$store.dispatch("insertDefi",{"defi" : this.currentDefi});
 				}
 				this.$store.state.updateDefi = true;
 				this.$navigateTo(listCat);

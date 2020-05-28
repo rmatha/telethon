@@ -18,26 +18,29 @@
 								<Image col="1" row="0" rowSpan="2" src="~/assets/icons/right.png" height="30px"/>
 							</GridLayout>
 						</FlexboxLayout>
-						<button class="boutonAction recup" text="Ajouter les défis de ma ville" @tap="recupereDefis" />
-						<GridLayout v-if="isCoordinateurOrOrganisateur" rows="auto" columns="*,50,50">
+						<button v-if="!isCoordinateurOrOrganisateur" class="boutonAction recup" text="Ajouter les défis de ma ville" @tap="recupereDefis" />
+						<GridLayout v-if="isCoordinateurOrOrganisateur" rows="auto,*" columns="*,50,50">
 							<Label row="0" col="0" class="m-b-20 titreTelethon" :text="sousTitreCommune" textWrap="true" />
 							<Image row="0" col="1" class="actionButton" src="~/assets/icons/save.png" @tap="uploadDefisCommune"/>
 							<Image row="0" col="2" src="~/assets/icons/add-256.gif" @tap="affichageCatCommune"/> 
+							<StackLayout row="1" col="0" colSpan="3" v-if="$store.state.defiCommune" >
+								<ListView for="item in $store.state.defiCommune.defis" height="auto">
+								  <v-template>
+									<GridLayout rows="*" columns="*,50"  margin="0" @tap="getDefiCommune(item)">
+										<GridLayout col="0" verticalAlignment="bottom">
+											<StackLayout paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16">
+												<Label :text="item.defi.categorie.nom+' --- '+ item.defi.nom" class="defiTitle" />
+												<Label :text="item.defi.description" class="defiDescription" />
+											</StackLayout>
+										</GridLayout>
+										<Image col="1" src="~/assets/icons/right.png" height="30px"/>
+									</GridLayout>
+								  </v-template>
+								</ListView> 
+							</StackLayout>
 						</GridLayout>
 									
-						<ListView v-if="isCoordinateurOrOrganisateur" for="item in $store.state.defiCommune.defis" >
-						  <v-template>
-							<GridLayout rows="*" columns="*,50"  margin="0" @tap="getDefiCommune(item)">
-								<GridLayout col="0" verticalAlignment="bottom">
-									<StackLayout paddingTop="8" paddingBottom="8" paddingLeft="16" paddingRight="16">
-										<Label :text="item.categorie.nom+' : '+item.nom" class="defiTitle" />
-										<Label :text="item.defidescription" class="defiDescription" />
-									</StackLayout>
-								</GridLayout>
-								<Image col="1" src="~/assets/icons/right.png" height="30px"/>
-							</GridLayout>
-						  </v-template>
-						</ListView> 
+						
 						<StackLayout v-else>
 							<Label :text="nbDefiCommune" class="defiTitle"/>
 						</StackLayout>
@@ -60,8 +63,9 @@
 	export default {
 		
 		mounted() {
-			//console.log("mesDefis : mounted : mesDefis "+JSON.stringify(this.$store.state.selectedEquipe.defis_equipes));
-			//console.log("mesDefis : mounted : defis  commune "+JSON.stringify(this.$store.state.defiCommune));
+			
+			console.log("mesDefis : mounted : selectedEquipe "+JSON.stringify(this.$store.state.selectedEquipe));
+			console.log("mesDefis : mounted : defis  commune "+JSON.stringify(this.$store.state.defiCommune.defis));
 		},
 		data() {
             return {
@@ -69,23 +73,31 @@
             };
         },
 		computed: {
+			isCoordinateurOrOrganisateur() {
+				var isCoordOrgan = false;
+				console.log("organisateur : "+this.$store.state.selectedEquipe.organisateur);
+				console.log("admin : "+this.$store.state.selectedEquipe.admin);
+				if (this.$store.state.selectedEquipe) {
+					if (this.$store.state.selectedEquipe.organisateur || this.$store.state.selectedEquipe.admin) {
+						isCoordOrgan = true;
+						console.log("on passe isCoordOrgan à true");
+					}
+				}
+				return isCoordOrgan;
+			},
+			
 			sousTitreCommune() {
 				return "Défis pour : "+this.$store.state.selectedEquipe.commune;
 			},
-			isCoordinateurOrOrganisateur() {
-				if (this.$store.state.selectedEquipe) {
-					if (this.$store.state.selectedEquipe.isOrganisateur || this.$store.state.selectedEquipe.isAdmin) {
-						return true;
-					}
-				}
-			},
+			
 			defisEquipeActifs() {
 				if (this.$store.state.selectedEquipe.defis_equipes) {
 					return this.$store.state.selectedEquipe.defis_equipes.filter(defiEquipe => {
 						return !defiEquipe.delete;
 					});
 				}
-				return;
+				console.log("Pas de défis pour l'équipe");
+				return null;
 			},
 			nbDefiCommune() {
 				if (this.$store.state.defiCommune.defis) {
@@ -123,7 +135,7 @@
 								params["nom"] = this.$store.state.selectedEquipe.nom;
 								//console.log("Appel suivant synchro");
 								axios
-								.get('https://telethon.citeyen.com/public/api/equipes/info', {params : params})
+								.get('https://telethon2020.citeyen.com/api/equipe/info', {params : params})
 								.then(response => {
 									this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
 									alert({
@@ -169,8 +181,8 @@
 				}).then(result => {
 					// on poste les defi pour la commune sur le serveur 
 					axios
-						  .post('https://www.telethon.citeyen.com/public/api/defisCommune/upload', {
-							defis : this.$store.state.defiCommune,
+						  .post('https://www.telethon2020.citeyen.com/api/defiCommune/upload', {
+							defis : this.$store.state.defiCommune.defis,
 							commune : this.$store.state.selectedEquipe.commune,
 						  })
 						  .then(response => {

@@ -114,11 +114,10 @@
 					params["nom"] = this.$store.state.selectedEquipe.nom;
 								
 					axios
-						.get('https://telethon.citeyen.com/public/api/equipes/version', {params : params})
+						.get('https://telethon2020.citeyen.com/api/equipe/info', {params : params})
 						.then(response => {
 							//console.log("Version de l'équipe sur le serveur : "+response.data.version);
-							let versionEquipeServeur = response.data.version;
-							if (versionEquipeServeur > this.$store.state.selectedEquipe.version) {
+							if (response.data.version > this.$store.state.selectedEquipe.version) {
 								//console.log("on doit demander si on récupère les nouveaux participants du serveur");
 								confirm({
 									title: "Mise à jour de l'équipe",
@@ -127,28 +126,13 @@
 									cancelButtonText: "NON"
 								}).then(result => {
 									if (result) {
-										axios
-										.get('https://telethon.citeyen.com/public/api/equipes/info', {params : params})
-										.then(response => {
-											this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
-											alert({
-											  title: "Chargement de l'équipe",
-											  message: "Synchronisation de l'équipe avec le serveur OK",
-											  okButtonText: "OK"
-											});
-											
-										})
-										.catch(error => {
-											//console.log("updatete KO  : "+error);
-											alert({
-											  title: "Problème de sauvegarde",
-											  message: "La synchronisation avec le serveur est KO. Mais vous pouvez continuer à utiliser cette équipe pour saisir les participants et les scores. Vous pourrez faire la sauvegarde plus tard",
-											  okButtonText: "OK"
-											}).then(() => {
-											  //console.log("Alert dialog closed");
-											});
-										});
 										this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
+										alert({
+										  title: "Chargement de l'équipe",
+										  message: "Synchronisation de l'équipe avec le serveur OK",
+										  okButtonText: "OK"
+										});
+										
 									}
 								});
 								
@@ -256,7 +240,7 @@
 			},
 
 			creerEquipe() {
-				//console.log("on change d'équipe");
+				console.log("on change d'équipe");
 				this.$navigateTo(changeEquipe, {
 					transition: {
 						name:'fade',
@@ -277,15 +261,15 @@
 				}).then(result => {
 				  //console.log(result);
 				  if (result) {
-					//console.log("On sauvegarde sur le serveur");
-					//console.log("Equipe :"+JSON.stringify(this.$store.state.selectedEquipe));
-					//console.log("Participants :"+JSON.stringify(this.$store.state.participants));
+					console.log("On sauvegarde sur le serveur");
+					console.log("Equipe :"+JSON.stringify(this.$store.state.selectedEquipe));
+					console.log("Participants :"+JSON.stringify(this.$store.state.participants));
 					axios
-						  .post('https://www.telethon.citeyen.com/public/api/equipes/uploadEquipe', {
+						  .post('https://www.telethon2020.citeyen.com/api/equipe/upload', {
 							Equipe : this.$store.state.selectedEquipe
 						  })
 						  .then(response => {
-								//console.log("update OK");
+								console.log("update OK : reponse :"+response);
 								// maintenant on récupère les informations sur le serveur pour être synchro
 							
 							
@@ -295,7 +279,7 @@
 								params["nom"] = this.$store.state.selectedEquipe.nom;
 								//console.log("Appel suivant synchro");
 								axios
-								.get('https://telethon.citeyen.com/public/api/equipes/info', {params : params})
+								.get('https://telethon2020.citeyen.com/api/equipe/info', {params : params})
 								.then(response => {
 									this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
 									alert({

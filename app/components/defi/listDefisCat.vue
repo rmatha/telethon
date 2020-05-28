@@ -71,7 +71,7 @@
 			}
         },
 		mounted() {
-			
+			console.log("listDefisCat : mounted : defis "+JSON.stringify(this.$store.state.defis));
 			
         },
 		methods: {
@@ -147,15 +147,10 @@
 							  okButtonText: "OK"
 							}).then(() => {
 								axios
-									.get('https://telethon.citeyen.com/public/api/defis/version')
+									.get('https://telethon2020.citeyen.com/api/defi/list')
 									.then(response => {
-										var versionServeur = response.data.version
-										axios
-										  .get('https://telethon.citeyen.com/public/api/defis/list')
-										  .then(responseList => {
-											//console.log("Chargement des  defis en base : "+JSON.stringify(responseList.data));
-											this.$store.dispatch("reloadDefis",{data : responseList.data,version : versionServeur});
-										  });
+										this.$store.dispatch("reloadDefis",{data : response.data.defis,version : response.data.version});
+										
 									})
 							});
 						})

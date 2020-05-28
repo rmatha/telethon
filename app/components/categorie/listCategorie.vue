@@ -60,7 +60,9 @@
             }
         },
 		mounted() {
-			
+			console.log("listCategorie : mounted : categories "+JSON.stringify(this.$store.state.categories));
+			console.log("listCategorie : mounted : defis "+JSON.stringify(this.$store.state.defis));
+
         },
 		methods: {
 			showActions(itemRef) {
@@ -80,7 +82,7 @@
 				//console.log("listCategorie itemRef:"+JSON.stringify(itemRef));
 				
 				var nbDefisCat = this.$store.state.defis.filter(item => {
-					//console.log("listCategorie : "+item.categorie.nom +" : "+itemRef.nom); 
+					console.log("listCategorie : "+item.categorie.nom +" : "+itemRef.nom); 
 					return item.categorie.nom == itemRef.nom;
 				});
 				return "Nombre de défis : "+nbDefisCat.length;

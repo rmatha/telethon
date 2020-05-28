@@ -75,12 +75,14 @@ const store = new Vuex.Store({
 		reloadDefis(state,data) {
 			this.state.defis = data.defis;
 			this.state.versionDefi = data.version;
-			//console.log("Nombre de defis en local : "+this.state.defis.length); 
+			console.log("TELESTORE : Nombre de defis en local : "+JSON.stringify(this.state.defis)); 
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
 		
 		reloadEquipes(state, data) {
+			console.log("TELESTORE : reloadEquipes : Chargement des equipes ");
             this.state.equipes = data.equipes;
+			console.log("TELESTORE : reloadEquipes : Chargement de la version ");
 			this.state.versionEquipe = data.version;
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 			//console.log("TELESTORE : reloadEquipes : Nombre d'équipe en base : "+this.state.equipes.length); 
@@ -161,23 +163,25 @@ const store = new Vuex.Store({
 		},
 		
 		deleteParticipant(state,data) {
-			//console.log("TELESTORE : DELETEPARTICIPANT : Liste de particpants avant suppression : "+JSON.stringify(this.state.selectedEquipe.participants));
+			console.log("TELESTORE : DELETEPARTICIPANT : Liste de particpants avant suppression : "+JSON.stringify(this.state.selectedEquipe.participants));
 			// avant de supprimer le participant, il faut supprimer mes scores de ce participant
-			var scoresParticipant = this.state.selectedEquipe.scores.filter(score => {
-				return score.participant.nom == data.participant.nom;
-			});
-			//console.log("TELESTORE : DELETEPARTICIPANT : Liste des scores à supprimer : "+JSON.stringify(scoresParticipant));
-			for (const score of scoresParticipant) {
-				score.delete = true;
-			};
-			
+			if (this.state.selectedEquipe.scores) {
+				var scoresParticipant = this.state.selectedEquipe.scores.filter(score => {
+					return score.participant.nom == data.participant.nom;
+				});
+				console.log("TELESTORE : DELETEPARTICIPANT : Liste des scores à supprimer : "+JSON.stringify(scoresParticipant));
+				for (const score of scoresParticipant) {
+					score.delete = true;
+				};
+			}
+			console.log("TELESTORE : DELETEPARTICIPANT : recupération du participant");
 			var indexParticipant = this.state.selectedEquipe.participants.findIndex(item => {
 				return item.nom == data.participant.nom;
 			});
-			//console.log("TELESTORE : DELETEPARTICIPANT : index deleted : "+indexParticipant);
+			console.log("TELESTORE : DELETEPARTICIPANT : index deleted : "+indexParticipant);
 			this.state.selectedEquipe.participants[indexParticipant].delete = true;
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
-			//console.log("TELESTORE : DELETEPARTICIPANT : Liste de particpants avant suppression : "+JSON.stringify(this.state.selectedEquipe.participants));
+			console.log("TELESTORE : DELETEPARTICIPANT : Liste de particpants apres suppression : "+JSON.stringify(this.state.selectedEquipe.participants));
 		},
 		
 		setParticipants(state,data) {
@@ -261,7 +265,7 @@ const store = new Vuex.Store({
 		
 		deleteDefisCurrentCommune(state,data) {
 			//console.log("Nombre de défis commune avant suppression : "+this.state.defiCommune.length);
-			this.state.defiCommune = this.state.defiCommune.filter(item => {
+			this.state.defiCommune.defis = this.state.defiCommune.defis.filter(item => {
 				return item !== data.defi;
 			});
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
@@ -300,10 +304,10 @@ const store = new Vuex.Store({
 		},
 		
 		insertDefisCurrentCommune(state,data) {
-			if (!this.state.defisCommune) {
-				this.state.defisCommune = [];
+			if (!this.state.defiCommune) {
+				this.state.defiCommune = [];
 			}
-			this.state.defisCommune.push(data.defi);
+			this.state.defiCommune.defis.push(data.defi);
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
 		
@@ -319,7 +323,9 @@ const store = new Vuex.Store({
 		},
 		
 		insertDefi(state,data) {
+			console.log("TELESTORE : insertDefi : before : "+JSON.stringify(this.state.defis));
 			this.state.defis.push(data.defi);
+			console.log("TELESTORE : insertDefi : after : "+JSON.stringify(this.state.defis));
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
 		
