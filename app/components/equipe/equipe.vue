@@ -27,7 +27,7 @@
 							<GridLayout rows="auto" columns="50,*,50" >
 								<Image row="0" col="0" class="actionButton" src="~/assets/menu_icon.png" @tap="onOpenDrawerTap"/>
 								<Label row="0" col="1" class="m-b-20 titreTelethon"  horizontalAlignment="center" :text="titreEquipe" textWrap="true" />
-								<Image v-if="$store.state.updateEquipe" row="0" col="2" class="actionButton" src="~/assets/icons/save.png" @tap="uploadEquipe"/>
+								<Image  row="0" col="2" class="actionButton" src="~/assets/icons/save.png" @tap="uploadEquipe"/>
 							</GridLayout>
 							<Label text="Votre équipe est Organisateur" v-if="$store.state.selectedEquipe.organisateur"  />
 							<Label text="Votre équipe est Coordinateur " v-if="$store.state.selectedEquipe.admin" />
@@ -117,8 +117,9 @@
 						.get('https://telethon2020.citeyen.com/api/equipe/info', {params : params})
 						.then(response => {
 							//console.log("Version de l'équipe sur le serveur : "+response.data.version);
-							if (response.data.version > this.$store.state.selectedEquipe.version) {
-								//console.log("on doit demander si on récupère les nouveaux participants du serveur");
+							//if (response.data.version > this.$store.state.selectedEquipe.version) {
+							if (true)  {
+							//console.log("on doit demander si on récupère les nouveaux participants du serveur");
 								confirm({
 									title: "Mise à jour de l'équipe",
 									message: "Une version plus récente a été trouvé sur le serveur. Voulez-vous récupérer la mise à jour ?",
@@ -126,7 +127,7 @@
 									cancelButtonText: "NON"
 								}).then(result => {
 									if (result) {
-										this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
+										this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data.equipe,"scores" : response.data.scores});
 										alert({
 										  title: "Chargement de l'équipe",
 										  message: "Synchronisation de l'équipe avec le serveur OK",
@@ -281,7 +282,7 @@
 								axios
 								.get('https://telethon2020.citeyen.com/api/equipe/info', {params : params})
 								.then(response => {
-									this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
+									this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data.equipe,"scores" : response.data.scores});
 									alert({
 									  title: "Chargement de l'équipe",
 									  message: "Synchronisation de l'équipe avec le serveur OK",

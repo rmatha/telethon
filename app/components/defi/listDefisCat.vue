@@ -23,8 +23,8 @@
 						<Label row="0" col="1" class="titre" :text="$store.state.selectedCategorie.nom" textAlignment="center" />
 					</GridLayout>
 					<GridLayout  rows="auto" columns="*,50">
-						<Label row="0" col="0" class="ml-10" text="Liste des défis" textAlignment="left" fontSize="24"/>
-						<Image row="0" col="1" v-if="$store.state.isAdmin" src="~/assets/icons/add-256.gif" @tap="addDefi"/>
+						<Label row="0" col="0" class="titre mt-20" text="Liste des défis" textAlignment="center" fontSize="30"/>
+						<Image row="0" col="1" v-if="$isCoordinateurOrOrganisateur" src="~/assets/icons/add-256.gif" @tap="addDefi"/>
 					</GridLayout>
 					<ListView key="$store.state.defis" for="item in defisCat" height="100%" >
 					  <v-template>
@@ -63,6 +63,19 @@
 					//console.log("ListDefiCat : defiCat :"+item.categorie.nom+" : "+this.$store.state.selectedCategorie.nom); 
 					return item.categorie.nom == this.$store.state.selectedCategorie.nom;
 				});
+			},
+			
+			isCoordinateurOrOrganisateur() {
+				var isCoordOrgan = false;
+				console.log("organisateur : "+this.$store.state.selectedEquipe.organisateur);
+				console.log("admin : "+this.$store.state.selectedEquipe.admin);
+				if (this.$store.state.selectedEquipe) {
+					if (this.$store.state.selectedEquipe.organisateur || this.$store.state.selectedEquipe.admin) {
+						isCoordOrgan = true;
+						console.log("on passe isCoordOrgan à true");
+					}
+				}
+				return isCoordOrgan;
 			},
 		},
         data() {
@@ -174,11 +187,13 @@
 </script>
 
 <style>
-.ml-10 {
-	margin : 0 0 0 10;
-}
+
 .mu-10 {
 	margin : 10 0 0 0;
+}
+
+mt-20 {
+	margin : 20 0 0 0;
 }
 .borderBottom {
 	border-width: 0 0 2 0;
@@ -189,7 +204,7 @@
 .defiTitle {
 	color : black;
 	font-weight: bold;
-	font-size: 15px;
+	font-size: 20px;
 }
 .defiDescription {
 	color : black;

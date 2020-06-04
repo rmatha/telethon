@@ -64,9 +64,10 @@
 										</GridLayout>
 									</StackLayout>
 								</ScrollView>
-								<ListPicker v-if="affichageEquipes" ref="equipeEnCours" :items="equipesVille" textField="nom" @tap="selectListEquipe"  />
-								<Label v-else textWrap="true" text="Il n'existe pas encore d'équipe sur cette commune. Utiliser 'Créer une équipe'" />
-								
+								<GridLayout rows="*" columns="*">
+									<ListPicker row="0" col="0" v-if="affichageEquipes" ref="equipeEnCours" :items="equipesVille" textField="nom" @tap="selectListEquipe"  />
+									<Label row="0" col="0" v-else textWrap="true" class="entetePage" verticalAlignment="center" text="Il n'existe pas encore d'équipe sur cette commune" />
+								</GridLayout>
 							</StackLayout>
 						</StackLayout>
 					</StackLayout>
@@ -213,7 +214,7 @@
 						axios
 						.get('https://telethon2020.citeyen.com/api/equipe/info', {params : params})
 						.then(response => {
-							this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
+							this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data.equipe,"scores" : response.data.scores});
 							// chargement des defis de la commune 
 							//console.log("CHANGEEQUIPE : creerEquipe :MAJ des defis communes à partir du serveur");
 							let params = {};

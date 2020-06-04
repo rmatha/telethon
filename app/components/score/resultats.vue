@@ -207,7 +207,7 @@ export default {
 								axios
 								.get('https://telethon.citeyen.com/public/api/equipes/info', {params : params})
 								.then(response => {
-									this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
+									this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data.equipe,"scores" : response.data.scores});
 									alert({
 									  title: "Chargement de l'équipe",
 									  message: "Synchronisation de l'équipe avec le serveur OK",

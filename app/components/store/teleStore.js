@@ -35,7 +35,7 @@ const store = new Vuex.Store({
 		categories: [],
 		defis: [],
 		defisCommune: [],
-		defis_equipes: [],
+		defiEquipes: [],
 		equipes : [],
 		scores : [],
 		villes : []
@@ -57,9 +57,10 @@ const store = new Vuex.Store({
         setSelectedEquipe(context,data) {
 			//console.log("TELESTORE : setSelectedEquipe : data : "+JSON.stringify(data));
 			this.state.selectedEquipe = data.equipe;
+			this.state.selectedEquipe.scores = data.scores;
 			this.state.updateEquipe = false;
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
-			//console.log("TELESTORE : setSelectedEquipe : this.selectedEquipe :"+JSON.stringify(this.state.selectedEquipe));
+			console.log("TELESTORE : setSelectedEquipe : this.selectedEquipe :"+JSON.stringify(this.state.selectedEquipe));
 			
 		},
 		
@@ -239,15 +240,15 @@ const store = new Vuex.Store({
 		
 		recupereDefis(state) {
 			//console.log("TELESTORE : RECUPERERDEFIS : defisCommune : "+JSON.stringify(this.state.defiCommune.defis));
-			//console.log("TELESTORE : RECUPERERDEFIS : mesDefis : "+JSON.stringify(this.state.selectedEquipe.defis_equipes));
-			//if (!this.state.selectedEquipe.defis_equipes) {
-				this.state.selectedEquipe.defis_equipes = [];
+			//console.log("TELESTORE : RECUPERERDEFIS : mesDefis : "+JSON.stringify(this.state.selectedEquipe.defiEquipes));
+			//if (!this.state.selectedEquipe.defiEquipes) {
+				this.state.selectedEquipe.defiEquipes = [];
 			//}
 			for (const defi of this.state.defiCommune.defis) {
 				defi.delete = false;
-				this.state.selectedEquipe.defis_equipes.push(defi);
+				this.state.selectedEquipe.defiEquipes.push(defi);
 			}
-			//console.log("TELESTORE : RECUPERERDEFIS : mesDefis : "+JSON.stringify(this.state.selectedEquipe.defis_equipes));
+			//console.log("TELESTORE : RECUPERERDEFIS : mesDefis : "+JSON.stringify(this.state.selectedEquipe.defiEquipes));
 			
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
@@ -258,9 +259,9 @@ const store = new Vuex.Store({
 				return defi.defi.id == data.defi.id;
 			});
 			//console.log("Index récupéré : "+indexDefi);
-			this.state.selectedEquipe.defis_equipes[indexDefi].defi.delete = true;
+			this.state.selectedEquipe.defiEquipes[indexDefi].defi.delete = true;
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
-			//console.log("Liste des défis après suppression : "+JSON.stringify(this.state.selectedEquipe.defis_equipes));
+			//console.log("Liste des défis après suppression : "+JSON.stringify(this.state.selectedEquipe.defiEquipes));
 		},
 		
 		deleteDefisCurrentCommune(state,data) {
@@ -289,18 +290,18 @@ const store = new Vuex.Store({
 			
 		},
 		deleteDefisEquipe(state,data) {
-			//console.log("TELESTORE : deleteDefisEquipe : Liste défis equipe avant suppression : "+JSON.stringify(this.state.selectedEquipe.defis_equipes));
+			//console.log("TELESTORE : deleteDefisEquipe : Liste défis equipe avant suppression : "+JSON.stringify(this.state.selectedEquipe.defiEquipes));
 			//console.log("TELESTORE : deleteDefisEquipe : data avant suppression : "+JSON.stringify(data.defi));
-			var indexDefiEquipe = this.state.selectedEquipe.defis_equipes.findIndex(item => {
+			var indexDefiEquipe = this.state.selectedEquipe.defiEquipes.findIndex(item => {
 				//console.log("TELESTORE : deleteDefisEquipe : on compare : "+item.defi.id+" : "+data.defi.defi.id);
 				return item.defi.id == data.defi.defi.id;
 			});
 			//console.log("TELESTORE : deleteDefisEquipe : récupération de l'index :"+indexDefiEquipe);
 			if (indexDefiEquipe >= 0) {
-				this.state.selectedEquipe.defis_equipes[indexDefiEquipe].delete = true;
+				this.state.selectedEquipe.defiEquipes[indexDefiEquipe].delete = true;
 			};
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
-			//console.log("TELESTORE : deleteDefisEquipe : Liste defis equipe après suppression : "+JSON.stringify(this.state.selectedEquipe.defis_equipes));
+			//console.log("TELESTORE : deleteDefisEquipe : Liste defis equipe après suppression : "+JSON.stringify(this.state.selectedEquipe.defiEquipes));
 		},
 		
 		insertDefisCurrentCommune(state,data) {
@@ -312,13 +313,13 @@ const store = new Vuex.Store({
 		},
 		
 		insertDefisEquipe(state,data) {
-			//console.log("TELESTORE : insertDefisEquipe : before : "+JSON.stringify(this.state.selectedEquipe.defis_equipes));
-			if (!this.state.selectedEquipe.defis_equipes) {
-				this.state.selectedEquipe.defis_equipes = [];
+			//console.log("TELESTORE : insertDefisEquipe : before : "+JSON.stringify(this.state.selectedEquipe.defiEquipes));
+			if (!this.state.selectedEquipe.defiEquipes) {
+				this.state.selectedEquipe.defiEquipes = [];
 			}
 			data.defi.delete = false;
-			this.state.selectedEquipe.defis_equipes.push(data.defi);
-			//console.log("TELESTORE : insertDefisEquipe : after : "+JSON.stringify(this.state.selectedEquipe.defis_equipes));
+			this.state.selectedEquipe.defiEquipes.push(data.defi);
+			//console.log("TELESTORE : insertDefisEquipe : after : "+JSON.stringify(this.state.selectedEquipe.defiEquipes));
 			ApplicationSettings.setString("store", JSON.stringify(this.state));
 		},
 		

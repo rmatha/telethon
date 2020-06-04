@@ -64,8 +64,10 @@
 		
 		mounted() {
 			
-			console.log("mesDefis : mounted : selectedEquipe "+JSON.stringify(this.$store.state.selectedEquipe));
-			console.log("mesDefis : mounted : defis  commune "+JSON.stringify(this.$store.state.defiCommune.defis));
+			console.log("mesDefis : mounted : selectedEquipe ");
+			console.log(JSON.stringify(this.$store.state.selectedEquipe));
+			console.log("mesDefis : mounted : defis  commune ");
+			console.log(JSON.stringify(this.$store.state.defiCommune.defis));
 		},
 		data() {
             return {
@@ -91,8 +93,8 @@
 			},
 			
 			defisEquipeActifs() {
-				if (this.$store.state.selectedEquipe.defis_equipes) {
-					return this.$store.state.selectedEquipe.defis_equipes.filter(defiEquipe => {
+				if (this.$store.state.selectedEquipe.defiEquipes) {
+					return this.$store.state.selectedEquipe.defiEquipes.filter(defiEquipe => {
 						return !defiEquipe.delete;
 					});
 				}
@@ -137,7 +139,7 @@
 								axios
 								.get('https://telethon2020.citeyen.com/api/equipe/info', {params : params})
 								.then(response => {
-									this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
+									this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data.equipe,"scores" : response.data.scores});
 									alert({
 									  title: "Chargement de l'équipe",
 									  message: "Synchronisation de l'équipe avec le serveur OK",

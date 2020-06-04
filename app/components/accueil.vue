@@ -100,8 +100,8 @@
 				}
 				else {
 					var messageDefi = "Pas de défis enregistrés pour l'équipe";
-					if (this.$store.state.selectedEquipe.defis_equipes) {
-						var nbDefisActifs = this.$store.state.selectedEquipe.defis_equipes.filter(defi => {
+					if (this.$store.state.selectedEquipe.defiEquipes) {
+						var nbDefisActifs = this.$store.state.selectedEquipe.defiEquipes.filter(defi => {
 							//console.log("ACCUEIL : nbDefisEquipe : "+JSON.stringify(defi));
 							return !defi.delete;
 						});
@@ -237,7 +237,7 @@
 						if (true) {
 						//if (response.data.version > this.$store.state.selectedEquipe.version) {
 							//console.log("Mise a jour de la version de l'équipe a partir du serveur");
-							this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
+							this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data.equipe,"scores" : response.data.scores});
 						}
 						else {
 							//console.log("Version de l'équipe déjà à jour");

@@ -236,7 +236,7 @@
 						//if (response.data.version > this.$store.state.selectedEquipe.version) {
 							//console.log("Mise a jour de la version de l'équipe a partir du serveur");
 							this.messages.push("Mise a jour de la version de l'équipe a partir du serveur");
-							this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data});
+							this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data.equipe,"scores" : response.data.scores});
 						}
 						else {
 							//console.log("Version de l'équipe déjà à jour");

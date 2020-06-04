@@ -8,7 +8,7 @@
 					<StackLayout width="100%" height="100%">
 						<GridLayout rows="auto" columns="*,50,50" >
 							<Label row="0" col="0" :text="$store.state.selectedDefi ? $store.state.selectedDefi.defi.nom : 'Vide'" class="sousTitre"/>
-							<Image row="0" col="1" class="actionButton" src="~/assets/icons/delete.png" @tap="deleteDefi"/>
+							<Image v-if="$store.state.selectedEquipe.admin"  row="0" col="1" class="actionButton" src="~/assets/icons/delete.png" @tap="deleteDefi"/>
 							<Image row="0" col="2" class="actionButton" src="~/assets/icons/modify.png" @tap="modifyDefi"/>
 						</GridLayout>
 						<Button class="boutonAction" v-if="detail" text="Cacher les détails du défi" @tap="changeDetailState"/>
@@ -89,9 +89,9 @@
 					//console.log("AFFICHAGEDEFI : DefiPrensent : terminée");
 				}
 				else {
-					if (this.$store.state.selectedEquipe.defis_equipes) {
+					if (this.$store.state.selectedEquipe.defiEquipes) {
 						//console.log("on passe par defisEquipe");
-						filterDefi = this.$store.state.selectedEquipe.defis_equipes.filter(defi => {
+						filterDefi = this.$store.state.selectedEquipe.defiEquipes.filter(defi => {
 							//console.log("AFFICHAGEDEFI : DefiPrensent : elem : "+JSON.stringify(defi));
 							//console.log("AFFICHAGEDEFI : DefiPrensent : selectedDEfi : "+JSON.stringify(this.$store.state.selectedDefi));
 							return (defi == this.$store.state.selectedDefi) & !defi.delete;

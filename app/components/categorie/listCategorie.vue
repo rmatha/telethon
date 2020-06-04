@@ -9,7 +9,7 @@
 						<GridLayout rows="auto" columns="*,50,50">
 							<Label row="0" col="0" text="Liste des catégories" class="label"/>
 							<Image v-if="$store.state.updateCategorie" row="0" col="1" class="actionButton" src="~/assets/icons/save.png" @tap=""/>
-							<Image row="0" col="2" src="~/assets/icons/add-256.gif" @tap="addCat()"/>
+							<Image row="0" col="2" v-if="isCoordinateurOrOrganisateur" src="~/assets/icons/add-256.gif" @tap="addCat()"/>
 							
 						</GridLayout>
 						<ListView for="item in $store.state.categories" height="100%" > 
@@ -48,6 +48,18 @@
 					return true;
 				}
 				return false;
+			},
+			isCoordinateurOrOrganisateur() {
+				var isCoordOrgan = false;
+				console.log("organisateur : "+this.$store.state.selectedEquipe.organisateur);
+				console.log("admin : "+this.$store.state.selectedEquipe.admin);
+				if (this.$store.state.selectedEquipe) {
+					if (this.$store.state.selectedEquipe.organisateur || this.$store.state.selectedEquipe.admin) {
+						isCoordOrgan = true;
+						console.log("on passe isCoordOrgan à true");
+					}
+				}
+				return isCoordOrgan;
 			},
 
 
