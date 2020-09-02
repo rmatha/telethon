@@ -49,7 +49,6 @@
 </template>
 
 <script>
-	import changeEquipe from "./equipe/changeEquipe";
 	import equipe from "./equipe/equipe";
 	import mesDefis from "./defi/mesDefis";
 	import resultats from "./score/resultats";
@@ -181,9 +180,6 @@
 				else {
 					currentElement.className = "flash";
 				}
-			},
-			navChangeEquipe(type) {
-				this.$navigateTo(changeEquipe, { props: {type : type}});
 			},
 			navMesDefis(args) {
 				this.tapFlash(args.object);

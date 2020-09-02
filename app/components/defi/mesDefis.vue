@@ -4,7 +4,7 @@
 			<Header dock="top" />
 			<Footer dock="bottom" />
 			<StackLayout dock="center" class="root" >
-				<ScrollView>
+				<ScrollView class="cadre">
 					<StackLayout width="100%" height="100%">
 						<GridLayout v-if="!isCoordinateurOrOrganisateur" rows="auto" columns="*,50,50">
 							<Label row="0" col="0" class="m-b-20 titreTelethon" text="Mes Défis" textWrap="true" />
@@ -18,7 +18,9 @@
 								<Image col="1" row="0" rowSpan="2" src="~/assets/icons/right.png" height="30px"/>
 							</GridLayout>
 						</FlexboxLayout>
-						<button v-if="!isCoordinateurOrOrganisateur" class="boutonAction recup" text="Ajouter les défis de ma ville" @tap="recupereDefis" />
+						<StackLayout v-if="showAjouterDefis == false">
+							<button v-if="!isCoordinateurOrOrganisateur" class="boutonAction recup" text="Ajouter les défis de ma ville" @tap="recupereDefis" />
+						</StackLayout>
 						<GridLayout v-if="isCoordinateurOrOrganisateur" rows="auto,*" columns="*,50,50">
 							<Label row="0" col="0" class="m-b-20 titreTelethon" :text="sousTitreCommune" textWrap="true" />
 							<Image row="0" col="1" class="actionButton" src="~/assets/icons/save.png" @tap="uploadDefisCommune"/>
@@ -42,7 +44,7 @@
 									
 						
 						<StackLayout v-else>
-							<Label :text="nbDefiCommune" class="defiTitle"/>
+							<Label :text="nbDefiCommune" class="defiTitle" textWrap="true"/>
 						</StackLayout>
 					</StackLayout>
 				</ScrollView>
@@ -67,11 +69,32 @@
 			console.log("mesDefis : mounted : selectedEquipe ");
 			console.log(JSON.stringify(this.$store.state.selectedEquipe));
 			console.log("mesDefis : mounted : defis  commune ");
-			console.log(JSON.stringify(this.$store.state.defiCommune.defis));
+			console.log(JSON.stringify(this.$store.state.defiCommune));
+			this.showAjouterDefis = true;
+			if (this.$store.state.selectedEquipe) {
+				let params = {};
+				params["commune"] = this.$store.state.selectedEquipe.commune;
+				axios
+				.get('https://telethon2020.citeyen.com/api/commune/info', {params : params})
+				.then(response => {
+					//console.log("Version defis communes serveur :"+response.data.version); 
+					this.messages.push("MAJ des defis commune à  partir du serveur");
+					this.$store.dispatch("reloadDefisCommune",{"defis" : response.data.defis,"version" : response.data.version});
+				})
+				.catch(error => {
+					// reinitialisation des defis de la commune
+					console.log("mesDefis : mounted : ERROR get defis commune : "+error);
+					this.$store.dispatch("reloadDefisCommune",{"defis" : null,"version" :"0"});
+					console.log("mesdefis : defis de la commune : "+this.$store.state.defiCommune);
+					this.showAjouterDefis = false;
+					console.log("showAjouterDefis : "+this.showAjouterDefis);
+				});
+				
+			}
 		},
 		data() {
             return {
-				defisUpdated : null,
+				showAjouterDefis : true,
             };
         },
 		computed: {
@@ -85,7 +108,6 @@
 						console.log("on passe isCoordOrgan à true");
 					}
 				}
-				return isCoordOrgan;
 			},
 			
 			sousTitreCommune() {
@@ -105,7 +127,7 @@
 				if (this.$store.state.defiCommune.defis) {
 					return "Nombre de défi sur votre commune : "+this.$store.state.defiCommune.defis.length;
 				}
-				return "Pas de défi sur votre commune !"; 
+				return "Pas de défi déclaré sur votre commune ! Utilisez le bouton '+' pour ajouter des défis"; 
 			}
 
 		},

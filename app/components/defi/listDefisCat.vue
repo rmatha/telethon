@@ -24,7 +24,7 @@
 					</GridLayout>
 					<GridLayout  rows="auto" columns="*,50">
 						<Label row="0" col="0" class="titre mt-20" text="Liste des défis" textAlignment="center" fontSize="30"/>
-						<Image row="0" col="1" v-if="$isCoordinateurOrOrganisateur" src="~/assets/icons/add-256.gif" @tap="addDefi"/>
+						<Image row="0" col="1" v-if="$isCoordOrga" src="~/assets/icons/add-256.gif" @tap="addDefi"/>
 					</GridLayout>
 					<ListView key="$store.state.defis" for="item in defisCat" height="100%" >
 					  <v-template>
@@ -63,28 +63,26 @@
 					//console.log("ListDefiCat : defiCat :"+item.categorie.nom+" : "+this.$store.state.selectedCategorie.nom); 
 					return item.categorie.nom == this.$store.state.selectedCategorie.nom;
 				});
-			},
+			}
 			
-			isCoordinateurOrOrganisateur() {
-				var isCoordOrgan = false;
-				console.log("organisateur : "+this.$store.state.selectedEquipe.organisateur);
-				console.log("admin : "+this.$store.state.selectedEquipe.admin);
-				if (this.$store.state.selectedEquipe) {
-					if (this.$store.state.selectedEquipe.organisateur || this.$store.state.selectedEquipe.admin) {
-						isCoordOrgan = true;
-						console.log("on passe isCoordOrgan à true");
-					}
-				}
-				return isCoordOrgan;
-			},
+			
 		},
         data() {
             return {
-				
+				isCoordOrga : false,
 			}
         },
 		mounted() {
 			console.log("listDefisCat : mounted : defis "+JSON.stringify(this.$store.state.defis));
+			this.isCoordOrga = false;
+			console.log("organisateur : "+this.$store.state.selectedEquipe.organisateur);
+			console.log("admin : "+this.$store.state.selectedEquipe.admin);
+			if (this.$store.state.selectedEquipe) {
+				if (this.$store.state.selectedEquipe.organisateur || this.$store.state.selectedEquipe.admin) {
+					this.isCoordOrga = true;
+					console.log("on passe isCoordOrga à true");
+				}
+			}
 			
         },
 		methods: {

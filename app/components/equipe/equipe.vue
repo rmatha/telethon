@@ -87,7 +87,8 @@
 	
 	const connectivity = require("connectivity");
 	import profil from "./profil";
-	import changeEquipe from "./changeEquipe";
+	import changeEquipeNew from "./changeEquipeNew";
+	import changeEquipeOld from "./changeEquipeOld";
 	import { Image } from "tns-core-modules/ui/image";
 	/*import * as camera from "nativescript-camera";*/
 	import store from "../store/teleStore.js";
@@ -116,30 +117,44 @@
 					axios
 						.get('https://telethon2020.citeyen.com/api/equipe/info', {params : params})
 						.then(response => {
-							//console.log("Version de l'équipe sur le serveur : "+response.data.version);
-							//if (response.data.version > this.$store.state.selectedEquipe.version) {
-							if (true)  {
-							//console.log("on doit demander si on récupère les nouveaux participants du serveur");
-								confirm({
-									title: "Mise à jour de l'équipe",
-									message: "Une version plus récente a été trouvé sur le serveur. Voulez-vous récupérer la mise à jour ?",
-									okButtonText: "OUI",
-									cancelButtonText: "NON"
-								}).then(result => {
-									if (result) {
-										this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data.equipe,"scores" : response.data.scores});
-										alert({
-										  title: "Chargement de l'équipe",
-										  message: "Synchronisation de l'équipe avec le serveur OK",
-										  okButtonText: "OK"
-										});
-										
-									}
-								});
+							//console.log("Version de l'équipe sur le serveur : "+response.data.equipe.version);
+							// on commence par vérifier que l'équipe existe sur le serveur
+							if (response.data.equipe) {
+								if (response.data.version > this.$store.state.selectedEquipe.version) {
+								//if (true)  {
+								//console.log("on doit demander si on récupère les nouveaux participants du serveur");
+									confirm({
+										title: "Mise à jour de l'équipe",
+										message: "Une version plus récente a été trouvée sur le serveur. Voulez-vous récupérer la mise à jour ?",
+										okButtonText: "OUI",
+										cancelButtonText: "NON"
+									}).then(result => {
+										if (result) {
+											this.$store.dispatch("setSelectedEquipe",{"equipe" : response.data.equipe,"scores" : response.data.scores});
+											alert({
+											  title: "Chargement de l'équipe",
+											  message: "Synchronisation de l'équipe avec le serveur OK",
+											  okButtonText: "OK"
+											});
+											
+										}
+									});
+									
+								}
+							}
+							else {
 								
 							}
+							
 						})
-						.catch(error => console.log("equipe : mounted : ERROR : "+error));
+						.catch(error => {
+							console.log("equipe : mounted : ERROR equipe info : "+error);
+							alert({
+							  title: "Chargement de l'équipe",
+							  message: "Pensez à sauvegarder votre équipe",
+							  okButtonText: "OK"
+							});
+						});
 						
 							
 				}
@@ -229,26 +244,20 @@
 			
 			changeEquipe() {
 				//console.log("on change d'équipe");
-				this.$navigateTo(changeEquipe, {
+				this.$navigateTo(changeEquipeOld, {
 					transition: {
 						name:'fade',
 						duration: 200
-					},
-					props: {
-						type : "search"
 					}
 				});
 			},
 
 			creerEquipe() {
 				console.log("on change d'équipe");
-				this.$navigateTo(changeEquipe, {
+				this.$navigateTo(changeEquipeNew, {
 					transition: {
 						name:'fade',
 						duration: 200
-					},
-					props: {
-						type : "new"
 					}
 				});
 			},
@@ -295,8 +304,6 @@
 									  title: "Problème de sauvegarde",
 									  message: "La synchronisation avec le serveur est KO. Mais vous pouvez continuer à utiliser cette équipe pour saisir les participants et les scores. Vous pourrez faire la sauvegarde plus tard",
 									  okButtonText: "OK"
-									}).then(() => {
-									  //console.log("Alert dialog closed");
 									});
 								});
 						  })

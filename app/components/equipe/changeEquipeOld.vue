@@ -21,35 +21,8 @@
 					</StackLayout>
 					<StackLayout ~mainContent >
 						<StackLayout   width="100%" height="100%">  
-							<StackLayout class="cadre" v-if="isNouvelleEquipe" >
-								<GridLayout rows="70" columns="50,*">
-									<Image row="0" col="0" class="actionButton" src="~/assets/menu_icon.png" @tap="onOpenDrawerTap"/>
-									<Label row="0" col="1" class="titre" horizontalAlignment="center" text="Nouvelle équipe" textWrap="true" />
-									
-								</GridLayout>
-								<Label class="label" text="Nom de l'équipe" />
-								<TextField class="textfield" hint="Ex : the killers..." v-model="input.nom"/>
-								<Label ref="labelVille" class="label" text="Ville du challenge Téléthon"  />
-								<TextField class="textfield" ref="textFieldVille" @textChange="onTextChange" @blur="lostFocus" v-model="input.commune"/>
-								<ScrollView v-if="affichageVilles" height="500">
-									<StackLayout backgroundColor="#3c495e" >
-										<GridLayout v-for="ville in villes" rows="40" columns="*"  >
-											<Label :text="ville.nom" @tap="selectVille(ville.nom,ville.code)" class="labelVille"/>
-										</GridLayout>
-									</StackLayout>
-								</ScrollView>
-								<Label class="label"  text="Mot de passe" />
-								<TextField class="textfield" v-model="input.code"/>
-								<GridLayout rows="auto,auto" columns="*,50" marginBottom="5">
-									<Label row="0" col="0" text="Equipe organisatrice" fontSize="14" class="labelCheck" />
-									<Switch ref="labelOrga" row="0"col="1" :checked="input.organisateur" class="switch-light" v-model="input.organisateur" @tap="setOrganisateur" />
-									<Label row="1" col="0" text="Equipe de coordination Téléthon" fontSize="14" class="labelCheck" />
-									<Switch row="1"col="1" checked="false" class="switch-light" v-model="input.admin" @tap="setCoordinateur" />
-									
-								</GridLayout>
-								<Button text="Créer" horizontalAlignment="center" @tap="creerEquipe"/>
-							</StackLayout>
-							<StackLayout v-if="isExistanteEquipe" >
+							<Label row="0" col="1" class="titre" horizontalAlignment="center" text="TEST OLD" textWrap="true" />
+							<StackLayout >
 								<GridLayout rows="70" columns="50,*">
 									<Image row="0" col="0" class="actionButton" src="~/assets/menu_icon.png" @tap="onOpenDrawerTap"/>
 									<Label row="0" col="1" class="titre" horizontalAlignment="center" text="Sélection de l'équipe" textWrap="true" />
@@ -86,6 +59,9 @@
 	import axios from 'axios';
 	import villesRef from "@/assets/villes.json"
 	
+	import changeEquipeOld from "./changeEquipeOld";
+	import changeEquipeNew from "./changeEquipeNew";
+	
 	
     export default {
         mounted() {
@@ -112,8 +88,6 @@
 		props: ['type'],
 		data() {
             return {
-                nouvelleEquipe : false,
-				existanteEquipe : false,
 				input: {
 					nom: "",
                     commune: "",
@@ -299,16 +273,22 @@
 				
 			},
 			selectNouvelleEquipe() {
-				this.nouvelleEquipe = true;
-				this.existanteEquipe = false;
-				this.affichageVilles = false;
-				this.$refs.drawer.closeDrawer();
+				console.log("on change d'équipe NEW");
+				this.$navigateTo(changeEquipeNew, {
+					transition: {
+						name:'fade',
+						duration: 200
+					}
+				});
 			},
 			selectEquipeExistante() {
-				this.nouvelleEquipe = false;
-				this.existanteEquipe = true;
-				this.affichageVilles = false;
-				this.$refs.drawer.closeDrawer();
+				console.log("on change d'équipe OLD");
+				this.$navigateTo(changeEquipeOld, {
+					transition: {
+						name:'fade',
+						duration: 200
+					}
+				});
 			},
 			selectVille(nom,code) {
 				//console.log("Sélection de la ville"+nom);
