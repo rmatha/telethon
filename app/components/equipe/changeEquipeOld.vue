@@ -20,8 +20,7 @@
 						
 					</StackLayout>
 					<StackLayout ~mainContent >
-						<StackLayout   width="100%" height="100%">  
-							<Label row="0" col="1" class="titre" horizontalAlignment="center" text="TEST OLD" textWrap="true" />
+						<StackLayout   width="100%" height="100%" @tap="dismissSoftKeybaord">  
 							<StackLayout >
 								<GridLayout rows="70" columns="50,*">
 									<Image row="0" col="0" class="actionButton" src="~/assets/menu_icon.png" @tap="onOpenDrawerTap"/>
@@ -61,6 +60,10 @@
 	
 	import changeEquipeOld from "./changeEquipeOld";
 	import changeEquipeNew from "./changeEquipeNew";
+	
+	import * as utils from "utils/utils";
+	import { isIOS, isAndroid } from "platform";
+	import * as frame from "ui/frame";
 	
 	
     export default {
@@ -107,6 +110,15 @@
         },
 	
         methods: { 
+			dismissSoftKeybaord() {
+				console.log("on veu fermer le clavier");
+				if (isIOS) {
+				  frame.topmost().nativeView.endEditing(true);
+				}
+				if (isAndroid) {
+				  utils.ad.dismissSoftInput();
+				}
+			},
 			onNavigationButtonTap() {
 				Frame.topmost().goBack();
 			},

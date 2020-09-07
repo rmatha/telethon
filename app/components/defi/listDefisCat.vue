@@ -24,7 +24,7 @@
 					</GridLayout>
 					<GridLayout  rows="auto" columns="*,50">
 						<Label row="0" col="0" class="titre mt-20" text="Liste des défis" textAlignment="center" fontSize="30"/>
-						<Image row="0" col="1" v-if="$isCoordOrga" src="~/assets/icons/add-256.gif" @tap="addDefi"/>
+						<Image row="0" col="1" v-if="isCoordOrga" src="~/assets/icons/add-256.gif" @tap="addDefi"/>
 					</GridLayout>
 					<ListView key="$store.state.defis" for="item in defisCat" height="100%" >
 					  <v-template>

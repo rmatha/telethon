@@ -76,16 +76,17 @@
 			},
 			defiPresent() {			
 				
-				//console.log("on vérifie si le défi est présent");
-				//console.log("this.$store.state.selectedCommune :"+this.$store.state.selectedCommune);
-				//console.log("this.$store.state.selectedCategorie :"+JSON.stringify(this.$store.state.selectedCategorie ));
+				console.log("on vérifie si le défi est présent");
+				console.log("this.$store.state.selectedCommune :"+this.$store.state.selectedCommune);
+				console.log("this.$store.state.selectedDefi :"+JSON.stringify(this.$store.state.selectedDefi ));
 				var filterDefi = []
 				if (this.$store.state.selectedCommune) {
-					
-					filterDefi = this.$store.state.defiCommune.defis.filter(defi => {
-						//console.log("AFFICHAGEDEFI : DefiPrensent : defis : "+JSON.stringify(defi));
-						return defi == this.$store.state.selectedDefi;
-					});
+					if (this.$store.state.defiCommune) {
+						filterDefi = this.$store.state.defiCommune.defis.filter(defi => {
+							console.log("AFFICHAGEDEFI : DefiPrensent : defis : "+JSON.stringify(defi));
+							return defi == this.$store.state.selectedDefi;
+						});
+					}
 					//console.log("AFFICHAGEDEFI : DefiPrensent : terminée");
 				}
 				else {
@@ -99,10 +100,10 @@
 					}
 				}
 				if (filterDefi.length > 0) {
-					//console.log("le défi a été trouvé");
+					console.log("le défi a été trouvé");
 					return true;
 				}
-				//console.log("le défi n'a pas été trouvé");
+				console.log("le défi n'a pas été trouvé");
 				return false;
 				
 			},

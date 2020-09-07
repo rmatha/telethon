@@ -1,5 +1,5 @@
 <template>
-	<page class="page" actionBarHidden="true">
+	<page class="page" actionBarHidden="true" @tap="dismissSoftKeybaord">
 		<DockLayout stretchLastChild="true">
 			<Header dock="top" />
 			<Footer dock="bottom" />
@@ -20,7 +20,7 @@
 						
 					</StackLayout>
 					<StackLayout ~mainContent >
-						<StackLayout   width="100%" height="100%">  
+						<ScrollView orientation="horizontal"  @tap="dismissSoftKeybaord">
 							<Label row="0" col="1" class="titre" horizontalAlignment="center" text="Nouvelle equipe" textWrap="true" />
 							<StackLayout class="cadre" >
 								<GridLayout rows="70" columns="50,*">
@@ -29,7 +29,7 @@
 									
 								</GridLayout>
 								<Label class="label" text="Nom de l'équipe" />
-								<TextField class="textfield" hint="Ex : the killers..." v-model="input.nom"/>
+								<TextField class="textfield" hint="Ex : the killers..." v-model="input.nom" />
 								<Label ref="labelVille" class="label" text="Ville du challenge Téléthon"  />
 								<TextField class="textfield" ref="textFieldVille" @textChange="onTextChange" @blur="lostFocus" v-model="input.commune"/>
 								<ScrollView v-if="affichageVilles" height="500">
@@ -51,7 +51,7 @@
 								<Button text="Créer" horizontalAlignment="center" @tap="creerEquipe"/>
 							</StackLayout>
 							
-						</StackLayout>
+						</ScrollView>
 					</StackLayout>
 				</RadSideDrawer>
 			</StackLayout>
@@ -70,6 +70,9 @@
 	
 	import changeEquipeOld from "./changeEquipeOld";
 	import changeEquipeNew from "./changeEquipeNew";
+	import * as utils from "utils/utils";
+	import { isIOS, isAndroid } from "platform";
+	import * as frame from "ui/frame";
 	
     export default {
         mounted() {
@@ -99,6 +102,16 @@
         },
 	
         methods: { 
+			dismissSoftKeybaord() {
+				console.log("on veu fermer le clavier");
+				if (isIOS) {
+				  frame.topmost().nativeView.endEditing(true);
+				}
+				if (isAndroid) {
+				  utils.ad.dismissSoftInput();
+				}
+			},
+			
 			onNavigationButtonTap() {
 				Frame.topmost().goBack();
 			},

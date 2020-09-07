@@ -25,7 +25,7 @@
 							<Label row="0" col="0" class="m-b-20 titreTelethon" :text="sousTitreCommune" textWrap="true" />
 							<Image row="0" col="1" class="actionButton" src="~/assets/icons/save.png" @tap="uploadDefisCommune"/>
 							<Image row="0" col="2" src="~/assets/icons/add-256.gif" @tap="affichageCatCommune"/> 
-							<StackLayout row="1" col="0" colSpan="3" v-if="$store.state.defiCommune" >
+							<StackLayout row="1" col="0" colSpan="3" v-if="$store.state.defiCommune.defis" >
 								<ListView for="item in $store.state.defiCommune.defis" height="auto">
 								  <v-template>
 									<GridLayout rows="*" columns="*,50"  margin="0" @tap="getDefiCommune(item)">
@@ -78,8 +78,12 @@
 				.get('https://telethon2020.citeyen.com/api/commune/info', {params : params})
 				.then(response => {
 					//console.log("Version defis communes serveur :"+response.data.version); 
-					this.messages.push("MAJ des defis commune à  partir du serveur");
-					this.$store.dispatch("reloadDefisCommune",{"defis" : response.data.defis,"version" : response.data.version});
+					if (response.data.defis) {
+						this.$store.dispatch("reloadDefisCommune",{"defis" : response.data.defis,"version" : response.data.version});
+					}
+					else {
+						console.log("pas de défis sur la commune");
+					}
 				})
 				.catch(error => {
 					// reinitialisation des defis de la commune
@@ -108,6 +112,7 @@
 						console.log("on passe isCoordOrgan à true");
 					}
 				}
+				return isCoordOrgan;
 			},
 			
 			sousTitreCommune() {
