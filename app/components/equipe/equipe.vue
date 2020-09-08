@@ -45,7 +45,7 @@
 						</StackLayout>
 
 						
-						<StackLayout  v-if="$store.state.selectedEquipe">
+						<StackLayout  v-if="setParticpants()">
 							<GridLayout rows="auto" columns="*,50" >
 								<Label row="0" col="0" class="label" text="Liste des participants de l'équipe" textWrap="true" />
 								<Image row="0" col="1" src="~/assets/icons/addUser.png" @tap="addParticipant"/>
@@ -53,7 +53,7 @@
 							
 							
 						</StackLayout>
-						<FlexboxLayout v-if="$store.state.selectedEquipe" flexDirection="column">
+						<FlexboxLayout v-if="participantsActifs" flexDirection="column">
 							<GridLayout rows="40" columns="*" v-for="(participant, index) in participantsActifs" :key="index">
 						
 								<Label :text="libelleProfil(participant)" class="valeur" @tap="editParticipant(participant)"/>
@@ -169,6 +169,7 @@
 				return reponse;
 			},
 			participantsActifs() {
+				console.log("Recherche de la liste des participants");
 				if (this.$store.state.selectedEquipe.participants) {
 					return this.$store.state.selectedEquipe.participants.filter(participant => {
 						return !participant.delete;
@@ -188,6 +189,13 @@
         },
 		
         methods: {
+			setParticpants() {
+				if (this.$store.state.selectedEquipe) {
+					if(!this.$store.state.selectedEquipe.admin & !this.$store.state.selectedEquipe.organisateur) {
+						return true
+					}
+				}
+			},
 			onNavigationButtonTap() {
 				Frame.topmost().goBack();
 			},

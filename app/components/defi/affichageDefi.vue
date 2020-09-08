@@ -7,9 +7,9 @@
 				<ScrollView row="1" col="0" >
 					<StackLayout width="100%" height="100%">
 						<GridLayout rows="auto" columns="*,50,50" >
-							<Label row="0" col="0" :text="$store.state.selectedDefi ? $store.state.selectedDefi.defi.nom : 'Vide'" class="sousTitre"/>
+							<Label row="0" col="0" :text="$store.state.selectedDefi ? $store.state.selectedDefi.defi.nom : 'Vide'"  textWrap="true" class="titre" horizontalAlignment="center"/>
 							<Image v-if="$store.state.selectedEquipe.admin"  row="0" col="1" class="actionButton" src="~/assets/icons/delete.png" @tap="deleteDefi"/>
-							<Image row="0" col="2" class="actionButton" src="~/assets/icons/modify.png" @tap="modifyDefi"/>
+							<Image v-if="isCoordinateurOrOrganisateur" row="0" col="2" class="actionButton" src="~/assets/icons/modify.png" @tap="modifyDefi"/>
 						</GridLayout>
 						<Button class="boutonAction" v-if="detail" text="Cacher les détails du défi" @tap="changeDetailState"/>
 						<Button class="boutonAction" v-else text="Afficher les détails du défi" @tap="changeDetailState"/>
@@ -23,7 +23,7 @@
 							<Label class="label" text="Barême :"  />
 							<Label :text="$store.state.selectedDefi ? $store.state.selectedDefi.defi.bareme : 'Non renseigné'" class="defiDesc" textWrap="true"/>
 						</StackLayout>
-						<GridLayout v-if="$store.state.selectedEquipe" rows="auto" columns="*,50" >
+						<GridLayout v-if="$store.state.selectedEquipe & (!$store.state.selectedEquipe.admin & !$store.state.selectedEquipe.organisateur)" rows="auto" columns="*,50" >
 							<Label row="0" col="0" class="label m-b-20" text="Liste des scores :" textWrap="true" />
 							<Image row="0" col="1" v-if="defiPresent" src="~/assets/icons/add-256.gif" @tap="addScore"/>
 						</GridLayout>
@@ -61,6 +61,18 @@
 	
 	export default {
 		computed: {
+			isCoordinateurOrOrganisateur() {
+				var isCoordOrgan = false;
+				console.log("organisateur : "+this.$store.state.selectedEquipe.organisateur);
+				console.log("admin : "+this.$store.state.selectedEquipe.admin);
+				if (this.$store.state.selectedEquipe) {
+					if (this.$store.state.selectedEquipe.organisateur || this.$store.state.selectedEquipe.admin) {
+						isCoordOrgan = true;
+						console.log("on passe isCoordOrgan à true");
+					}
+				}
+				return isCoordOrgan;
+			},
 			
 			ajouterDefiLabel() {
 				if(this.$store.state.selectedCommune) {

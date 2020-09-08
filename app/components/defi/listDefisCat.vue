@@ -59,10 +59,12 @@
 	export default {
 		computed: {
 			defisCat () {
-				return this.$store.state.defis.filter(item => {
-					//console.log("ListDefiCat : defiCat :"+item.categorie.nom+" : "+this.$store.state.selectedCategorie.nom); 
-					return item.categorie.nom == this.$store.state.selectedCategorie.nom;
-				});
+				if (this.$store.state.selectedCategorie) {
+					return this.$store.state.defis.filter(item => {
+						//console.log("ListDefiCat : defiCat :"+item.categorie.nom+" : "+this.$store.state.selectedCategorie.nom); 
+						return item.categorie.nom == this.$store.state.selectedCategorie.nom;
+					});
+				}
 			}
 			
 			

@@ -26,6 +26,7 @@ TNSFontIcon.paths = {
 TNSFontIcon.loadCss();
 
 Vue.filter('fonticon', fonticon);
+
 Vue.registerElement('CheckBox', () => require('nativescript-checkbox').CheckBox);
 Vue.component('FloatLabel', FloatLabel);
 Vue.component('Footer',Footer);

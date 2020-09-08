@@ -31,7 +31,7 @@
 				return this.score.participant ? this.score.participant.nom : "Non défini";
 			},
 			defiNom() {
-				return "Defi : "+this.$store.state.selectedDefi.nom;
+				return "Defi : "+this.$store.state.selectedDefi.defi.nom;
 			},
 			
         },

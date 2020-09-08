@@ -68,17 +68,7 @@
 	
     export default {
         mounted() {
-			console.log("changeEquipe : mounted : type : "+this.type);
-			if (this.type == "new") {
-				this.nouvelleEquipe = true;
-				this.existanteEquipe = false;
-				console.log("changeEquipe : mounted : on veut creer une nouvelle équipe : "+this.nouvelleEquipe);
-			};
-			if (this.type == "search") {
-				this.existanteEquipe = true;
-				this.nouvelleEquipe = false;
-				console.log("changeEquipe : mounted : on veut récupérer une équipe : "+this.existanteEquipe);
-			};
+			
         },
 		computed: {	
 			isNouvelleEquipe() {
@@ -88,7 +78,6 @@
 				return this.existanteEquipe;
 			}
         },
-		props: ['type'],
 		data() {
             return {
 				input: {

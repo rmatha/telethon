@@ -18,7 +18,7 @@
 								<Image col="1" row="0" rowSpan="2" src="~/assets/icons/right.png" height="30px"/>
 							</GridLayout>
 						</FlexboxLayout>
-						<StackLayout v-if="showAjouterDefis == false">
+						<StackLayout v-if="showAjouterDefis">
 							<button v-if="!isCoordinateurOrOrganisateur" class="boutonAction recup" text="Ajouter les défis de ma ville" @tap="recupereDefis" />
 						</StackLayout>
 						<GridLayout v-if="isCoordinateurOrOrganisateur" rows="auto,*" columns="*,50,50">
@@ -66,11 +66,12 @@
 		
 		mounted() {
 			
+			console.log("mesDefis : mounted : defiEquipes ");
+			console.log(JSON.stringify(this.$store.state.selectedEquipe.defiEquipes));
 			console.log("mesDefis : mounted : selectedEquipe ");
 			console.log(JSON.stringify(this.$store.state.selectedEquipe));
 			console.log("mesDefis : mounted : defis  commune ");
 			console.log(JSON.stringify(this.$store.state.defiCommune));
-			this.showAjouterDefis = true;
 			if (this.$store.state.selectedEquipe) {
 				let params = {};
 				params["commune"] = this.$store.state.selectedEquipe.commune;
@@ -90,18 +91,24 @@
 					console.log("mesDefis : mounted : ERROR get defis commune : "+error);
 					this.$store.dispatch("reloadDefisCommune",{"defis" : null,"version" :"0"});
 					console.log("mesdefis : defis de la commune : "+this.$store.state.defiCommune);
-					this.showAjouterDefis = false;
-					console.log("showAjouterDefis : "+this.showAjouterDefis);
+					
 				});
 				
 			}
 		},
 		data() {
             return {
-				showAjouterDefis : true,
             };
         },
 		computed: {
+			showAjouterDefis() {
+				var temp = false;
+				if (this.$store.state.defiCommune) {
+					temp = true;
+				}
+				console.log("showAjouterDefis : "+temp);
+				return temp;
+			},
 			isCoordinateurOrOrganisateur() {
 				var isCoordOrgan = false;
 				console.log("organisateur : "+this.$store.state.selectedEquipe.organisateur);
@@ -150,7 +157,7 @@
 					//console.log("Equipe :"+JSON.stringify(this.$store.state.selectedEquipe));
 					//console.log("Participants :"+JSON.stringify(this.$store.state.participants));
 					axios
-						  .post('https://www.telethon.citeyen.com/public/api/equipes/uploadEquipe', {
+						  .post('https://www.telethon2020.citeyen.com/api/equipe/upload', {
 							Equipe : this.$store.state.selectedEquipe
 						  })
 						  .then(response => {
